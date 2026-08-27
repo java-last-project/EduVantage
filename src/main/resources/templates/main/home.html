@@ -2,30 +2,71 @@
 <html>
     <main class="container" style="max-width: 1200px; padding-bottom: 100px;">
     
-    <!-- 1. 최상단 타이틀 영역 (Hero) -->
-    <section class="hero-title-section">
-        <h1 class="hero-title">Title</h1>
-        <p class="hero-subtitle">Subtitle</p>
-    </section>
+    <!-- 1. 최상단 둥근 통합검색 영역 (검색 버튼 내부 삽입) -->
+	<section class="hero-title-section">
+		<div class="d-flex justify-content-center px-3">
+			<form action="/category/search" class="w-100" method="get" style="max-width: 600px;">
+				<div class="position-relative w-100" style="max-width: 600px;">
+					<input type="text" class="search-input-rounded" placeholder="검색어를 입력하세요...">
+					<button type="button" class="search-btn-inside" aria-label="검색">
+						<i class="fa-solid fa-magnifying-glass"></i>
+					</button>
+				</div>
+			</form>
+		</div>
+	</section>
 
-    <!-- 2. 대형 배너 영역 (2분할) -->
-    <section class="row g-4 mb-5 pb-4">
-        <div class="col-md-6">
-            <div class="img-placeholder rounded-3" style="height: 300px;">
-                <i class="fa-regular fa-image fa-3x"></i>
+    <!-- 2. 대형 슬라이더 배너 영역 (Bootstrap Carousel 적용) -->
+    <section class="mb-5 pb-4">
+        <div id="mainBannerCarousel" class="carousel carousel-dark slide rounded-3 overflow-hidden" data-bs-ride="carousel">
+            <!-- 하단 인디케이터 (버튼) -->
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#mainBannerCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#mainBannerCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#mainBannerCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="img-placeholder rounded-3" style="height: 300px;">
-                <i class="fa-regular fa-image fa-3x"></i>
+            
+            <!-- 슬라이드 아이템들 -->
+            <div class="carousel-inner">
+                <!-- 슬라이드 1 -->
+                <div class="carousel-item active" data-bs-interval="4000">
+                    <div class="img-placeholder" style="height: 350px; width: 100%;">
+                        <i class="fa-regular fa-image fa-3x"></i>
+                        <span class="ms-3 text-muted fw-bold">첫 번째 추천 강의/도서 배너</span>
+                    </div>
+                </div>
+                <!-- 슬라이드 2 -->
+                <div class="carousel-item" data-bs-interval="4000">
+                    <div class="img-placeholder" style="height: 350px; width: 100%;">
+                        <i class="fa-regular fa-image fa-3x"></i>
+                        <span class="ms-3 text-muted fw-bold">두 번째 추천 강의/도서 배너</span>
+                    </div>
+                </div>
+                <!-- 슬라이드 3 -->
+                <div class="carousel-item" data-bs-interval="4000">
+                    <div class="img-placeholder" style="height: 350px; width: 100%;">
+                        <i class="fa-regular fa-image fa-3x"></i>
+                        <span class="ms-3 text-muted fw-bold">세 번째 추천 강의/도서 배너</span>
+                    </div>
+                </div>
             </div>
+            
+            <!-- 좌우 이동 컨트롤 -->
+            <button class="carousel-control-prev" type="button" data-bs-target="#mainBannerCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">이전</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#mainBannerCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">다음</span>
+            </button>
         </div>
     </section>
 
     <!-- 3. 중단 가로형 리스트 영역 -->
     <section class="mb-5 pb-4">
         <div class="mb-3">
-            <h3 class="section-heading">Heading</h3>
+            <h3 class="section-heading">강의목록</h3>
             <p class="section-subheading">Subheading</p>
         </div>
 
@@ -69,7 +110,7 @@
     <!-- 4. 하단 세로형 그리드 영역 -->
     <section>
         <div class="mb-3">
-            <h3 class="section-heading">Heading</h3>
+            <h3 class="section-heading">시험</h3>
             <p class="section-subheading">Subheading</p>
         </div>
 
