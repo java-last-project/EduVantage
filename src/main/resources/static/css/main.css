@@ -7,7 +7,7 @@
     --main-hover: #1d4ed8; /* 마우스 올렸을 때 살짝 더 짙어지는 파란색 */
     
     /* 아래 배경 및 테두리 컬러는 기존과 동일하게 유지 */
-    --bg-body: #f8f9fc;
+    --bg-body: rgb(255, 255, 255);
     --bg-light-blue: #eff6ff; /* 배경도 보라빛을 빼고 옅은 파란색으로 수정 */
     --border-color: #e2e8f0;
     --border-hover: #cbd5e1;
@@ -21,6 +21,11 @@ body {
     color: var(--text-main);
     letter-spacing: -0.02em;
     margin: 0;
+    
+    /* 화면 높이를 최소 100%로 잡고 세로 방향 Flex 레이아웃 적용 */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 /* ==================== 버튼 & 배지 ==================== */
@@ -77,9 +82,56 @@ body {
 /* ==================== 레이아웃 ==================== */
 /* 헤더 */
 .header-flat {
-    border-bottom: 1px solid var(--border-color);
-    background-color: #ffffff;
+    border-bottom: none; /* 어두운 배경에 맞춰 기존 테두리 제거 */
+    background-color: #1c242b; /* 1.webp 이미지 배경색 반영 */
     padding: 12px 0;
+}
+
+/* 헤더 네비게이션 메뉴 호버 효과 */
+.header-nav-link {
+    transition: opacity 0.2s ease;
+}
+
+.header-nav-link:hover {
+    opacity: 0.7; /* 마우스를 올리면 투명해지면서 살짝 어두워지는 효과 */
+}
+
+.btn-light-custom, .btn-dark-custom{
+	transition: opacity 0.2s ease;
+}
+.btn-light-custom:hover, .btn-dark-custom:hover{
+	opacity: 0.7;
+}
+
+.footer-dark {
+    background-color: #1c242b;
+    padding: 40px 0;
+    border-top: none;
+    
+    /* 위쪽 여백을 최대로 확보하여 푸터를 항상 바닥으로 밀어냄 */
+    margin-top: auto; 
+}
+
+/* 푸터 내부 텍스트 톤다운 덮어쓰기 */
+.footer-dark h5 {
+    color: #e2e8f0 !important; /* 제목은 연한 회색으로 톤다운 */
+}
+
+.footer-dark .fs-custom-sm {
+    color: #94a3b8 !important; /* 본문은 조금 더 차분한 회색으로 톤다운 */
+}
+
+.footer-link {
+    text-decoration: none; /* 링크 밑줄 제거 */
+    color: inherit; /* 부모 요소(h5)의 톤다운된 텍스트 색상을 그대로 상속받음 */
+}
+
+/* 마우스 호버(올림) 및 클릭 시에도 색상 변경이나 밑줄이 생기지 않도록 강제 */
+.footer-link:hover,
+.footer-link:focus,
+.footer-link:active {
+    text-decoration: none;
+    color: inherit;
 }
 
 /* 2단 메인 레이아웃 (좌측 사이드바 + 우측 콘텐츠) */
@@ -114,6 +166,43 @@ body {
     color: var(--text-main);
 }
 .custom-checkbox input { margin-right: 8px; }
+
+/* ==================== 둥근 통합 검색창 (버튼 내부 삽입형) ==================== */
+.search-input-rounded {
+    width: 100%;
+    padding: 14px 20px;
+    padding-right: 50px; /* 우측에 들어갈 돋보기 버튼 공간 확보 */
+    border: 1px solid var(--border-color);
+    border-radius: 50px; /* 모서리를 둥근 캡슐 형태로 변경 */
+    font-size: 15px;
+    color: var(--text-main);
+    background-color: #ffffff;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-input-rounded:focus {
+    border-color: var(--main-color);
+}
+
+/* 입력창 내부 우측 돋보기 버튼 */
+.search-btn-inside {
+    position: absolute;
+    top: 50%;
+    right: 14px; /* 우측 여백 */
+    transform: translateY(-50%); /* 수직 중앙 정렬 */
+    background: none;
+    border: none;
+    color: var(--main-color);
+    font-size: 18px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.search-btn-inside:hover {
+    color: var(--main-hover);
+}
 
 /* ==================== 카드 ==================== */
 /* 강의 카드 (그림자 완전 제거, 얇은 테두리) */
