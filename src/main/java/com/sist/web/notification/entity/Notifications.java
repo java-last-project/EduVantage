@@ -17,7 +17,7 @@ public class Notifications {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private int no;
     @Column(name="member_id")
-    private Member member;
+    //private Member member;
     private String type;
     private String title;
     private String content;

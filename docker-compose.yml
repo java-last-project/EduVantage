@@ -32,7 +32,7 @@ services:
     image: provectuslabs/kafka-ui
     # 고민필요
     ports:
-      - "8080:8080"
+      - "8081:8081"
     environment:
       # 카프카 클러스터 이름
       KAFKA_CLUSTERS_0_NAME: local
@@ -40,4 +40,3 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
     depends_on:
       - kafka
-
