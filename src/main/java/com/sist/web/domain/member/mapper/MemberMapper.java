@@ -13,3 +13,4 @@ public interface MemberMapper {
 			+"WHERE username=#{username}")
 	public MemberVO memberInfoData(String username);
 }
+

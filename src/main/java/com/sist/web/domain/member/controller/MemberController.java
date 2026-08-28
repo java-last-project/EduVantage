@@ -15,4 +15,10 @@ public class MemberController {
 		 model.addAttribute("main_html", "member/login");
 		 return "main/main";
 	 }
+	 
+	 // 회원가입
+	 @RequestMapping("/member/join")
+	 public String member_join(Model mdoel) {
+		 return "main/main";
+	 }
 }
