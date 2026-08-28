@@ -10,11 +10,13 @@
 
             <div class="d-flex align-items-center gap-4">
                 <nav class="d-flex gap-4 fw-medium align-items-center" style="font-size: 15px;">
-                    <a href="#" class="text-decoration-none text-dark">강의</a>
-                    <a href="#" class="text-decoration-none text-dark">시험</a>
-                    <a href="#" class="text-decoration-none text-dark">도서</a>
-                    <a href="#" class="text-decoration-none text-dark">커뮤니티</a>
-                    <a href="#" class="text-decoration-none text-dark"></a>
+                   <!-- 각 a 태그에 header-nav-link 클래스 추가 -->
+                    <a href="#" class="text-decoration-none text-white header-nav-link">강의</a>
+                    <a href="#" class="text-decoration-none text-white header-nav-link">도서</a>
+                    <a href="#" class="text-decoration-none text-white header-nav-link">커뮤니티</a>
+                    <a sec:authorize="hasRole('USER')" href="#" class="text-decoration-none text-white header-nav-link">마이페이지</a>
+                    <a sec:authorize="hasRole('INSTRUCTOR')" href="#" class="text-decoration-none text-white header-nav-link">강사페이지</a>
+                    <a sec:authorize="hasRole('ADMIN')"  href="#" class="text-decoration-none text-white header-nav-link">관리자페이지</a>
                     
                     <a href="#" class="text-decoration-none text-white header-nav-link" style="font-size: 18px;" title="알림">
                         <i class="fa-regular fa-bell"></i>
@@ -25,13 +27,13 @@
                    <a sec:authorize="!isAuthenticated()" href="/member/login" class="text-decoration-none btn-light-custom">로그인</a>
                     <a href="#" class="text-decoration-none btn-dark-custom">회원가입</a>
 				   
-				    <span sec:authorize="hasRole('ADMIN')">
+				    <span sec:authorize="hasRole('ADMIN')" class="text-white">
 				        <strong th:text="${session.name}"></strong>(관리자)님
 				    </span>
-				    <span sec:authorize="hasRole('USER')">
+				    <span sec:authorize="hasRole('USER')" class="text-white">
 				        <strong th:text="${session.name}"></strong>(일반사용자)님
 				    </span>
-				    <span sec:authorize="hasRole('INSTRUCTOR')">
+				    <span sec:authorize="hasRole('INSTRUCTOR')" class="text-white">
 				        <strong th:text="${session.name}"></strong>(강사)님
 				    </span>
 				
