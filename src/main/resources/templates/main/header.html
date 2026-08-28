@@ -13,36 +13,33 @@
                     <a href="#" class="text-decoration-none text-white header-nav-link">시험</a>
                     <a href="#" class="text-decoration-none text-white header-nav-link">도서</a>
                     <a href="#" class="text-decoration-none text-white header-nav-link">커뮤니티</a>
+                    <a sec:authorize="hasRole('USER')" href="#" class="text-decoration-none text-white header-nav-link">마이페이지</a>
+                    <a sec:authorize="hasRole('INSTRUCTOR')" href="#" class="text-decoration-none text-white header-nav-link">강사페이지</a>
+                    <a sec:authorize="hasRole('ADMIN')"  href="#" class="text-decoration-none text-white header-nav-link">관리자페이지</a>
                     
                     <a href="#" class="text-decoration-none text-white header-nav-link" style="font-size: 18px;" title="알림">
                         <i class="fa-regular fa-bell"></i>
                     </a>
                 </nav>
-                <!-- 시큐리티 작성 전 임시 -->
-                <div class="d-flex">
-					<a href="#" class="text-decoration-none btn-light-custom">로그인</a>
-	    			<a href="#" class="text-decoration-none btn-dark-custom">회원가입</a>
-    			</div>
-               	<!--
-				<div class="d-flex gap-2 align-items-center">
-					<a sec:authorize="!isAuthenticated()" href="/member/login" class="text-decoration-none btn-light-custom">로그인</a>
-					<a href="#" class="text-decoration-none btn-dark-custom">회원가입</a>
+                
+                <div class="d-flex gap-2 align-items-center">
+                   <a sec:authorize="!isAuthenticated()" href="/member/login" class="text-decoration-none btn-light-custom">로그인</a>
+                    <a href="#" class="text-decoration-none btn-dark-custom">회원가입</a>
 				   
-				    <span sec:authorize="hasRole('ADMIN')">
-				        <strong th:text="${session.username}"></strong>(관리자)님
+				    <span sec:authorize="hasRole('ADMIN')" class="text-white">
+				        <strong th:text="${session.name}"></strong>(관리자)님
 				    </span>
-				    <span sec:authorize="hasRole('USER')">
-				        <strong th:text="${session.username}"></strong>(일반사용자)님
+				    <span sec:authorize="hasRole('USER')" class="text-white">
+				        <strong th:text="${session.name}"></strong>(일반사용자)님
 				    </span>
-				    <span sec:authorize="hasRole('MANAGER')">
-				        <strong th:text="${session.username}"></strong>(매니저)님
+				    <span sec:authorize="hasRole('INSTRUCTOR')" class="text-white">
+				        <strong th:text="${session.name}"></strong>(강사)님
 				    </span>
 				
 				    <a sec:authorize="isAuthenticated()" href="/member/logout" class="text-decoration-none btn-light-custom">로그아웃</a>
-				</div>
-				-->
-			</div>
-		</div>
-	</div>
+                </div>
+            </div>
+        </div>
+    </div>
 </header>
 </html>
