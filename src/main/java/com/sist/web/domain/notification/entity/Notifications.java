@@ -1,4 +1,4 @@
-package com.sist.web.notification.entity;
+package com.sist.web.domain.notification.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,13 +17,14 @@ public class Notifications {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private int no;
     @Column(name="member_id")
-    //private Member member;
+    private int memberId;
     private String type;
     private String title;
     private String content;
     private int related_id;
     private String event_key;
-    private String is_read = "N";
+    @Column(name="is_read")
+    private String isRead = "N";
 
     @Enumerated(EnumType.STRING)
     private SendStatus send_status = SendStatus.PENDING;

@@ -6,7 +6,8 @@ server:
     context-path: /
 
 spring:
-
+  config:
+    import: optional:file:.env[.properties]
   datasource:
     url: ${TEAMDB_URL}
     username: ${TEAMDB_USERNAME}

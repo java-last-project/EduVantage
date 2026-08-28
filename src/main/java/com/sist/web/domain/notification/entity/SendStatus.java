@@ -1,4 +1,4 @@
-package com.sist.web.notification.entity;
+package com.sist.web.domain.notification.entity;
 
 public enum SendStatus {
     PENDING,
