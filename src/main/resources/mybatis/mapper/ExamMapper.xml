@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.web.domain.exam.mapper.ExamMapper">
+	<select id="examListData" resultType="com.sist.web.domain.exam.vo.ExamQuestionVO" parameterType="hashmap">
+		SELECT *
+		FROM (
+		    SELECT q.no,q.title,o.option1,o.option2,o.option3,o.option4,q.type,q.score
+		    FROM EXAM_QUESTION q
+		    JOIN EXAM_OPTION o ON q.no=o.question_no
+			<where>
+				<if test="type != null and type != 0">
+					q.type=#{type}
+				</if>
+       		</where>
+		    ORDER BY DBMS_RANDOM.VALUE
+		)
+		WHERE ROWNUM &lt;=#{count}
+	</select>
+</mapper>

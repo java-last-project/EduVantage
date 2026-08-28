@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<div class="exam-layout">
+		<th:block th:include="exam/sidebar"></th:block>
+	
+		<main class="exam-main">
+			<header class="exam-header">
+				<h2 class="fs-4 fw-bold mb-0">정보처리기사 기출문제 모의고사 (20220424)</h2>
+			</header>
+	
+			<div class="exam-content">
+				<div class="flex-grow-1">     
+	                <!-- 타이머 및 제출 바 -->
+					<div class="exam-card d-flex justify-content-between align-items-center">
+						<div class="d-flex align-items-center gap-3">
+							<span class="badge" style="background-color: var(--bg-light-blue); color: var(--main-color);">시험 진행 중</span>
+							<h5 class="fw-bold mb-0">정보처리기사 모의고사</h5>
+						</div>
+						<div class="d-flex align-items-center gap-4 fw-medium">
+							<span class="text-muted"><i class="fa-regular fa-clock"></i> 경과시간: 00:15:23</span>
+							<span class="text-danger"><i class="fa-solid fa-stopwatch"></i> 남은시간: 00:44:37</span>
+							<button class="btn text-white px-4" style="background-color: var(--main-color);">제출하기</button>
+						</div>
+					</div>
+	                <!-- 객관식 문제 -->
+					<div class="exam-card">
+						<div class="d-flex justify-content-between mb-3">
+							<span class="badge bg-light text-secondary border">객관식</span>
+							<span class="fw-bold" style="color: var(--main-color);">문제 3 / 20</span>
+						</div>
+						<h5 class="fw-bold mb-4" style="line-height: 1.5;">React의 useEffect Hook에서 클린업(cleanup) 함수가 실행되는 올바른 시점은 언제인가요? 가장 올바른 설명을 고르세요.</h5>
+     
+						<div class="d-flex flex-column gap-2">
+							<label class="option-box">
+								<input type="radio" name="q3">
+								<span>① 컴포넌트가 처음 마운트(Mount)되어 렌더링이 완료된 직후</span>
+							</label>
+							<label class="option-box selected">
+								<input type="radio" name="q3" checked>
+								<span>② 다음 Effect가 실행되기 전과 컴포넌트가 언마운트(Unmount)될 때</span>
+							</label>
+							<label class="option-box">
+								<input type="radio" name="q3">
+								<span>③ 상태(State)가 변경되어 해당 컴포넌트가 강제로 리렌더링을 지시하기 직전</span>
+							</label>
+							<label class="option-box">
+								<input type="radio" name="q3">
+								<span>④ 의존성 배열(Dependency Array) 내의 값들이 전혀 변경되지 않았을 때</span>
+							</label>
+						</div>
+					</div>
+	                <!-- 주관식 문제 카드 -->
+					<div class="exam-card">
+						<div class="d-flex justify-content-between mb-3">
+							<span class="badge border" style="background-color: #fffbeb; color: #d97706; border-color: #fde68a;">주관식</span>
+							<span class="fw-bold" style="color: var(--main-color);">문제 4 / 20</span>
+						</div>
+						<h5 class="fw-bold mb-4" style="line-height: 1.5;">컴포넌트 리렌더링 시 연산량이 많은 함수의 반환 값을 재사용하기 위해 사용하는 React 내장 Hook의 이름을 입력하세요. (대소문자 정확히 기입)</h5>
+						<input type="text" class="form-control p-3" placeholder="정답을 입력하세요 (예: useMyHook)" style="border-radius: 8px;">
+					</div>
+				</div>
+					<!-- 우측: 답안 현황 (스크롤 시 고정됨) -->
+				<div class="omr-col">
+					<div class="exam-card">
+						<h6 class="fw-bold mb-1">답안 현황</h6>
+						<p class="text-muted mb-4" style="font-size: 13px;">문제를 클릭하면 해당 번호로 즉시 이동합니다.</p> 
+						<div class="omr-grid mb-4">
+							<div class="omr-btn solved">1</div>
+							<div class="omr-btn solved">2</div>
+							<div class="omr-btn current">3</div>
+							<div class="omr-btn">4</div>
+							<div class="omr-btn solved">5</div>
+							<div class="omr-btn solved">6</div>
+							<div class="omr-btn">7</div>
+						</div>
+	                    <!-- 범례 -->
+						<div class="d-flex flex-column gap-2 mb-4" style="font-size: 13px;">
+							<div class="d-flex align-items-center gap-2">
+								<div style="width: 14px; height: 14px; border-radius: 2px; background-color: var(--main-color);"></div> 풀이 완료 (8)
+							</div>
+							<div class="d-flex align-items-center gap-2">
+								<div style="width: 14px; height: 14px; border-radius: 2px; border: 2px solid var(--main-color); background-color: #fff;"></div> 현재 문제 (1)
+							</div>
+							<div class="d-flex align-items-center gap-2">
+								<div style="width: 14px; height: 14px; border-radius: 2px; background-color: var(--bg-body);"></div> 남은 문제 (11)
+							</div>
+						</div>
+	                    <!-- 진행률 바 -->
+						<div class="p-3 rounded" style="background-color: var(--bg-body);">
+							<div class="d-flex justify-content-between fw-bold mb-2">
+								<span style="font-size: 14px;">전체 진행률</span>
+								<span style="color: var(--main-color);">40%</span>
+							</div>
+							<div class="progress" style="height: 6px;">
+								<div class="progress-bar" role="progressbar" style="width: 40%; background-color: var(--main-color);" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+							</div>
+							<div class="text-end mt-2 text-muted" style="font-size: 12px;">풀이 완료: 8 / 20</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</html>
