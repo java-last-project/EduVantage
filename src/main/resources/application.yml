@@ -1,14 +1,11 @@
 # port => default : 8080
 # Spring => 데이터베이스 (Datasource)
 server:
+  port: 9090
   servlet: 
     context-path: /
+
 spring:
-  servlet:
-    multipart:
-      enabled: true
-      max-file-size: 100MB
-      max-request-size: 100MB
 
   datasource:
     url: ${TEAMDB_URL}
@@ -30,11 +27,10 @@ spring:
     encoding: UTF-8
     prefix: classpath:templates/
     suffix: .html
-    mode: HTML
-file:
-  upload_dir: C:\upload
+    mode: HTML	
+
 mybatis:
-  type-aliases-package: com.sist.web.vo
+  type-aliases-package: com.sist.web.domain
   mapper-locations: mybatis/mapper/*.xml
 # logging
 logging: 
