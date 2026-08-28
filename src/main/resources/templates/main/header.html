@@ -9,20 +9,32 @@
 
             <div class="d-flex align-items-center gap-4">
                 <nav class="d-flex gap-4 fw-medium align-items-center" style="font-size: 15px;">
-                    <a href="#" class="text-decoration-none text-dark">Home</a>
                     <a href="#" class="text-decoration-none text-dark">강의</a>
+                    <a href="#" class="text-decoration-none text-dark">시험</a>
                     <a href="#" class="text-decoration-none text-dark">도서</a>
                     <a href="#" class="text-decoration-none text-dark">커뮤니티</a>
-                    <a href="#" class="text-decoration-none text-dark">취업지원</a>
+                    <a href="#" class="text-decoration-none text-dark"></a>
                     
                     <a href="#" class="text-decoration-none text-dark" style="font-size: 18px;" title="알림">
                         <i class="fa-regular fa-bell"></i>
                     </a>
                 </nav>
                 
-                <div class="d-flex gap-2">
-                    <a href="#" class="text-decoration-none btn-light-custom">로그인</a>
+                <div class="d-flex gap-2 align-items-center">
+                   <a sec:authorize="!isAuthenticated()" href="/member/login" class="text-decoration-none btn-light-custom">로그인</a>
                     <a href="#" class="text-decoration-none btn-dark-custom">회원가입</a>
+				   
+				    <span sec:authorize="hasRole('ADMIN')">
+				        <strong th:text="${session.name}"></strong>(관리자)님
+				    </span>
+				    <span sec:authorize="hasRole('USER')">
+				        <strong th:text="${session.name}"></strong>(일반사용자)님
+				    </span>
+				    <span sec:authorize="hasRole('INSTRUCTOR')">
+				        <strong th:text="${session.name}"></strong>(강사)님
+				    </span>
+				
+				    <a sec:authorize="isAuthenticated()" href="/member/logout" class="text-decoration-none btn-light-custom">로그아웃</a>
                 </div>
             </div>
         </div>
