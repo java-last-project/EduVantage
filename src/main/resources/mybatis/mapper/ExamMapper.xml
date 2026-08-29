@@ -1,12 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sist.web.domain.exam.mapper.ExamMapper">
-	<select id="examListData" resultType="com.sist.web.domain.exam.vo.ExamQuestionVO" parameterType="hashmap">
+	<resultMap id="questionMap" type="com.sist.web.domain.exam.vo.ExamQuestionVO">
+		<id property="no" column="NO"/>
+		<result property="title" column="TITLE"/>
+		<result property="type" column="TYPE"/>
+		<result property="score" column="SCORE"/>
+
+		<association property="ovo" javaType="com.sist.web.domain.exam.vo.ExamOptionVO">
+			<id property="no" column="OPTION_NO"/>
+			<result property="option1" column="OPTION1"/>
+			<result property="option2" column="OPTION2"/>
+			<result property="option3" column="OPTION3"/>
+			<result property="option4" column="OPTION4"/>
+		</association>
+	</resultMap>
+
+	<select id="examListData" resultMap="questionMap" parameterType="hashmap">
 		SELECT *
 		FROM (
 		    SELECT q.no,q.title,o.option1,o.option2,o.option3,o.option4,q.type,q.score
 		    FROM EXAM_QUESTION q
-		    JOIN EXAM_OPTION o ON q.no=o.question_no
+		    LEFT JOIN EXAM_OPTION o ON q.no=o.question_no
 			<where>
 				<if test="type != null and type != 0">
 					q.type=#{type}

@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<script>
+    const SESSION_NAME=/*[[${session.name}*/ ''
+</script>
 	<div class="exam-layout">
 		<th:block th:include="exam/sidebar"></th:block>
 	
@@ -101,4 +104,22 @@
 			</div>
 		</main>
 	</div>
+<script src="/vue/axios.js"></script>
+<script src="/vue/exam/examStore.js"></script>
+<script>
+const {onMounted,ref,createApp}=Vue
+const {createPinia}=Pinia
+const examApp=createApp({
+    setup(){
+        const store=useExamStore()
+        onMounted(()=>{
+            store.username=SESSION_NAME
+            store.examDetailData()
+        })
+        return{
+            store
+        }
+    }
+})
+</script>
 </html>
