@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<style>
+	.layout{
+		display:flex;
+		flex:1;
+		background:#f5f6f8;
+	}
+
+	.main{
+		flex:1;
+		min-width:0;
+		padding:32px 40px;
+	}
+
+	.page-header{ margin-bottom:24px; }
+	.page-title{
+		font-size:26px;
+		font-weight:700;
+		margin:0 0 6px;
+		color:var(--text-main);
+	}
+	.page-desc{
+		font-size:14px;
+		color:var(--text-muted);
+		margin:0;
+	}
+
+	/* ===== 통계 카드 ===== */
+	.stat-grid{
+		display:grid;
+		grid-template-columns:repeat(3, 1fr);
+		gap:16px;
+		margin-bottom:24px;
+	}
+	.stat-card{
+		background:#ffffff;
+		border:1px solid var(--border-color);
+		border-radius:10px;
+		padding:20px 24px;
+		display:flex;
+		align-items:center;
+		gap:16px;
+	}
+	.stat-icon{
+		width:48px; height:48px;
+		border-radius:10px;
+		display:flex;
+		align-items:center;
+		justify-content:center;
+		font-size:18px;
+		flex-shrink:0;
+		color:#ffffff;
+	}
+	.stat-icon.member{ background:var(--main-color, #2563eb); }
+	.stat-icon.revenue{ background:#16a34a; }
+	.stat-icon.student{ background:#f59e0b; }
+
+	.stat-label{ font-size:13px; color:var(--text-muted); margin-bottom:4px; }
+	.stat-value{ font-size:22px; font-weight:700; color:var(--text-main); }
+
+	/* ===== Best 5 강의 카드 ===== */
+	.table-card{
+		background:#ffffff;
+		border:1px solid var(--border-color);
+		border-radius:10px;
+		overflow:hidden;
+	}
+	.table-card-header{
+		padding:20px 24px;
+		border-bottom:1px solid var(--border-color);
+	}
+	.table-card-title{
+		font-size:16px;
+		font-weight:700;
+		color:var(--text-main);
+		margin:0 0 2px;
+	}
+	.table-card-desc{
+		font-size:13px;
+		color:var(--text-muted);
+		margin:0;
+	}
+
+	.rank-list{ padding:8px 24px 20px; }
+	.rank-row{
+		display:flex;
+		align-items:center;
+		gap:16px;
+		padding:14px 0;
+		border-bottom:1px solid var(--border-color);
+	}
+	.rank-row:last-child{ border-bottom:none; }
+	.rank-num{
+		width:26px; height:26px;
+		border-radius:50%;
+		background:#f1f5f9;
+		color:var(--text-muted);
+		font-size:13px;
+		font-weight:700;
+		display:flex;
+		align-items:center;
+		justify-content:center;
+		flex-shrink:0;
+	}
+	.rank-row:nth-child(1) .rank-num{ background:var(--main-color, #2563eb); color:#fff; }
+	.rank-info{ flex:1; min-width:0; }
+	.rank-title{
+		font-size:14px;
+		font-weight:500;
+		color:var(--text-main);
+		margin-bottom:6px;
+		white-space:nowrap;
+		overflow:hidden;
+		text-overflow:ellipsis;
+	}
+	.rank-bar-track{
+		height:6px;
+		border-radius:3px;
+		background:#f1f5f9;
+		overflow:hidden;
+	}
+	.rank-bar-fill{
+		height:100%;
+		background:var(--main-color, #2563eb);
+		border-radius:3px;
+	}
+	.rank-count{
+		font-size:14px;
+		font-weight:600;
+		color:var(--text-main);
+		flex-shrink:0;
+		white-space:nowrap;
+	}
+
+	@media (max-width:900px){
+		.main{ padding:20px; }
+		.stat-grid{ grid-template-columns:1fr; }
+	}
+</style>
+
+<div class="layout">
+<!-- ================= Main ================= -->
+<main class="main">
+
+	<div class="page-header">
+		<h1 class="page-title">대시보드</h1>
+		<p class="page-desc">플랫폼 현황을 한눈에 확인합니다.</p>
+	</div>
+
+	<div class="stat-grid">
+		<div class="stat-card">
+			<div class="stat-icon member"><i class="fa-solid fa-users"></i></div>
+			<div>
+				<div class="stat-label">총 회원</div>
+				<div class="stat-value">78명</div>
+			</div>
+		</div>
+		<div class="stat-card">
+			<div class="stat-icon revenue"><i class="fa-solid fa-won-sign"></i></div>
+			<div>
+				<div class="stat-label">누적 매출</div>
+				<div class="stat-value">12,480,000원</div>
+			</div>
+		</div>
+		<div class="stat-card">
+			<div class="stat-icon student"><i class="fa-solid fa-graduation-cap"></i></div>
+			<div>
+				<div class="stat-label">총 수강생</div>
+				<div class="stat-value">231명</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="table-card">
+		<div class="table-card-header">
+			<h2 class="table-card-title">수강생 Best 5 강의</h2>
+			<p class="table-card-desc">수강생 수가 가장 많은 강의 순위입니다.</p>
+		</div>
+		<div class="rank-list" id="rank-list">
+			<!-- rows injected by JS -->
+		</div>
+	</div>
+
+</main>
+</div>
+
+<script>
+	const bestCourses = [
+		{ title:"스프링 부트로 배우는 백엔드 개발", students:64 },
+		{ title:"Vue3 + Pinia 실전 프론트엔드",       students:52 },
+		{ title:"오라클 DB 기초부터 실무까지",         students:41 },
+		{ title:"타입스크립트 실전 입문",              students:33 },
+		{ title:"파이썬 데이터 분석 기초",              students:27 },
+	];
+
+	const max = Math.max(...bestCourses.map(c => c.students));
+	const list = document.getElementById("rank-list");
+	list.innerHTML = bestCourses.map((c, i) => `
+		<div class="rank-row">
+			<div class="rank-num">${i + 1}</div>
+			<div class="rank-info">
+				<div class="rank-title">${c.title}</div>
+				<div class="rank-bar-track">
+					<div class="rank-bar-fill" style="width:${Math.round((c.students / max) * 100)}%"></div>
+				</div>
+			</div>
+			<div class="rank-count">${c.students}명</div>
+		</div>
+	`).join("");
+</script>
+
+</html>
