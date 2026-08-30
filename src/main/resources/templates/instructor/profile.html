@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<style>
+	.layout{
+		display:flex;
+		flex:1;
+		background:#f5f6f8;
+	}
+
+	.main{
+		flex:1;
+		min-width:0;
+		padding:32px 40px;
+	}
+
+	/* ===== 프로필 헤더 ===== */
+	.profile-header{
+		display:flex;
+		align-items:center;
+		gap:16px;
+		background:#ffffff;
+		border:1px solid var(--border-color);
+		border-radius:10px;
+		padding:24px;
+		margin-bottom:20px;
+	}
+	.profile-avatar{
+		width:60px; height:60px;
+		border-radius:50%;
+		background:var(--main-color, #2563eb);
+		color:#fff;
+		display:flex;
+		align-items:center;
+		justify-content:center;
+		font-size:22px;
+		font-weight:700;
+		flex-shrink:0;
+	}
+	.profile-info{ flex:1; min-width:0; }
+	.profile-name-row{
+		display:flex;
+		align-items:center;
+		gap:8px;
+		margin-bottom:4px;
+	}
+	.profile-name{
+		font-size:20px;
+		font-weight:700;
+		color:var(--text-main);
+		margin:0;
+	}
+	.role-tag{
+		display:inline-block;
+		padding:3px 8px;
+		border-radius:5px;
+		font-size:12px;
+		font-weight:600;
+		background:var(--bg-light-blue, #eff6ff);
+		color:var(--main-color, #2563eb);
+	}
+	.profile-meta{ font-size:13px; color:var(--text-muted); }
+
+	.btn-outline{
+		padding:9px 16px;
+		background:#ffffff;
+		border:1px solid var(--border-color);
+		border-radius:8px;
+		font-size:14px;
+		font-weight:500;
+		color:var(--text-main);
+		cursor:pointer;
+		white-space:nowrap;
+		flex-shrink:0;
+	}
+	.btn-outline:hover{ background:#f9fafb; }
+
+	/* ===== 소개 카드 ===== */
+	.bio-card{
+		background:#ffffff;
+		border:1px solid var(--border-color);
+		border-radius:10px;
+		padding:24px;
+	}
+	.bio-card h2{
+		font-size:16px;
+		font-weight:700;
+		color:var(--text-main);
+		margin:0 0 12px;
+	}
+	.bio-text{
+		font-size:14px;
+		color:var(--text-muted);
+		line-height:1.7;
+		margin:0;
+	}
+
+	@media (max-width:900px){
+		.main{ padding:20px; }
+		.profile-header{ flex-wrap:wrap; }
+	}
+</style>
+
+<div class="layout">
+<!-- ================= Main ================= -->
+<main class="main">
+
+	<div class="profile-header">
+		<div class="profile-avatar">김</div>
+		<div class="profile-info">
+			<div class="profile-name-row">
+				<h1 class="profile-name">김민지</h1>
+				<span class="role-tag">강의 제공자</span>
+			</div>
+			<div class="profile-meta">minji.kim@edutech.com &middot; 가입일 2025.11.20</div>
+		</div>
+		<button class="btn-outline">프로필 수정</button>
+	</div>
+
+	<div class="bio-card">
+		<h2>강사 소개</h2>
+		<p class="bio-text">
+			안녕하세요, 백엔드 개발과 데이터베이스 설계를 가르치는 강사 김민지입니다.
+			실무에서 겪은 경험을 바탕으로 처음 배우는 분들도 이해하기 쉽게 강의를 구성하고 있습니다.
+			궁금한 점은 언제든 QnA로 남겨주세요.
+		</p>
+	</div>
+
+</main>
+</div>
+
+</html>
