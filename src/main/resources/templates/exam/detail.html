@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<script>
-    const SESSION_NAME=/*[[${session.name}*/ ''
+<script th:inline="javascript">
+const SESSION_NAME = /*[[${session.name}]]*/ ''
+const EXAM_THEME = /*[[${theme}]]*/ 0
+const EXAM_COUNT = /*[[${count}]]*/ 20
 </script>
 	<div class="exam-layout">
 		<th:block th:include="exam/sidebar"></th:block>
 	
 		<main class="exam-main">
 			<header class="exam-header">
-				<h2 class="fs-4 fw-bold mb-0">정보처리기사 기출문제 모의고사 (20220424)</h2>
+				<h2 class="fs-4 fw-bold mb-0" v-text="store.theme===1?'정보처리기사 기출문제 모의고사':'정보보안기사 기출문제 모의고사'"></h2>
 			</header>
 	
 			<div class="exam-content">
@@ -18,7 +20,7 @@
 					<div class="exam-card d-flex justify-content-between align-items-center">
 						<div class="d-flex align-items-center gap-3">
 							<span class="badge" style="background-color: var(--bg-light-blue); color: var(--main-color);">시험 진행 중</span>
-							<h5 class="fw-bold mb-0">정보처리기사 모의고사</h5>
+							<h5 class="fw-bold mb-0" v-text="store.theme===1?'정보처리기사 기출문제 모의고사':'정보보안기사 기출문제 모의고사'"></h5>
 						</div>
 						<div class="d-flex align-items-center gap-4 fw-medium">
 							<span class="text-muted"><i class="fa-regular fa-clock"></i> 경과시간: 00:15:23</span>
@@ -27,78 +29,72 @@
 						</div>
 					</div>
 	                <!-- 객관식 문제 -->
-					<div class="exam-card">
+					<div v-for="(q,index) in store.list" :key="index" class="exam-card" :id="'q-box-'+index">
 						<div class="d-flex justify-content-between mb-3">
-							<span class="badge bg-light text-secondary border">객관식</span>
-							<span class="fw-bold" style="color: var(--main-color);">문제 3 / 20</span>
+							<span v-if="q.type === 1" class="badge bg-light text-secondary border">객관식</span>
+							<span v-else class="badge border" style="background-color: #fffbeb; color: #d97706; border-color: #fde68a;">주관식</span>
+							<span class="fw-bold" style="color: var(--main-color);">문제 {{index+1}} / {{store.list.length}}</span>
 						</div>
-						<h5 class="fw-bold mb-4" style="line-height: 1.5;">React의 useEffect Hook에서 클린업(cleanup) 함수가 실행되는 올바른 시점은 언제인가요? 가장 올바른 설명을 고르세요.</h5>
+						<h5 class="fw-bold mb-4" style="line-height: 1.5;">{{ q.title }}</h5>
      
-						<div class="d-flex flex-column gap-2">
-							<label class="option-box">
-								<input type="radio" name="q3">
-								<span>① 컴포넌트가 처음 마운트(Mount)되어 렌더링이 완료된 직후</span>
-							</label>
-							<label class="option-box selected">
-								<input type="radio" name="q3" checked>
-								<span>② 다음 Effect가 실행되기 전과 컴포넌트가 언마운트(Unmount)될 때</span>
-							</label>
-							<label class="option-box">
-								<input type="radio" name="q3">
-								<span>③ 상태(State)가 변경되어 해당 컴포넌트가 강제로 리렌더링을 지시하기 직전</span>
-							</label>
-							<label class="option-box">
-								<input type="radio" name="q3">
-								<span>④ 의존성 배열(Dependency Array) 내의 값들이 전혀 변경되지 않았을 때</span>
-							</label>
+						<div v-if="q.type === 1" class="d-flex flex-column gap-2">
+							<label class="option-box" :class="{selected: userAnswers[q.no]==='1'}">
+			                    <input type="radio" :name="'q_' + q.no" value="1" v-model="userAnswers[q.no]">
+			                    <span>① {{q.ovo?.option1}}</span>
+			                </label>
+			                <label class="option-box" :class="{selected: userAnswers[q.no]==='2'}">
+			                    <input type="radio" :name="'q_' + q.no" value="2" v-model="userAnswers[q.no]">
+			                    <span>② {{q.ovo?.option2}}</span>
+			                </label>
+			                <label class="option-box" :class="{selected: userAnswers[q.no]==='3'}">
+			                    <input type="radio" :name="'q_' + q.no" value="3" v-model="userAnswers[q.no]">
+			                    <span>③ {{q.ovo?.option3}}</span>
+			                </label>
+			                <label class="option-box" :class="{selected: userAnswers[q.no]==='4'}">
+			                    <input type="radio" :name="'q_' + q.no" value="4" v-model="userAnswers[q.no]">
+			                    <span>④ {{q.ovo?.option4}}</span>
+			                </label>
 						</div>
-					</div>
-	                <!-- 주관식 문제 카드 -->
-					<div class="exam-card">
-						<div class="d-flex justify-content-between mb-3">
-							<span class="badge border" style="background-color: #fffbeb; color: #d97706; border-color: #fde68a;">주관식</span>
-							<span class="fw-bold" style="color: var(--main-color);">문제 4 / 20</span>
+	                
+						<div v-else>
+							<input type="text" class="form-control p-3" placeholder="정답을 입력하세요" style="border-radius: 8px;" v-model="userAnswers[q.no]">
 						</div>
-						<h5 class="fw-bold mb-4" style="line-height: 1.5;">컴포넌트 리렌더링 시 연산량이 많은 함수의 반환 값을 재사용하기 위해 사용하는 React 내장 Hook의 이름을 입력하세요. (대소문자 정확히 기입)</h5>
-						<input type="text" class="form-control p-3" placeholder="정답을 입력하세요 (예: useMyHook)" style="border-radius: 8px;">
 					</div>
 				</div>
-					<!-- 우측: 답안 현황 (스크롤 시 고정됨) -->
-				<div class="omr-col">
+				<div class="omr-col" style="min-width: 300px;"> <!-- 패널 최소 가로 폭 확보 -->
 					<div class="exam-card">
 						<h6 class="fw-bold mb-1">답안 현황</h6>
 						<p class="text-muted mb-4" style="font-size: 13px;">문제를 클릭하면 해당 번호로 즉시 이동합니다.</p> 
-						<div class="omr-grid mb-4">
-							<div class="omr-btn solved">1</div>
-							<div class="omr-btn solved">2</div>
-							<div class="omr-btn current">3</div>
-							<div class="omr-btn">4</div>
-							<div class="omr-btn solved">5</div>
-							<div class="omr-btn solved">6</div>
-							<div class="omr-btn">7</div>
-						</div>
-	                    <!-- 범례 -->
-						<div class="d-flex flex-column gap-2 mb-4" style="font-size: 13px;">
-							<div class="d-flex align-items-center gap-2">
-								<div style="width: 14px; height: 14px; border-radius: 2px; background-color: var(--main-color);"></div> 풀이 완료 (8)
-							</div>
-							<div class="d-flex align-items-center gap-2">
-								<div style="width: 14px; height: 14px; border-radius: 2px; border: 2px solid var(--main-color); background-color: #fff;"></div> 현재 문제 (1)
-							</div>
-							<div class="d-flex align-items-center gap-2">
-								<div style="width: 14px; height: 14px; border-radius: 2px; background-color: var(--bg-body);"></div> 남은 문제 (11)
+						<div class="omr-grid mb-4" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
+							<div v-for="(q, index) in store.list" :key="'omr-' + q.no" class="omr-btn text-center py-2 border rounded" 
+				                :class="{ solved: userAnswers[q.no] }"
+				                @click="scrollToQuestion(index)"
+				                style="cursor: pointer;">
+								{{index+1}}
 							</div>
 						</div>
-	                    <!-- 진행률 바 -->
+				        
+						<div class="d-flex justify-content-around align-items-center mb-4 py-2 border-top border-bottom" style="font-size: 12px;">
+							<div class="d-flex align-items-center gap-1">
+								<div style="width: 12px; height: 12px; border-radius: 2px; background-color: var(--main-color);"></div> 풀이 완료
+							</div>
+							<div class="d-flex align-items-center gap-1">
+								<div style="width: 12px; height: 12px; border-radius: 2px; border: 2px solid var(--main-color); background-color: #fff;"></div> 현재 문제
+							</div>
+							<div class="d-flex align-items-center gap-1">
+								<div style="width: 12px; height: 12px; border-radius: 2px; background-color: var(--bg-body);"></div> 남은 문제
+							</div>
+						</div>
+				       
 						<div class="p-3 rounded" style="background-color: var(--bg-body);">
 							<div class="d-flex justify-content-between fw-bold mb-2">
 								<span style="font-size: 14px;">전체 진행률</span>
 								<span style="color: var(--main-color);">40%</span>
 							</div>
-							<div class="progress" style="height: 6px;">
+							<div class="progress mb-2" style="height: 6px;">
 								<div class="progress-bar" role="progressbar" style="width: 40%; background-color: var(--main-color);" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
 							</div>
-							<div class="text-end mt-2 text-muted" style="font-size: 12px;">풀이 완료: 8 / 20</div>
+							<div class="text-end text-muted" style="font-size: 12px;">풀이 완료: 8 / 20</div>
 						</div>
 					</div>
 				</div>
@@ -113,14 +109,26 @@ const {createPinia}=Pinia
 const examApp=createApp({
     setup(){
         const store=useExamStore()
+        const userAnswers=ref({})
+        const scrollToQuestion=(index)=>{
+			const target = document.getElementById('q-box-'+index)
+			if(target) {
+				target.scrollIntoView({behavior:'smooth', block:'center'})
+			}
+		}
         onMounted(()=>{
             store.username=SESSION_NAME
-            store.examDetailData()
+            const requestParams={theme:EXAM_THEME,count:EXAM_COUNT}
+            store.examDetailData(requestParams)
         })
         return{
-            store
+            store,
+            userAnswers,
+            scrollToQuestion
         }
     }
 })
+examApp.use(createPinia())
+examApp.mount('.exam-layout')
 </script>
 </html>

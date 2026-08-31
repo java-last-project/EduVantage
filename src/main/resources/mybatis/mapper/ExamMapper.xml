@@ -5,6 +5,7 @@
 		<id property="no" column="NO"/>
 		<result property="title" column="TITLE"/>
 		<result property="type" column="TYPE"/>
+		<result property="theme" column="THEME"/>
 		<result property="score" column="SCORE"/>
 
 		<association property="ovo" javaType="com.sist.web.domain.exam.vo.ExamOptionVO">
@@ -16,19 +17,49 @@
 		</association>
 	</resultMap>
 
-	<select id="examListData" resultMap="questionMap" parameterType="hashmap">
+	<select id="examDetailData" resultMap="questionMap" parameterType="hashmap">
 		SELECT *
 		FROM (
-		    SELECT q.no,q.title,o.option1,o.option2,o.option3,o.option4,q.type,q.score
+		    SELECT q.no,q.title,o.option1,o.option2,o.option3,o.option4,q.type,q.theme,q.score
 		    FROM EXAM_QUESTION q
 		    LEFT JOIN EXAM_OPTION o ON q.no=o.question_no
 			<where>
-				<if test="type != null and type != 0">
-					q.type=#{type}
+				<if test="theme!=null and theme!=0">
+					q.theme=#{theme}
 				</if>
        		</where>
 		    ORDER BY DBMS_RANDOM.VALUE
 		)
 		WHERE ROWNUM &lt;=#{count}
 	</select>
+	
+	<insert id="insertEnrollment" parameterType="com.sist.web.domain.exam.vo.ExamEnrollmentVO">
+	    INSERT INTO exam_enrollment
+	    <trim prefix="(" suffix=")" suffixOverrides=",">
+	        no,
+	        member_id,
+	        regdate,
+	        starttime,
+	        endtime,
+	        <if test="theme != null and theme != 0">
+	            theme,
+	        </if>
+	        <if test="exam_no != null and exam_no != 0">
+	            exam_no,
+	        </if>
+	    </trim>
+	    <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+	        exam_enrollment_no_seq.NEXTVAL,
+	        #{member_id},
+	        SYSDATE,
+	        #{starttime},
+	        #{endtime},
+	        <if test="theme != null and theme != 0">
+	            #{theme},
+	        </if>
+	        <if test="exam_no != null and exam_no != 0">
+	            #{exam_no},
+	        </if>
+	    </trim>
+	</insert>
 </mapper>
