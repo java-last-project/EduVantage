@@ -22,15 +22,17 @@ public class ExamRestController {
         Map<String,Object> map=new HashMap<>();
         try{
             int count=(Integer)params.get("count");
-            Integer type=0;
-            if(params.containsKey("type")){
-                type=(Integer)params.get("type");
+            Integer theme=0;
+            if(params.containsKey("theme")){
+                theme=(Integer)params.get("theme");
+                map.put("theme", theme);
             }
-            List<ExamQuestionVO> list=eService.examListData(type,count);
+            List<ExamQuestionVO> list=eService.examDetailData(theme,count);
+            map.put("count",count);
             map.put("list",list);
         }catch(Exception ex){
             ex.printStackTrace();
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
         return ResponseEntity.ok(map);
     }
