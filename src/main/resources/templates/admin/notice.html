@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<style>
+	:root{
+		--green-bg:#dcfce7; --green-text:#16a34a;
+		--red-bg:#fee2e2;   --red-text:#dc2626;
+		--yellow-bg:#fef9c3; --yellow-text:#a16207;
+		--radius:10px;
+	}
+
+	.layout{
+		display:flex;
+		flex:1;
+		background:#f5f6f8;
+	}
+
+	.main{
+		flex:1;
+		min-width:0;
+		padding:32px 40px;
+	}
+
+	/* ===== 헤더 영역 ===== */
+	.page-header{
+		display:flex;
+		justify-content:space-between;
+		align-items:flex-start;
+		margin-bottom:24px;
+		flex-wrap:wrap;
+		gap:12px;
+	}
+	.page-title{
+		font-size:26px;
+		font-weight:700;
+		margin:0 0 6px;
+		color:var(--text-main);
+	}
+	.page-desc{
+		font-size:14px;
+		color:var(--text-muted);
+		margin:0;
+	}
+	.btn-primary{
+		display:flex;
+		align-items:center;
+		gap:6px;
+		padding:10px 16px;
+		background:var(--main-color);
+		border:1px solid var(--main-color);
+		border-radius:8px;
+		font-size:14px;
+		font-weight:500;
+		color:#ffffff;
+		cursor:pointer;
+		white-space:nowrap;
+	}
+	.btn-primary:hover{ background:var(--main-hover); border-color:var(--main-hover); }
+
+	/* ===== 필터 영역 ===== */
+	.filters{
+		display:flex;
+		gap:12px;
+		margin-bottom:16px;
+		flex-wrap:wrap;
+	}
+	.select-box, .search-box{
+		display:flex;
+		align-items:center;
+		gap:8px;
+		padding:10px 14px;
+		background:#ffffff;
+		border:1px solid var(--border-color);
+		border-radius:8px;
+		font-size:14px;
+		color:var(--text-main);
+	}
+	.select-box{ cursor:pointer; white-space:nowrap; }
+	.select-box .muted{ color:var(--text-muted); }
+	.select-box i, .search-box i{
+		font-size:12px;
+		color:var(--text-muted);
+		flex-shrink:0;
+	}
+	.search-box{ flex:1; min-width:200px; }
+	.search-box input{
+		border:none;
+		outline:none;
+		font-size:14px;
+		flex:1;
+		background:transparent;
+		color:var(--text-main);
+	}
+	.search-box input::placeholder{ color:#9ca3af; }
+
+	/* ===== 테이블 ===== */
+	.table-card{
+		background:#ffffff;
+		border:1px solid var(--border-color);
+		border-radius:var(--radius);
+		overflow:hidden;
+	}
+	.table-card table{ width:100%; border-collapse:collapse; }
+	.table-card thead th{
+		text-align:left;
+		font-size:13px;
+		font-weight:600;
+		color:var(--text-muted);
+		padding:14px 20px;
+		border-bottom:1px solid var(--border-color);
+		background:#fafafa;
+	}
+	.table-card tbody td{
+		padding:16px 20px;
+		font-size:14px;
+		border-bottom:1px solid var(--border-color);
+		vertical-align:middle;
+	}
+	.table-card tbody tr:last-child td{ border-bottom:none; }
+	.table-card tbody tr:hover{ background:#fafafa; }
+
+	.notice-title-cell{ display:flex; align-items:center; gap:8px; }
+	.notice-title-text{ font-weight:500; color:var(--text-main); }
+	.tag-urgent{
+		display:inline-block;
+		padding:2px 6px;
+		border-radius:4px;
+		font-size:11px;
+		font-weight:700;
+		background:var(--red-bg, #fee2e2);
+		color:var(--red-text, #dc2626);
+		flex-shrink:0;
+	}
+	.author-text, .views-text, .date-text{ color:var(--text-muted); }
+
+	.badge{
+		display:inline-block;
+		padding:4px 10px;
+		border-radius:6px;
+		font-size:12px;
+		font-weight:600;
+	}
+	.badge-active{ background:var(--green-bg); color:var(--green-text); }
+	.badge-suspended{ background:var(--red-bg); color:var(--red-text); }
+	.badge-pending{ background:var(--yellow-bg); color:var(--yellow-text); }
+
+	.btn-detail{
+		padding:7px 14px;
+		background:#ffffff;
+		border:1px solid var(--border-color);
+		border-radius:6px;
+		font-size:13px;
+		color:var(--text-main);
+		cursor:pointer;
+	}
+	.btn-detail:hover{ background:#f3f4f6; }
+
+	/* ===== 페이지네이션 ===== */
+	.pagination{
+		display:flex;
+		align-items:center;
+		justify-content:space-between;
+		padding:16px 20px;
+		font-size:14px;
+		color:var(--text-muted);
+		flex-wrap:wrap;
+		gap:12px;
+	}
+	.pagination b{ color:var(--text-main); }
+	.page-controls{ display:flex; align-items:center; gap:4px; }
+	.page-btn{
+		width:32px; height:32px;
+		display:flex;
+		align-items:center;
+		justify-content:center;
+		border:1px solid var(--border-color);
+		background:#fff;
+		border-radius:6px;
+		font-size:13px;
+		color:var(--text-main);
+		cursor:pointer;
+	}
+	.page-btn:hover{ background:#f3f4f6; }
+	.page-btn.active{
+		background:var(--main-color);
+		border-color:var(--main-color);
+		color:#fff;
+	}
+	.page-btn.nav{ color:var(--text-muted); }
+
+	@media (max-width:900px){
+		.main{ padding:20px; }
+	}
+</style>
+
+<div class="layout">
+<!-- ================= Main ================= -->
+<main class="main">
+
+	<div class="page-header">
+		<div>
+			<h1 class="page-title">공지사항 관리</h1>
+			<p class="page-desc">플랫폼 공지사항을 등록하고 노출 상태를 관리합니다.</p>
+		</div>
+		<button class="btn-primary">
+			<i class="fa-solid fa-plus"></i>
+			새 공지 등록
+		</button>
+	</div>
+
+	<div class="filters">
+		<div class="select-box">
+			구분: <span class="muted">전체</span>
+			<i class="fa-solid fa-chevron-down"></i>
+		</div>
+		<div class="select-box">
+			상태: <span class="muted">전체 상태</span>
+			<i class="fa-solid fa-chevron-down"></i>
+		</div>
+		<div class="search-box">
+			<i class="fa-solid fa-magnifying-glass"></i>
+			<input type="text" placeholder="제목으로 검색...">
+		</div>
+	</div>
+
+	<div class="table-card">
+		<table>
+			<thead>
+				<tr>
+					<th style="width:60px;">No</th>
+					<th>제목</th>
+					<th>작성자</th>
+					<th>조회수</th>
+					<th>상태</th>
+					<th>등록일</th>
+					<th style="text-align:right;">관리</th>
+				</tr>
+			</thead>
+			<tbody id="notice-table-body">
+				<!-- rows injected by JS -->
+			</tbody>
+		</table>
+
+		<div class="pagination">
+			<div>전체 <b>21</b>건 중 <b>1-7</b> 표시</div>
+			<div class="page-controls">
+				<button class="page-btn nav"><i class="fa-solid fa-chevron-left"></i></button>
+				<button class="page-btn active">1</button>
+				<button class="page-btn">2</button>
+				<button class="page-btn">3</button>
+				<button class="page-btn nav"><i class="fa-solid fa-chevron-right"></i></button>
+			</div>
+		</div>
+	</div>
+
+</main>
+</div>
+
+<script>
+	const notices = [
+		{ no:1, title:"서버 점검 안내 (3/20 새벽 2시~4시)", urgent:true,  author:"김민지", views:1284, status:"게시중", date:"2024.03.15" },
+		{ no:2, title:"신규 강의 3종 오픈 이벤트",           urgent:false, author:"김민지", views:952,  status:"게시중", date:"2024.03.12" },
+		{ no:3, title:"이용약관 개정 안내",                   urgent:true,  author:"김민지", views:713,  status:"게시중", date:"2024.03.08" },
+		{ no:4, title:"봄맞이 수강료 할인 프로모션",           urgent:false, author:"김민지", views:1509, status:"게시중", date:"2024.03.02" },
+		{ no:5, title:"모바일 앱 업데이트 안내",               urgent:false, author:"김민지", views:341,  status:"숨김",   date:"2024.02.26" },
+		{ no:6, title:"개인정보처리방침 개정 사전 안내",       urgent:false, author:"김민지", views:288,  status:"게시중", date:"2024.02.20" },
+		{ no:7, title:"설 연휴 고객센터 운영시간 안내",         urgent:false, author:"김민지", views:604,  status:"숨김",   date:"2024.02.05" },
+	];
+
+	const statusMap = {
+		"게시중": "badge-active",
+		"숨김": "badge-pending",
+	};
+
+	const tbody = document.getElementById("notice-table-body");
+	tbody.innerHTML = notices.map(n => `
+		<tr>
+			<td>${n.no}</td>
+			<td>
+				<div class="notice-title-cell">
+					${n.urgent ? '<span class="tag-urgent">긴급</span>' : ''}
+					<span class="notice-title-text">${n.title}</span>
+				</div>
+			</td>
+			<td class="author-text">${n.author}</td>
+			<td class="views-text">${n.views.toLocaleString()}</td>
+			<td><span class="badge ${statusMap[n.status]}">${n.status}</span></td>
+			<td class="date-text">${n.date}</td>
+			<td style="text-align:right;">
+				<button class="btn-detail">상세보기</button>
+			</td>
+		</tr>
+	`).join("");
+</script>
+
+</html>
