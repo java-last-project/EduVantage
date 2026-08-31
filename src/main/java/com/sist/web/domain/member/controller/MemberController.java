@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 public class MemberController {
+	 // 로그인
 	 @RequestMapping("/member/login")
 	 public String member_login(Model model)
 	 {
@@ -18,7 +19,8 @@ public class MemberController {
 	 
 	 // 회원가입
 	 @RequestMapping("/member/join")
-	 public String member_join(Model mdoel) {
+	 public String member_join(Model model) {
+		 model.addAttribute("main_html", "member/join");
 		 return "main/main";
 	 }
 }
