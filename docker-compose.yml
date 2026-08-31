@@ -30,9 +30,8 @@ services:
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
   kafka-ui:
     image: provectuslabs/kafka-ui
-    # 고민필요
     ports:
-      - "8081:8081"
+      - "8080:8080"
     environment:
       # 카프카 클러스터 이름
       KAFKA_CLUSTERS_0_NAME: local
@@ -40,3 +39,20 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
     depends_on:
       - kafka
+
+  #벡터 DB
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: rag-pgvector
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sist1
+      POSTGRES_PASSWORD: happy
+      POSTGRES_DB: ragdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgvector-data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+volumes:
+  pgvector-data:
