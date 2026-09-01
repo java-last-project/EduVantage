@@ -344,3 +344,157 @@ body {
     background-color: var(--main-hover, #4338ca);
     border-color: var(--main-hover, #4338ca);
 }
+
+/* ==================== 시험(대시보드) 페이지 전용 레이아웃 ==================== */
+.exam-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--bg-body);
+}
+
+/* 좌측 사이드바 */
+.exam-sidebar {
+    width: 250px;
+    background-color: #1c242b; 
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+.exam-sidebar-logo {
+    padding: 24px;
+    font-size: 20px;
+    font-weight: 800;
+}
+.exam-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 16px;
+}
+.exam-nav-item {
+    padding: 12px 16px;
+    color: #94a3b8;
+    text-decoration: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    transition: background-color 0.2s, color 0.2s;
+}
+.exam-nav-item:hover, .exam-nav-item.active {
+    background-color: var(--main-color);
+    color: #ffffff;
+}
+.exam-profile {
+    margin-top: auto;
+    padding: 20px 24px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* 메인 콘텐츠 영역 */
+.exam-main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 상단 헤더 */
+.exam-header {
+    height: 70px;
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* 시험 본문 및 카드 */
+.exam-content {
+    padding: 40px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+.exam-card {
+    background-color: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 20px;
+}
+
+/* 문제 보기 라디오 박스 */
+.option-box {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+}
+.option-box:hover {
+    border-color: var(--border-hover);
+    background-color: var(--bg-body);
+}
+.option-box.selected {
+    border-color: var(--main-color);
+    background-color: var(--bg-light-blue);
+    color: var(--main-color);
+    font-weight: 600;
+}
+.option-box input[type="radio"] {
+    accent-color: var(--main-color);
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+/* 우측 OMR 답안 현황 */
+.omr-col {
+    width: 320px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 110px; /* 헤더 70px + 여백 40px */
+}
+.omr-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+.omr-btn {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-body);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.omr-btn.solved {
+    background-color: var(--main-color);
+    color: #ffffff;
+    border-color: var(--main-color);
+}
+.omr-btn.current {
+    border: 2px solid var(--main-color);
+    background-color: #ffffff;
+    color: var(--main-color);
+}
