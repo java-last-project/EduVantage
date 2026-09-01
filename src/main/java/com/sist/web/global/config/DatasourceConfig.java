@@ -13,9 +13,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import javax.sql.DataSource;
 
 /**
- * [WHAT] 데이터베이스를 두개 이상 쓰는 경우 자동연결 X -> 별도 설정 필요
+ * [WHAT] DB 연결정보 주입한 datasource 생성
+ * [WHY] 단일 DB인 경우: 자동생성됨
  */
-
 @Configuration
 public class DatasourceConfig {
     //기본: 메인 DB(오라클)
@@ -51,6 +51,5 @@ public class DatasourceConfig {
         return DataSourceBuilder.create().build();
     }
 
-    //벡터DB 전용 연산자(<==>) 사용을 위해 네이티브 SQL 생성 시 보조메서드??
-    //순수 벡터 전용 쿼리 실행 통로 ??
+    //필요할 경우: 벡터DB 전용 연산자(<==>) 사용을 위해 네이티브 SQL 생성 시 보조메서드
 }
