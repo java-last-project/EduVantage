@@ -31,7 +31,7 @@ spring:
 
 mybatis:
   type-aliases-package: com.sist.web.domain
-  mapper-locations: mybatis/mapper/*.xml
+  mapper-locations: classpath:mybatis/mapper/**/*.xml
 # logging
 logging: 
   level:
