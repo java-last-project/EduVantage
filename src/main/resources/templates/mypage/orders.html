@@ -5,6 +5,70 @@
 <title>Insert title here</title>
 </head>
 <body>
-<div style="background-color: green">orders</div>
+<div class="container-fluid p-3">
+
+  <!-- 탭 -->
+  <ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+      <a class="nav-link active fw-semibold" href="#">강의 구매목록 <span class="text-secondary">(3)</span></a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link text-secondary" href="#">도서 구매목록 <span class="text-secondary">(2)</span></a>
+    </li>
+  </ul>
+
+  <div class="card border">
+    <div class="card-body">
+
+		<div class="d-flex justify-content-between align-items-center mb-4">
+		  <div class="d-flex gap-2">
+		    <button class="btn btn-dark btn-sm rounded-pill px-3">전체</button>
+		    <button class="btn btn-outline-secondary btn-sm rounded-pill px-3">결제완료</button>
+		    <button class="btn btn-outline-secondary btn-sm rounded-pill px-3">환불완료</button>
+		  </div>
+		  <select class="form-select form-select-sm w-auto">
+		    <option>최근 6개월</option>
+		    <option>최근 3개월</option>
+		    <option>최근 1개월</option>
+		  </select>
+		</div>
+
+      <div class="border rounded-3 mb-3 overflow-hidden">
+
+        <div class="d-flex justify-content-between align-items-center bg-light px-3 py-2">
+          <div>
+            <span class="fw-bold small">2026.09.01</span>
+            <span class="text-secondary small ms-2">주문번호 123123123</span>
+          </div>
+          <span class="badge rounded-pill text-bg-light border">결제완료</span>
+        </div>
+
+        <!-- 주문 항목 반복 (th:each="item : ${order.items}") -->
+        <div class="d-flex align-items-center gap-3 px-3 py-3 border-top">
+          <div class="bg-light rounded-2 flex-shrink-0" style="width: 70px; height: 50px; overflow: hidden;">
+            <img src="" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+          </div>
+          <div class="flex-grow-1" style="min-width: 0">
+            <div class="fw-semibold text-truncate">수강명</div>
+            <div class="text-secondary small">강사</div>
+          </div>
+          <div class="fw-bold" style="min-width: 90px;">가격</div>
+          <a href="#" class="btn btn-dark btn-sm px-3 flex-shrink-0">수강하기</a>
+        </div>
+
+      </div>
+
+      <nav class="d-flex justify-content-center mt-4">
+        <ul class="pagination pagination-sm mb-0">
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+        </ul>
+      </nav>
+
+    </div>
+  </div>
+
+</div>
 </body>
 </html>
