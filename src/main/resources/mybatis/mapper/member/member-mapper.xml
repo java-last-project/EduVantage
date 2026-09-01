@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.web.domain.member.mapper.MemberMapper">
+	<!-- 회원가입 아이디 중복검사 -->
+	<select id="memberIdCheck" resultType="int" parameterType="string">
+		SELECT count(*)
+		FROM member
+		WHERE  username=#{username}
+	</select>
+	<!-- 새로 가입해서 DB에 데이터 추가 INSERT -->
+	<insert id="memberInsertData" parameterType="com.sist.web.domain.member.vo.MemberVO">
+	    INSERT INTO member (
+	    	member_id, username, password, name, sex, birthdate, 
+	    	phone, post, addr1, addr2, profile_desc
+	    ) 
+	    VALUES (
+	   	 	MEM_MID_SEQ.NEXTVAL, #{username}, #{password}, #{name}, #{sex}, 
+	    	TO_DATE(#{birthdate}, 'YYYYMMDD'), #{phone}, #{post}, #{addr1}, #{addr2}, #{profile_desc}
+	    )
+	</insert>
+	<insert id="memberAuthInsert" parameterType="string">
+	    INSERT INTO authority (no, member_id, authority) 
+	    VALUES (
+	        AUTH_ANO_SEQ.NEXTVAL, 
+	        (SELECT member_id FROM member WHERE username = #{username}), 'ROLE_USER'
+	    )
+	</insert>
+</mapper>
