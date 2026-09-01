@@ -63,7 +63,7 @@ const useMemberStore = defineStore('member', {
             }
             
             // 4. 검증 통과 시 서버로 데이터 전송 
-            alert("회원가입 데이터를 서버로 전송합니다!");
+            alert("회원가입이 완료되었습니다.");
             document.getElementById('joinForm').submit();
         },
 		
