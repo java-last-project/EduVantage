@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<style>
+	:root{
+		--green-bg:#dcfce7; --green-text:#16a34a;
+		--yellow-bg:#fef9c3; --yellow-text:#a16207;
+		--radius:10px;
+	}
+
+	.layout{
+		display:flex;
+		flex:1;
+		background:#f5f6f8;
+	}
+
+	.main{
+		flex:1;
+		min-width:0;
+		padding:32px 40px;
+	}
+
+	/* ===== 헤더 영역 ===== */
+	.page-header{ margin-bottom:24px; }
+	.page-title{
+		font-size:26px;
+		font-weight:700;
+		margin:0 0 6px;
+		color:var(--text-main);
+	}
+	.page-desc{
+		font-size:14px;
+		color:var(--text-muted);
+		margin:0;
+	}
+
+	/* ===== 필터 영역 ===== */
+	.filters{
+		display:flex;
+		gap:12px;
+		margin-bottom:16px;
+		flex-wrap:wrap;
+	}
+	.select-box, .search-box{
+		display:flex;
+		align-items:center;
+		gap:8px;
+		padding:10px 14px;
+		background:#ffffff;
+		border:1px solid var(--border-color);
+		border-radius:8px;
+		font-size:14px;
+		color:var(--text-main);
+	}
+	.select-box{ cursor:pointer; white-space:nowrap; }
+	.select-box .muted{ color:var(--text-muted); }
+	.select-box i, .search-box i{
+		font-size:12px;
+		color:var(--text-muted);
+		flex-shrink:0;
+	}
+	.search-box{ flex:1; min-width:200px; }
+	.search-box input{
+		border:none;
+		outline:none;
+		font-size:14px;
+		flex:1;
+		background:transparent;
+		color:var(--text-main);
+	}
+	.search-box input::placeholder{ color:#9ca3af; }
+
+	/* ===== 게시판 테이블 ===== */
+	.table-card{
+		background:#ffffff;
+		border:1px solid var(--border-color);
+		border-radius:var(--radius);
+		overflow:hidden;
+	}
+	.table-card table{ width:100%; border-collapse:collapse; }
+	.table-card thead th{
+		text-align:left;
+		font-size:13px;
+		font-weight:600;
+		color:var(--text-muted);
+		padding:14px 20px;
+		border-bottom:1px solid var(--border-color);
+		background:#fafafa;
+	}
+	.table-card tbody td{
+		padding:16px 20px;
+		font-size:14px;
+		border-bottom:1px solid var(--border-color);
+		vertical-align:middle;
+	}
+	.table-card tbody tr:last-child td{ border-bottom:none; }
+	.table-card tbody tr:hover{ background:#fafafa; }
+
+	.qna-title-text{
+		color:var(--text-main);
+		font-weight:500;
+		text-decoration:none;
+		cursor:pointer;
+	}
+	.qna-title-text:hover{ color:var(--main-color); text-decoration:underline; }
+	.course-tag{
+		display:inline-block;
+		padding:3px 8px;
+		border-radius:5px;
+		font-size:12px;
+		background:var(--bg-light-blue, #eff6ff);
+		color:var(--main-color, #2563eb);
+	}
+	.author-text, .date-text{ color:var(--text-muted); }
+
+	.badge{
+		display:inline-block;
+		padding:4px 10px;
+		border-radius:6px;
+		font-size:12px;
+		font-weight:600;
+	}
+	.badge-active{ background:var(--green-bg); color:var(--green-text); }
+	.badge-pending{ background:var(--yellow-bg); color:var(--yellow-text); }
+
+
+
+	/* ===== 페이지네이션 ===== */
+	.pagination{
+		display:flex;
+		align-items:center;
+		justify-content:space-between;
+		padding:16px 20px;
+		font-size:14px;
+		color:var(--text-muted);
+		flex-wrap:wrap;
+		gap:12px;
+	}
+	.pagination b{ color:var(--text-main); }
+	.page-controls{ display:flex; align-items:center; gap:4px; }
+	.page-btn{
+		width:32px; height:32px;
+		display:flex;
+		align-items:center;
+		justify-content:center;
+		border:1px solid var(--border-color);
+		background:#fff;
+		border-radius:6px;
+		font-size:13px;
+		color:var(--text-main);
+		cursor:pointer;
+	}
+	.page-btn:hover{ background:#f3f4f6; }
+	.page-btn.active{
+		background:var(--main-color);
+		border-color:var(--main-color);
+		color:#fff;
+	}
+	.page-btn.nav{ color:var(--text-muted); }
+
+	@media (max-width:900px){
+		.main{ padding:20px; }
+	}
+</style>
+
+<div class="layout">
+<!-- ================= Main ================= -->
+<main class="main">
+
+	<div class="page-header">
+		<h1 class="page-title">수강생 QnA</h1>
+		<p class="page-desc">내 강의에 달린 질문을 확인하고 답변 상태를 관리합니다.</p>
+	</div>
+
+	<div class="filters">
+		<div class="select-box">
+			강의: <span class="muted">전체</span>
+			<i class="fa-solid fa-chevron-down"></i>
+		</div>
+		<div class="select-box">
+			답변상태: <span class="muted">전체</span>
+			<i class="fa-solid fa-chevron-down"></i>
+		</div>
+		<div class="search-box">
+			<i class="fa-solid fa-magnifying-glass"></i>
+			<input type="text" placeholder="제목으로 검색...">
+		</div>
+	</div>
+
+	<div class="table-card">
+		<table>
+			<thead>
+				<tr>
+					<th style="width:60px;">No</th>
+					<th>제목</th>
+					<th>강의</th>
+					<th>작성자</th>
+					<th>답변상태</th>
+					<th>등록일</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>5</td>
+					<td><a href="#" class="qna-title-text">3주차 실습 코드에서 에러가 발생합니다</a></td>
+					<td><span class="course-tag">스프링 부트로 배우는 백엔드 개발</span></td>
+					<td class="author-text">최수빈</td>
+					<td><span class="badge badge-active">답변완료</span></td>
+					<td class="date-text">2024.03.15</td>
+				</tr>
+				<tr>
+					<td>4</td>
+					<td><a href="#" class="qna-title-text">과제 제출 기한을 연장할 수 있나요?</a></td>
+					<td><span class="course-tag">MyBatis로 배우는 매퍼 설계</span></td>
+					<td class="author-text">한소희</td>
+					<td><span class="badge badge-pending">답변대기</span></td>
+					<td class="date-text">2024.03.13</td>
+				</tr>
+				<tr>
+					<td>3</td>
+					<td><a href="#" class="qna-title-text">강의 자료 PDF는 어디서 다운로드하나요?</a></td>
+					<td><span class="course-tag">오라클 DB 기초부터 실무까지</span></td>
+					<td class="author-text">윤도현</td>
+					<td><span class="badge badge-active">답변완료</span></td>
+					<td class="date-text">2024.03.10</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td><a href="#" class="qna-title-text">실습 환경 세팅이 안 돼요 (Windows)</a></td>
+					<td><span class="course-tag">스프링 부트로 배우는 백엔드 개발</span></td>
+					<td class="author-text">박준형</td>
+					<td><span class="badge badge-pending">답변대기</span></td>
+					<td class="date-text">2024.03.08</td>
+				</tr>
+				<tr>
+					<td>1</td>
+					<td><a href="#" class="qna-title-text">수료 조건이 궁금합니다</a></td>
+					<td><span class="course-tag">MyBatis로 배우는 매퍼 설계</span></td>
+					<td class="author-text">김민수</td>
+					<td><span class="badge badge-active">답변완료</span></td>
+					<td class="date-text">2024.03.02</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<div class="pagination">
+			<div>전체 <b>5</b>건 중 <b>1-5</b> 표시</div>
+			<div class="page-controls">
+				<button class="page-btn nav"><i class="fa-solid fa-chevron-left"></i></button>
+				<button class="page-btn active">1</button>
+				<button class="page-btn nav"><i class="fa-solid fa-chevron-right"></i></button>
+			</div>
+		</div>
+	</div>
+
+</main>
+</div>
+
+</html>

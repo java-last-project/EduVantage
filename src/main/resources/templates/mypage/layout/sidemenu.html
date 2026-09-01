@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<div class="p-2">
+ 
+  <div class="card border p-2">
+    <div class="d-flex flex-column gap-1">
+ 
+      <a href="/mypage" class="d-flex align-items-center gap-2 rounded-3 px-3 py-2 text-decoration-none"
+         th:classappend="${active=='profile'} ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'">
+        <i class="bi bi-person fs-5 text-center" style="width: 20px;"></i>
+        <span>프로필</span>
+      </a>
+ 
+      <a href="/mypage/dashboard" class="d-flex align-items-center gap-2 rounded-3 px-3 py-2 text-decoration-none"
+         th:classappend="${active=='dashboard'} ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'">
+        <i class="bi bi-speedometer2 fs-5 text-center" style="width: 20px;"></i>
+        <span>대시보드</span>
+      </a>
+ 
+      <a href="/mypage/courses" class="d-flex align-items-center gap-2 rounded-3 px-3 py-2 text-decoration-none"
+         th:classappend="${active=='courses'} ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'">
+        <i class="bi bi-mortarboard fs-5 text-center" style="width: 20px;"></i>
+        <span>내 학습</span>
+      </a>
+ 
+      <hr class="my-1 text-secondary opacity-25">
+ 
+      <a href="/mypage/carts" class="d-flex align-items-center gap-2 rounded-3 px-3 py-2 text-decoration-none"
+         th:classappend="${active=='carts'} ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'">
+        <i class="bi bi-cart3 fs-5 text-center" style="width: 20px;"></i>
+        <span>장바구니</span>
+      </a>
+ 
+      <a href="/mypage/orders" class="d-flex align-items-center gap-2 rounded-3 px-3 py-2 text-decoration-none"
+         th:classappend="${active=='orders'} ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'">
+        <i class="bi bi-receipt fs-5 text-center" style="width: 20px;"></i>
+        <span>구매목록</span>
+      </a>
+ 
+    </div>
+  </div>
+ 
+</div>
+</body>
+</html>

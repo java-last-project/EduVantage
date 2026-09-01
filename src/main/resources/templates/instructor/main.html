@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<div class="layout">
+		<aside class="exam-sidebar">
+		<nav class="exam-nav">
+			<a href="/instructor/profile" class="exam-nav-item active"><i class="fa-solid fa-user"></i> 프로필</a>
+			<a href="/instructor/course" class="exam-nav-item"><i class="fa-solid fa-book-open"></i> 담당 강의 목록</a>
+			<a href="/instructor/qna" class="exam-nav-item"><i class="fa-solid fa-comment"></i> 수강생 QnA</a>
+		</nav>
+
+		<!-- 접속자 프로필 -->
+		<!-- <div class="exam-profile">
+			<div style="width: 40px; height: 40px; background: #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+				<i class="fa-solid fa-user text-white"></i>
+			</div>
+			<div>
+				<div class="fw-bold fs-6">김민지</div>
+				<div style="font-size: 12px; color: #94a3b8;">Lv.3 러너</div>
+			</div>
+		</div> -->
+	</aside>
+		
+		<!-- 메인 화면 -->
+		<!-- 본문 내용 삽입 영역 -->
+    	<th:block th:include="${instructor_html}"></th:block>
+	</div>
+</html>

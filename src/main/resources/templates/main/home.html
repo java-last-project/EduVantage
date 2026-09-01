@@ -110,47 +110,92 @@
     </section>
 
     <!-- 하단 세로형 그리드 영역 -->
-    <section>
-        <div class="mb-3">
-            <h3 class="section-heading">시험</h3>
-            <p class="section-subheading">Subheading</p>
-        </div>
-
-        <div class="row g-4">
-            <!-- 그리드 카드 1 -->
-            <div class="col-md-4">
-                <div class="card-vertical">
-                    <div class="img-placeholder">
-                        <i class="fa-regular fa-image fa-2x"></i>
-                    </div>
-                    <h5>Title</h5>
-                    <p>Body text for whatever you'd like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story.</p>
-                </div>
-            </div>
-            
-            <!-- 그리드 카드 2 -->
-            <div class="col-md-4">
-                <div class="card-vertical">
-                    <div class="img-placeholder">
-                        <i class="fa-regular fa-image fa-2x"></i>
-                    </div>
-                    <h5>Title</h5>
-                    <p>Body text for whatever you'd like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story.</p>
-                </div>
-            </div>
-
-            <!-- 그리드 카드 3 -->
-            <div class="col-md-4">
-                <div class="card-vertical">
-                    <div class="img-placeholder">
-                        <i class="fa-regular fa-image fa-2x"></i>
-                    </div>
-                    <h5>Title</h5>
-                    <p>Body text for whatever you'd like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+	<section>
+		<div class="mb-3">
+			<h3 class="section-heading">상시시험 바로가기</h3>
+	        <p class="section-subheading">원하는 과목과 문제 수를 선택하여 즉시 모의고사를 시작하세요.</p>
+		</div>
+	
+		<div class="row g-4">
+			<div class="col-md-4">
+				<div class="card-vertical shadow-sm border rounded-3 p-4 text-center h-100 d-flex flex-column justify-content-center" style="background-color: #fff;">
+					<div class="exam-front">
+						<div class="mb-3">
+							<i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
+						</div>
+						<h5 class="fw-bold mb-1">정보처리기사</h5>
+						<p class="text-muted small mb-4">상시시험</p>
+						<button type="button" class="btn text-white w-100 mt-auto fw-bold" style="background-color: var(--main-color, #0d6efd);" onclick="toggleExamOptions(this)">
+							응시하기
+						</button>
+					</div>
+	
+					<div class="exam-options d-none flex-column h-100 justify-content-center">
+						<h6 class="fw-bold mb-3 text-dark">문제 수를 선택하세요</h6>
+						<div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사',1, 20)">20제</button>
+							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사',1, 40)">40제</button>
+							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사',1, 60)">60제</button>
+							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사',1, 80)">80제</button>
+							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사',1, 100)">100제</button>
+						</div>
+						<button type="button" class="btn btn-light btn-sm text-muted mt-auto w-100" onclick="toggleExamOptions(this)">
+							<i class="fa-solid fa-arrow-left"></i> 뒤로
+						</button>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card-vertical shadow-sm border rounded-3 p-4 text-center h-100 d-flex flex-column justify-content-center" style="background-color: #fff;">
+					<div class="exam-front">
+						<div class="mb-3">
+							<i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
+						</div>
+						<h5 class="fw-bold mb-1">정보보안기사</h5>
+						<p class="text-muted small mb-4">상시시험</p>
+						<button type="button" class="btn text-white w-100 mt-auto fw-bold" style="background-color: var(--main-color, #0d6efd);" onclick="toggleExamOptions(this)">
+							응시하기
+						</button>
+					</div>
+	
+					<div class="exam-options d-none flex-column h-100 justify-content-center">
+						<h6 class="fw-bold mb-3 text-dark">문제 수를 선택하세요</h6>
+						<div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사',2, 20)">20제</button>
+							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사',2, 40)">40제</button>
+							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사',2, 60)">60제</button>
+							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사',2, 80)">80제</button>
+							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사',2, 100)">100제</button>
+						</div>
+						<button type="button" class="btn btn-light btn-sm text-muted mt-auto w-100" onclick="toggleExamOptions(this)">
+							<i class="fa-solid fa-arrow-left"></i> 뒤로
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
 
 </main>
+<script>
+function toggleExamOptions(button) {
+	const card = button.closest('.card-vertical')
+	const front = card.querySelector('.exam-front')
+	const options = card.querySelector('.exam-options')
+	front.classList.toggle('d-none')
+	options.classList.toggle('d-none')
+
+	if (!options.classList.contains('d-none')) {
+		options.style.display = 'flex'
+	} else {
+		options.style.display = ''
+	}
+}
+
+function startExam(subjectName,theme, count) {
+	if(confirm(`${subjectName} ${count}문제를 시작하시겠습니까?`)) {
+		location.href = `/exam/detail?theme=${theme}&count=${count}`
+	}
+}
+</script>
 </html>

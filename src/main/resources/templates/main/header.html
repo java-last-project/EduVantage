@@ -14,10 +14,10 @@
                     <a href="#" class="text-decoration-none text-white header-nav-link">도서</a>
                     <a href="#" class="text-decoration-none text-white header-nav-link">커뮤니티</a>
                     <a sec:authorize="hasRole('USER')" href="#" class="text-decoration-none text-white header-nav-link">마이페이지</a>
-                    <a sec:authorize="hasRole('INSTRUCTOR')" href="#" class="text-decoration-none text-white header-nav-link">강사페이지</a>
-                    <a sec:authorize="hasRole('ADMIN')"  href="#" class="text-decoration-none text-white header-nav-link">관리자페이지</a>
-                    
-                    <a href="#" class="text-decoration-none text-white header-nav-link" style="font-size: 18px;" title="알림">
+                    <a sec:authorize="hasRole('INSTRUCTOR')" href="/instructor/profile" class="text-decoration-none text-white header-nav-link">강사페이지</a>
+                    <a sec:authorize="hasRole('ADMIN')"  href="/admin/dashboard" class="text-decoration-none text-white header-nav-link">관리자페이지</a>
+
+                    <a href="#" class="text-decoration-none text-white" style="font-size: 18px" title="알림" data-bs-toggle="modal" data-bs-target="#notificationModal">
                         <i class="fa-regular fa-bell"></i>
                     </a>
                 </nav>

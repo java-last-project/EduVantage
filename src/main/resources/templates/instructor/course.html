@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<style>
+	.layout{
+		display:flex;
+		flex:1;
+		background:#f5f6f8;
+	}
+
+	.main{
+		flex:1;
+		min-width:0;
+		padding:32px 40px;
+	}
+
+	.page-header{
+		display:flex;
+		justify-content:space-between;
+		align-items:flex-start;
+		margin-bottom:24px;
+		flex-wrap:wrap;
+		gap:12px;
+	}
+	.page-title{
+		font-size:26px;
+		font-weight:700;
+		margin:0 0 6px;
+		color:var(--text-main);
+	}
+	.page-desc{
+		font-size:14px;
+		color:var(--text-muted);
+		margin:0;
+	}
+	.btn-primary{
+		display:flex;
+		align-items:center;
+		gap:6px;
+		padding:10px 16px;
+		background:var(--main-color);
+		border:1px solid var(--main-color);
+		border-radius:8px;
+		font-size:14px;
+		font-weight:500;
+		color:#ffffff;
+		cursor:pointer;
+		white-space:nowrap;
+	}
+	.btn-primary:hover{ background:var(--main-hover); border-color:var(--main-hover); }
+
+	/* card-horizontal 안의 버튼 줄 - main.css의 .card-horizontal / .img-placeholder는 그대로 재사용 */
+	.card-actions{ display:flex; gap:8px; }
+	.btn-sm-outline{
+		padding:6px 14px;
+		background:#ffffff;
+		border:1px solid var(--border-color);
+		border-radius:4px;
+		font-size:13px;
+		font-weight:500;
+		color:var(--text-main);
+		cursor:pointer;
+	}
+	.btn-sm-outline:hover{ background:#f3f4f6; }
+	.btn-sm-danger{
+		padding:6px 14px;
+		background:#ffffff;
+		border:1px solid var(--red-text, #dc2626);
+		border-radius:4px;
+		font-size:13px;
+		font-weight:500;
+		color:var(--red-text, #dc2626);
+		cursor:pointer;
+	}
+	.btn-sm-danger:hover{ background:#fee2e2; }
+
+	@media (max-width:900px){
+		.main{ padding:20px; }
+	}
+</style>
+
+<div class="layout">
+<!-- ================= Main ================= -->
+<main class="main">
+
+	<div class="page-header">
+		<div>
+			<h1 class="page-title">담당 강의 목록</h1>
+			<p class="page-desc">내가 개설한 강의를 관리하고 새 강의를 등록합니다.</p>
+		</div>
+		<button class="btn-primary">
+			<i class="fa-solid fa-plus"></i>
+			새 강의 등록
+		</button>
+	</div>
+
+	<div id="course-list">
+
+		<div class="card-horizontal">
+			<div class="img-placeholder">
+				<i class="fa-regular fa-image fa-2x"></i>
+			</div>
+			<div class="card-content">
+				<h5>스프링 부트로 배우는 백엔드 개발</h5>
+				<p>실무에서 바로 쓰는 스프링 부트 기초부터 REST API 설계까지 단계별로 다룹니다.</p>
+				<div class="card-actions">
+					<button class="btn-sm-outline">관리</button>
+					<button class="btn-sm-danger">삭제</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="card-horizontal">
+			<div class="img-placeholder">
+				<i class="fa-regular fa-image fa-2x"></i>
+			</div>
+			<div class="card-content">
+				<h5>MyBatis로 배우는 매퍼 설계</h5>
+				<p>XML 매퍼 작성법과 동적 SQL, 실무에서 자주 겪는 매핑 이슈 해결법을 정리했습니다.</p>
+				<div class="card-actions">
+					<button class="btn-sm-outline">관리</button>
+					<button class="btn-sm-danger">삭제</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="card-horizontal">
+			<div class="img-placeholder">
+				<i class="fa-regular fa-image fa-2x"></i>
+			</div>
+			<div class="card-content">
+				<h5>오라클 DB 기초부터 실무까지</h5>
+				<p>테이블 설계, 인덱스, 트랜잭션까지 실무 예제와 함께 차근차근 학습합니다.</p>
+				<div class="card-actions">
+					<button class="btn-sm-outline">관리</button>
+					<button class="btn-sm-danger">삭제</button>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+</main>
+</div>
+
+</html>

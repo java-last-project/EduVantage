@@ -11,7 +11,7 @@ import lombok.Data;
 //TYPE                 NUMBER      
 @Data
 public class ExamQuestionVO {
-	private int no,score,type;
+	private int no,score,type,theme;
 	private String title,image,answer,description;
 	private ExamOptionVO ovo;
 }
