@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+<div class="container" style="max-width: 1200px; padding-bottom: 100px;">
+  <div class="row mt-4">
+  	<div class="col-md-2">
+  	  <th:block th:include="mypage/layout/sidemenu"></th:block>
+  	</div>
+  	<div class="col-md-10">
+  	  <th:block th:include="${mypage_html}"></th:block>
+  	</div>
+  </div>
+</div>
+</body>
+</html>
