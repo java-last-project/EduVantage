@@ -1,12 +1,16 @@
-<!-- 회원가입 폼 전용 CSS -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>회원가입</title>
+<script src="//t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <style>
 .join-wrapper {
 	background-color: #f7f8fa;
 	display: flex;
 	justify-content: center;
 	padding: 60px 0;
-	font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI",
-		Roboto, sans-serif;
+	font-family: 'Pretendard', sans-serif;
 }
 
 .join-container {
@@ -18,7 +22,6 @@
 	box-sizing: border-box;
 }
 
-/* 헤더 영역 */
 .header-area {
 	text-align: center;
 	margin-bottom: 40px;
@@ -48,7 +51,6 @@
 	margin: 0;
 }
 
-/* 섹션 타이틀 */
 .section-title {
 	font-size: 16px;
 	font-weight: 800;
@@ -58,7 +60,6 @@
 	border-bottom: 1px solid #eee;
 }
 
-/* 입력 폼 공통 */
 .form-group {
 	margin-bottom: 20px;
 }
@@ -95,7 +96,6 @@
 	border-color: #5a5cff;
 }
 
-/* 혼합 레이아웃 (버튼 포함) */
 .input-with-btn {
 	display: flex;
 	gap: 10px;
@@ -121,7 +121,6 @@
 	background-color: #f9f9f9;
 }
 
-/* 라디오 버튼 (성별) */
 .radio-group {
 	display: flex;
 	gap: 20px;
@@ -164,7 +163,6 @@
 	border-radius: 50%;
 }
 
-/* 주소 및 텍스트에리어 */
 .address-group {
 	display: flex;
 	flex-direction: column;
@@ -176,7 +174,6 @@ textarea.form-control {
 	height: 100px;
 }
 
-/* 가입 완료 버튼 */
 .btn-submit {
 	width: 100%;
 	padding: 16px;
@@ -195,104 +192,107 @@ textarea.form-control {
 	background-color: #484ae6;
 }
 </style>
-
-<div class="join-wrapper">
-	<div class="join-container">
-		<div class="header-area">
-			<div class="system-badge">교육센터 평가 시스템</div>
-			<h2 class="join-title">회원가입</h2>
-			<p class="join-subtitle">평가 시스템 이용을 위해 계정을 생성해 주세요.</p>
+</head>
+<body>
+	<div id="app" class="join-wrapper">
+		<div class="join-container">
+			<div class="header-area">
+				<div class="system-badge">EduVantage 교육 센터</div>
+				<h2 class="join-title">회원가입</h2>
+				<p class="join-subtitle">평가 시스템 이용을 위해 계정을 생성해 주세요.</p>
+			</div>
+			<form id="joinForm" action="/member/join_process" method="post" @submit.prevent="store.submitForm">
+			    <div class="section-title">계정 정보</div>
+			
+			    <div class="form-group">
+			        <div class="form-label">아이디<span class="required">*</span></div>
+			        <div class="input-with-btn">
+			            <input type="text" name="username" v-model="store.formData.username" class="form-control" placeholder="아이디를 입력해 주세요 (영문, 숫자 5~20자)">
+			            <button type="button" class="btn-outline" @click="store.checkId">중복확인</button>
+			        </div>
+			    </div>
+			
+			    <div class="form-group">
+			        <div class="form-label">비밀번호<span class="required">*</span></div>
+			        <input type="password" name="password" v-model="store.formData.password" class="form-control" placeholder="비밀번호를 입력해 주세요 (숫자 포함 8자 이상)">
+			    </div>
+			
+			    <div class="form-group">
+			        <div class="form-label">비밀번호 확인<span class="required">*</span></div>
+			        <input type="password" name="passwordConfirm" v-model="store.formData.passwordConfirm" class="form-control" placeholder="위 입력한 비밀번호와 일치하게 입력">
+			    </div>
+			
+			    <div class="section-title">개인 정보</div>
+			
+			    <div class="form-group">
+			        <div class="form-label">이름<span class="required">*</span></div>
+			        <input type="text" name="name" v-model="store.formData.name" class="form-control" placeholder="성함을 입력해 주세요">
+			    </div>
+			
+			    <div class="form-group">
+			        <div class="form-label">생년월일<span class="required">*</span></div>
+			        <input type="text" name="birthdate" v-model="store.formData.birthdate" class="form-control" placeholder="YYYYMMDD (예: 19950815)">
+			    </div>
+			
+			    <div class="form-group">
+			        <label class="form-label">성별<span class="required">*</span></label>
+			        <div class="radio-group">
+			            <label class="radio-label">
+			                <input type="radio" name="sex" value="M" v-model="store.formData.sex"> 남자
+			            </label>
+			            <label class="radio-label">
+			                <input type="radio" name="sex" value="F" v-model="store.formData.sex"> 여자
+			            </label>
+			        </div>
+			    </div>
+			
+			    <div class="form-group">
+			        <div class="form-label">연락처<span class="required">*</span></div>
+			        <input type="text" name="phone" v-model="store.formData.phone" class="form-control" placeholder="'-' 없이 숫자만 입력해 주세요">
+			    </div>
+			
+			    <div class="section-title">추가 정보</div>
+			
+			    <div class="form-group">
+			        <div class="form-label">주소</div>
+			        <div class="address-group">
+			            <div class="input-with-btn" style="width: 50%;">
+			                <input type="text" name="post" v-model="store.formData.post" class="form-control" placeholder="우편번호" readonly>
+			                <button type="button" class="btn-outline" @click="store.openPostcode">우편번호 찾기</button>
+			            </div>
+			            <input type="text" name="addr1" v-model="store.formData.addr1" class="form-control" placeholder="기본 주소" readonly>
+			            <input type="text" id="address2" name="addr2" v-model="store.formData.addr2" class="form-control" placeholder="상세 주소 입력">
+			        </div>
+			    </div>
+			
+			    <div class="form-group">
+			        <div class="form-label">자기소개</div>
+			        <textarea name="profile_desc" v-model="store.formData.profile_desc" class="form-control" placeholder="간단한 본인 소개 및 학습 목적 등을 기술해 주세요."></textarea>
+			    </div>
+			
+			    <button type="submit" class="btn-submit">가입하기</button>
+			</form>
 		</div>
-
-		<form action="/member/join_process" method="post">
-
-			<!-- 1. 계정 정보 -->
-			<div class="section-title">계정 정보</div>
-
-			<div class="form-group">
-				<label class="form-label" for="userId">아이디<span
-					class="required">*</span></label>
-				<div class="input-with-btn">
-					<input type="text" id="userId" name="userId" class="form-control"
-						placeholder="아이디를 입력해 주세요 (영문, 숫자 5~20자)">
-					<button type="button" class="btn-outline">중복확인</button>
-				</div>
-			</div>
-
-			<div class="form-group">
-				<label class="form-label" for="userPwd">비밀번호<span
-					class="required">*</span></label> <input type="password" id="userPwd"
-					name="userPwd" class="form-control"
-					placeholder="비밀번호를 입력해 주세요 (숫자 포함 8자 이상)">
-			</div>
-
-			<div class="form-group">
-				<label class="form-label" for="userPwdConfirm">비밀번호 확인<span
-					class="required">*</span></label> <input type="password"
-					id="userPwdConfirm" class="form-control"
-					placeholder="비밀번호를 한번 더 입력해 주세요">
-			</div>
-
-			<!-- 2. 개인 정보 -->
-			<div class="section-title">개인 정보</div>
-
-			<div class="form-group">
-				<label class="form-label" for="userName">이름<span
-					class="required">*</span></label> <input type="text" id="userName"
-					name="userName" class="form-control" placeholder="성함을 입력해 주세요">
-			</div>
-
-			<div class="form-group">
-				<label class="form-label" for="birthDate">생년월일<span
-					class="required">*</span></label> <input type="text" id="birthDate"
-					name="birthDate" class="form-control"
-					placeholder="YYYYMMDD (예: 19950815)">
-			</div>
-
-			<div class="form-group">
-				<label class="form-label">성별<span class="required">*</span></label>
-				<div class="radio-group">
-					<label class="radio-label"> <input type="radio"
-						name="gender" value="M" checked> 남자
-					</label> <label class="radio-label"> <input type="radio"
-						name="gender" value="F"> 여자
-					</label>
-				</div>
-			</div>
-
-			<div class="form-group">
-				<label class="form-label" for="phone">연락처<span
-					class="required">*</span></label> <input type="text" id="phone"
-					name="phone" class="form-control" placeholder="'-' 없이 숫자만 입력해 주세요">
-			</div>
-
-			<!-- 3. 추가 정보 -->
-			<div class="section-title">추가 정보</div>
-
-			<div class="form-group">
-				<label class="form-label">주소</label>
-				<div class="address-group">
-					<div class="input-with-btn" style="width: 50%;">
-						<input type="text" id="zipcode" name="zipcode"
-							class="form-control" placeholder="우편번호" readonly>
-						<button type="button" class="btn-outline">우편번호 찾기</button>
-					</div>
-					<input type="text" id="address1" name="address1"
-						class="form-control" placeholder="기본 주소" readonly> <input
-						type="text" id="address2" name="address2" class="form-control"
-						placeholder="상세 주소 입력">
-				</div>
-			</div>
-
-			<div class="form-group">
-				<label class="form-label" for="introduce">자기소개</label>
-				<textarea id="introduce" name="introduce" class="form-control"
-					placeholder="간단한 본인 소개 및 학습 목적 등을 기술해 주세요."></textarea>
-			</div>
-
-			<!-- 제출 버튼 -->
-			<button type="submit" class="btn-submit">가입하기</button>
-
-		</form>
 	</div>
-</div>
+
+	<!-- store 파일 연결 -->
+	<script src="/vue/member/memberStore.js"></script>
+
+	<!-- Vue 인스턴스 생성 및 연결 -->
+	<script>
+    const { createApp } = Vue;
+    const { createPinia } = Pinia;
+
+    const app = createApp({
+        setup() {
+            // memberStore.js에 정의된 useMemberStore 호출
+            const store = useMemberStore(); 
+            return { store };
+        }
+    });
+    app.use(createPinia());
+    app.mount('#app');
+</script>
+
+</body>
+</html>
