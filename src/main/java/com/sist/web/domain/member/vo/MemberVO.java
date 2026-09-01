@@ -23,6 +23,6 @@ import java.util.*;
 public class MemberVO {
 	private int member_id, enabled;
 	private String username, password, name, sex, phone, post, addr1, addr2, email, 
-					profile_desc, profile_image, dbday;
-	private Date regdate, birthdate;
+					profile_desc, profile_image, birthdate, dbday;
+	private Date regdate;
 }
