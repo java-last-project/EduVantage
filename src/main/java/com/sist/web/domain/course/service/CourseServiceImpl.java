@@ -83,4 +83,22 @@ public class CourseServiceImpl implements CourseService {
 		return list;
 	}
 
+	@Override
+	public CourseVO courseDetail(int no) {
+		CourseVO vo=cMapper.courseDetail(no);
+		if (vo != null && vo.getTechList()!=null) {
+	        List<String> uniqueCategories = vo.getTechList().stream()
+	            .map(TechStackVO::getCategory)
+	            .filter(cat -> cat != null && !cat.isEmpty())
+	            .map(cat -> "Unclassified".equals(cat) ? "기타" : cat)
+	            .distinct()
+	            .collect(Collectors.toList());
+	        vo.setCategoryList(uniqueCategories);
+	    }
+		if (vo.getContent()!=null) {
+            vo.setContent(vo.getContent().replace("\r\n","<br>").replace("\n","<br>"));
+        }
+		return vo;
+	}
+
 }

@@ -12,6 +12,7 @@
     <result property="regular_price" column="regular_price"/>
     <result property="thumbnail" column="thumbnail"/>
     <result property="images" column="images"/>
+    <result property="content" column="content"/>
     
     <collection property="techList" ofType="com.sist.web.domain.course.vo.TechStackVO">
         <id property="no" column="tech_no"/>
@@ -46,7 +47,7 @@
 	            AND c.no IN (
 	                SELECT ctm.course_no 
 	                FROM course_tech_mapping ctm 
-	                JOIN tech_stack st ON ctm.tech_no = st.no 
+	                JOIN tech_stack st ON ctm.tech_no=st.no 
 	                WHERE st.category IN 
 	                <foreach item="category" collection="categories" open="(" separator="," close=")">
 	                    #{category}
@@ -67,9 +68,9 @@
 	        </choose>
 	        OFFSET #{start} ROWS FETCH NEXT 15 ROWS ONLY
 	    ) p_c
-	    JOIN member m ON p_c.instructor_no = m.member_id
-	    LEFT JOIN course_tech_mapping ctm ON p_c.no = ctm.course_no
-	    LEFT JOIN tech_stack t ON ctm.tech_no = t.no
+	    JOIN member m ON p_c.instructor_no=m.member_id
+	    LEFT JOIN course_tech_mapping ctm ON p_c.no=ctm.course_no
+	    LEFT JOIN tech_stack t ON ctm.tech_no=t.no
 		ORDER BY 
 		<choose>
 			<when test="column=='star'">p_c.star DESC, p_c.no DESC</when>
@@ -88,7 +89,7 @@
 	        AND c.no IN (
 	            SELECT ctm.course_no 
 	            FROM course_tech_mapping ctm 
-	            JOIN tech_stack st ON ctm.tech_no = st.no 
+	            JOIN tech_stack st ON ctm.tech_no=st.no 
 	            WHERE st.category IN 
 	            <foreach item="category" collection="categories" open="(" separator="," close=")">
 	                #{category}
@@ -109,6 +110,12 @@
 	</select>
 	
 	<select id="courseDetail" resultMap="courseResultMap" parameterType="int">
-		SELECT 
+		SELECT c.no, c.title, c.instructor_no, m.name AS instructor, c.star, c.student_count, c.pay_price, c.regular_price, 
+           c.thumbnail, c.images, c.content,t.no AS tech_no, t.tech AS tech_name, t.category
+    	FROM Course c
+    	LEFT JOIN member m ON c.instructor_no=m.member_id
+    	LEFT JOIN course_tech_mapping ctm ON c.no=ctm.course_no
+    	LEFT JOIN tech_stack t ON ctm.tech_no=t.no
+    	WHERE c.no=#{no}
 	</select>
 </mapper>

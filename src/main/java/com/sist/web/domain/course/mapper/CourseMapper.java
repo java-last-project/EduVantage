@@ -14,4 +14,5 @@ public interface CourseMapper {
 	public List<CourseVO> courseListData(Map<String,Object> map);
 	public int courseCount(Map<String,Object> map);
 	public List<TechStackVO> courseCategoryList();
+	public CourseVO courseDetail(int no);
 }

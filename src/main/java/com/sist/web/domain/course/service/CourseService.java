@@ -10,4 +10,5 @@ public interface CourseService {
 	public List<CourseVO> courseListData(int page,String column,String category,String fd);
 	public int[] coursePageData(int page,String category,String fd);
 	public List<TechStackVO> courseCategoryList();
+	public CourseVO courseDetail(int no);
 }
