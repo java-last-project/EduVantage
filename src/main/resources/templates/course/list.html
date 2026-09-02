@@ -16,7 +16,7 @@
 					<div style="font-size: 14px; font-weight: bold; color: #334155; margin-bottom: 12px;">카테고리</div>
 					<div class="form-check mb-2" v-for="(c,index) in store.catList" :key="index">
 						<input class="form-check-input" type="checkbox" :value="c.category" v-model="store.categories" @change="store.move(1)">
-						<label class="form-check-label text-secondary">{{c.category}}</label>
+						<label class="form-check-label text-secondary">{{c.category==='Unclassified'?'기타':c.category}}</label>
 					</div>
                 </div>
             </div>
@@ -37,34 +37,36 @@
             <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 mb-5">
                 
                 <div class="col" v-for="(vo,index) in store.cList" :key="index">
-                    <div class="card h-100 border rounded-4 overflow-hidden" style="transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
-                        <div class="position-relative" style="padding-top: 56.25%; background-color: #000;">
-                            <img :src="vo.thumbnail" class="position-absolute top-0 start-0 w-100 h-100" style="object-fit: cover;" alt="Thumbnail">
-                        </div>
-                        
-                        <div class="card-body p-4 d-flex flex-column">
-                            <h5 class="card-title fw-bold mb-2" style="font-size: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                                {{vo.title}}
-                            </h5>
-                            <p class="text-muted small mb-2">{{vo.instructor}}</p>
-                            
-							<div class="d-flex flex-wrap gap-1 mb-3">
-								<span v-for="(cat, index) in vo.categoryList" :key="index" class="badge rounded-pill bg-light text-secondary border fw-normal" style="font-size: 11px; padding: 5px 10px;">
-									{{cat}}
-								</span>
-							</div>
-
-                            <div class="d-flex align-items-center mb-3 small">
-                                <span class="text-warning fw-bold me-1"><i class="fa-solid fa-star"></i> {{vo.star}}</span>
-                                <span class="text-muted">{{vo.student_count}}명</span>
-                            </div>
-                            
-                            <div class="mt-auto d-flex align-items-baseline gap-2">
-                                <span style="color: #2563eb; font-weight: 800; font-size: 18px;">₩{{vo.pay_price}}</span>
-                                <span style="text-decoration: line-title; color: #94a3b8; font-size: 13px; text-decoration: line-through;">₩{{vo.regular_price}}</span>
-                            </div>
-                        </div>
-                    </div>
+                	<a :href="'/course/detail?no='+vo.no" class="text-decoration-none text-reset">
+	                    <div class="card h-100 border rounded-4 overflow-hidden" style="transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+	                        <div class="position-relative" style="padding-top: 56.25%; background-color: #000;">
+	                            <img :src="vo.thumbnail" class="position-absolute top-0 start-0 w-100 h-100" style="object-fit: cover;" alt="Thumbnail">
+	                        </div>
+	                        
+	                        <div class="card-body p-4 d-flex flex-column">
+	                            <h5 class="card-title fw-bold mb-2" style="font-size: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+	                                {{vo.title}}
+	                            </h5>
+	                            <p class="text-muted small mb-2">{{vo.instructor}}</p>
+	                            
+								<div class="d-flex flex-wrap gap-1 mb-3">
+									<span v-for="(cat, index) in vo.categoryList" :key="index" class="badge rounded-pill bg-light text-secondary border fw-normal" style="font-size: 11px; padding: 5px 10px;">
+										{{cat}}
+									</span>
+								</div>
+	
+	                            <div class="d-flex align-items-center mb-3 small">
+	                                <span class="text-warning fw-bold me-1"><i class="fa-solid fa-star"></i> {{vo.star}}</span>
+	                                <span class="text-muted">{{vo.student_count}}명</span>
+	                            </div>
+	                            
+	                            <div class="mt-auto d-flex align-items-baseline gap-2">
+	                                <span style="color: #2563eb; font-weight: 800; font-size: 18px;">₩{{vo.pay_price}}</span>
+	                                <span style="text-decoration: line-title; color: #94a3b8; font-size: 13px; text-decoration: line-through;">₩{{vo.regular_price}}</span>
+	                            </div>
+	                        </div>
+	                    </div>
+                    </a>
                 </div>
 
             </div>
