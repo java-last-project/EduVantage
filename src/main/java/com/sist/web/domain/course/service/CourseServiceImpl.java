@@ -75,11 +75,11 @@ public class CourseServiceImpl implements CourseService {
 	@Override
 	public List<TechStackVO> courseCategoryList() {
 		List<TechStackVO> list=cMapper.courseCategoryList();
-		for (TechStackVO vo : list) {
-	        if (vo.getCategory()!=null && "Unclassified".equals(vo.getCategory())) {
-	            vo.setCategory("기타");
-	        }
-	    }
+//		for (TechStackVO vo : list) {
+//	        if (vo.getCategory()!=null && "Unclassified".equals(vo.getCategory())) {
+//	            vo.setCategory("기타");
+//	        }
+//	    }
 		return list;
 	}
 

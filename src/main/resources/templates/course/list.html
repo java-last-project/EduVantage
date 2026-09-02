@@ -16,7 +16,7 @@
 					<div style="font-size: 14px; font-weight: bold; color: #334155; margin-bottom: 12px;">카테고리</div>
 					<div class="form-check mb-2" v-for="(c,index) in store.catList" :key="index">
 						<input class="form-check-input" type="checkbox" :value="c.category" v-model="store.categories" @change="store.move(1)">
-						<label class="form-check-label text-secondary">{{c.category}}</label>
+						<label class="form-check-label text-secondary">{{c.category==='Unclassified'?'기타':c.category}}</label>
 					</div>
                 </div>
             </div>
