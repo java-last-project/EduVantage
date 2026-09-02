@@ -17,8 +17,13 @@
                     <a sec:authorize="hasRole('INSTRUCTOR')" href="/instructor/profile" class="text-decoration-none text-white header-nav-link">강사페이지</a>
                     <a sec:authorize="hasRole('ADMIN')"  href="/admin/dashboard" class="text-decoration-none text-white header-nav-link">관리자페이지</a>
 
-                    <a href="#" class="text-decoration-none text-white" style="font-size: 18px" title="알림" data-bs-toggle="modal" data-bs-target="#notificationModal">
+                    <a sec:authorize="isAuthenticated()" class="position-relative text-decoration-none text-white" style="font-size: 18px" title="알림" data-bs-toggle="modal" data-bs-target="#notificationModal">
                         <i class="fa-regular fa-bell"></i>
+                        <!--새 알림용 뱃지-->
+                        <span id="notification-badge"
+                              class="position-absolute translate-middle p-1 rounded-circle"
+                              style="top:0;right:-10px;display:none;background-color: var(--main-color)">
+                        </span>
                     </a>
                 </nav>
                 
