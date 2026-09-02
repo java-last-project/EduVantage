@@ -49,20 +49,23 @@ spring:
   kafka:
     # 카프카 브로커 위치
     bootstrap-servers: localhost:29092
+    listener:
+      ack-mode: batch
     producer:
       # key 직렬화 방식: String으로 일관 적용
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       # value 직렬화 방식: Json으로 일관 적용
-      value-serializer: org.apache.kafka.common.serialization.JsonSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
     consumer:
       # 컨슈머별로 groupId 개별 저장 => groupId 기본값 설정
       group-id: notification-service
       # key/value 역직렬화 일관적용
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.JsonDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       # 역직렬화 허용 클래스 지정
       properties:
-        spring.json.trusted.packages: "com.sist.web.domain.notification.event"
+        spring.json.trusted.packages: "*"
       # 토픽에 쌓인 과거 메시지부터 다 읽음
       auto-offset-reset: earliest
 mybatis:

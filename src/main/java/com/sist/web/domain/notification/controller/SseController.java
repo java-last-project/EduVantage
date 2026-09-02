@@ -1,6 +1,7 @@
 package com.sist.web.domain.notification.controller;
 
 import com.sist.web.domain.member.mapper.MemberMapper;
+import com.sist.web.domain.notification.producer.CourseCompletedProducer;
 import com.sist.web.domain.notification.repository.EmitterRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,7 @@ import java.util.Map;
 public class SseController {
     private final MemberMapper memberMapper;
     private final EmitterRepository emitterRepository;
+    private final CourseCompletedProducer  courseCompletedProducer;
 
     /**
      * [WHAT] 클라이언트가 EventSource로 연결할 포인트
@@ -44,6 +46,7 @@ public class SseController {
         emitter.onError((e)->emitterRepository.deleteByMemberId(memberId));
 
         //테스트
+        /*
         try{
             emitter.send(SseEmitter.event()
                     .data(Map.of("title","테스트", "content","서버 연결이 완료됐습니다.")));
@@ -51,6 +54,9 @@ public class SseController {
         }catch (IOException e){
             emitterRepository.deleteByMemberId(memberId);
         }
+         */
+        courseCompletedProducer.publishCompletion(memberId, 2, "JAVA 기초");
+
         return emitter;
     }
 }
