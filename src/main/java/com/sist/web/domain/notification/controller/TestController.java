@@ -1,9 +1,11 @@
 package com.sist.web.domain.notification.controller;
 
+import com.sist.web.domain.vector.VectorDataLoader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,13 +19,12 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/test")
+@RequiredArgsConstructor
 public class TestController {
     @Qualifier("vectorDataSource")
     private final DataSource vectorDataSource;
+    private final VectorDataLoader vectorDataLoader;
 
-    public TestController(@Qualifier("vectorDataSource") DataSource vectorDataSource) {
-        this.vectorDataSource = vectorDataSource;
-    }
 
     @GetMapping
     public ResponseEntity<Map<String,Object>> testConnection(){
@@ -55,5 +56,11 @@ public class TestController {
             result.put("error", e.getMessage());
             return ResponseEntity.internalServerError().body(result);
         }
+    }
+
+    @GetMapping("/embedding-load")
+    public ResponseEntity<String> loadEmbedding(){
+        vectorDataLoader.loadAllCourse();
+        return ResponseEntity.ok("embedding-load complete");
     }
 }
