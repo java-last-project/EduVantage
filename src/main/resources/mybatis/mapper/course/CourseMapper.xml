@@ -12,6 +12,7 @@
     <result property="regular_price" column="regular_price"/>
     <result property="thumbnail" column="thumbnail"/>
     <result property="images" column="images"/>
+    <result property="content" column="content"/>
     
     <collection property="techList" ofType="com.sist.web.domain.course.vo.TechStackVO">
         <id property="no" column="tech_no"/>
@@ -19,6 +20,7 @@
         <result property="category" column="category"/>
     </collection>
 </resultMap>
+
 	<select id="courseMainList" resultType="com.sist.web.domain.course.vo.CourseVO">
 		SELECT *
 		FROM (
@@ -30,6 +32,7 @@
 		)
 		WHERE ROWNUM &lt;=10
 	</select>
+	
 	<select id="courseListData" resultMap="courseResultMap" parameterType="hashmap">
 		SELECT p_c.no, p_c.title, p_c.instructor_no, m.name AS instructor, 
 	           p_c.star, p_c.student_count, p_c.pay_price, p_c.regular_price, 
@@ -44,7 +47,7 @@
 	            AND c.no IN (
 	                SELECT ctm.course_no 
 	                FROM course_tech_mapping ctm 
-	                JOIN tech_stack st ON ctm.tech_no = st.no 
+	                JOIN tech_stack st ON ctm.tech_no=st.no 
 	                WHERE st.category IN 
 	                <foreach item="category" collection="categories" open="(" separator="," close=")">
 	                    #{category}
@@ -65,9 +68,9 @@
 	        </choose>
 	        OFFSET #{start} ROWS FETCH NEXT 15 ROWS ONLY
 	    ) p_c
-	    JOIN member m ON p_c.instructor_no = m.member_id
-	    LEFT JOIN course_tech_mapping ctm ON p_c.no = ctm.course_no
-	    LEFT JOIN tech_stack t ON ctm.tech_no = t.no
+	    JOIN member m ON p_c.instructor_no=m.member_id
+	    LEFT JOIN course_tech_mapping ctm ON p_c.no=ctm.course_no
+	    LEFT JOIN tech_stack t ON ctm.tech_no=t.no
 		ORDER BY 
 		<choose>
 			<when test="column=='star'">p_c.star DESC, p_c.no DESC</when>
@@ -76,6 +79,7 @@
 			<otherwise>p_c.no DESC</otherwise>
 		</choose>
 	</select>
+	
 	<select id="courseCount" resultType="int" parameterType="hashmap">
 		SELECT COUNT(*)
 	    FROM Course c
@@ -85,7 +89,7 @@
 	        AND c.no IN (
 	            SELECT ctm.course_no 
 	            FROM course_tech_mapping ctm 
-	            JOIN tech_stack st ON ctm.tech_no = st.no 
+	            JOIN tech_stack st ON ctm.tech_no=st.no 
 	            WHERE st.category IN 
 	            <foreach item="category" collection="categories" open="(" separator="," close=")">
 	                #{category}
@@ -98,9 +102,20 @@
 		</if>
 		
 	</select>
+	
 	<select id="courseCategoryList" resultType="com.sist.web.domain.course.vo.TechStackVO">
 		SELECT DISTINCT category
 		FROM tech_stack
 		ORDER BY category
+	</select>
+	
+	<select id="courseDetail" resultMap="courseResultMap" parameterType="int">
+		SELECT c.no, c.title, c.instructor_no, m.name AS instructor, c.star, c.student_count, c.pay_price, c.regular_price, 
+           c.thumbnail, c.images, c.content,t.no AS tech_no, t.tech AS tech_name, t.category
+    	FROM Course c
+    	LEFT JOIN member m ON c.instructor_no=m.member_id
+    	LEFT JOIN course_tech_mapping ctm ON c.no=ctm.course_no
+    	LEFT JOIN tech_stack t ON ctm.tech_no=t.no
+    	WHERE c.no=#{no}
 	</select>
 </mapper>
