@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style type="text/css">
+/* 리스트 래퍼 */
+.book-list-wrapper { 
+	max-width: 1200px; 
+	margin: 0 auto; 
+	padding: 40px 20px; 
+	font-family: 'Pretendard', sans-serif; 
+}
+
+/* 카테고리 탭 */
+.category-tabs { 
+	display: flex; 
+	flex-wrap: wrap; 
+	gap: 24px; 
+	border-bottom: 2px solid #f0f0f0; 
+	padding-bottom: 15px; 
+	margin-bottom: 20px; 
+	list-style: none; 
+	padding-left: 0; 
+}
+.category-tabs li { 
+	font-size: 16px; 
+	font-weight: 600; 
+	color: #888; 
+	cursor: pointer; 
+	transition: color 0.2s; 
+}
+.category-tabs li.active { 
+	color: #222; 
+	border-bottom: 2px solid #222; 
+	padding-bottom: 13px; 
+	margin-bottom: -15px; 
+}
+
+/* 정렬 옵션 */
+.sort-options { 
+	text-align: right; 
+	margin-bottom: 30px; 
+	font-size: 13px; 
+	color: #888; 
+}
+.sort-options span { 
+	cursor: pointer; 
+	margin: 0 8px; 
+}
+.sort-options span.active { 
+	font-weight: 700; 
+	color: #222; 
+}
+
+/* 도서 그리드 */
+.book-grid { 
+	display: grid; 
+	grid-template-columns: repeat(4, 1fr); 
+	gap: 24px;
+	 margin-bottom: 50px; 
+}
+.book-card { 
+	border: 1px solid #eee; 
+	border-radius: 8px; 
+	overflow: hidden; 
+	background: #fff; 
+	transition: box-shadow 0.2s; 
+	cursor: pointer; 
+}
+.book-card:hover { 
+	box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+}
+
+/* 도서 표지 이미지 영역 설정 */
+.book-image-wrapper { 
+	width: 100%; 
+	aspect-ratio: 1 / 1.4;
+	background: #f7f8fa; 
+ }
+.book-image-wrapper img { 
+	width: 100%; 
+	height: 100%; 
+	object-fit: cover; 
+}
+
+/* 도서 텍스트 정보 */
+.book-info { 
+	padding: 16px; 
+}
+.book-title { 
+	font-size: 16px; 
+	font-weight: 700; 
+	margin: 0 0 8px 0; 
+	color: #222; 
+	white-space: nowrap; 
+	overflow: hidden; 
+	text-overflow: ellipsis; 
+}
+.book-author { 
+	font-size: 13px; 
+	color: #666; 
+	margin: 0 0 16px 0; 
+}
+.book-meta { 
+	display: flex; 
+	gap: 12px; 
+	font-size: 12px; 
+	color: #999; 
+}
+
+/* 페이지네이션 */
+.pagination { 
+	display: flex; 
+	justify-content: center; 
+	gap: 8px; 
+}
+.pagination span { 
+	display: inline-flex; 
+	align-items: center; 
+	justify-content: center; 
+	width: 32px; 
+	height: 32px; 
+	border-radius: 4px; 
+	border: 1px solid #ddd; 
+	cursor: pointer; 
+	font-size: 14px; 
+}
+.pagination span.active { 
+	background: #555; 
+	color: #fff; 
+	border-color: #555; 
+}
+</style>
+
+</head>
+<body>
+ <!-- 정렬 옵션 -->
+    <div class="sort-options">
+        <span :class="{ active: store.sortOption === '출간일 순' }" 
+        @click="store.setSortOption('출간일 순')">출간일 순</span>|
+        <span :class="{ active: store.sortOption === '낮은 가격순' }" 
+        @click="store.setSortOption('낮은 가격순')">낮은 가격순</span>|
+        <span :class="{ active: store.sortOption === '높은 가격순' }" 
+        @click="store.setSortOption('높은 가격순')">높은 가격순</span>|
+        <span :class="{ active: store.sortOption === '조회 수 순' }" 
+        @click="store.setSortOption('조회 수 순')">조회 수 순</span>
+    </div>
+<div class="book-grid">
+    <div class="book-card" v-for="book in store.list" :key="book.book_id">
+        <div class="book-image-wrapper">
+            <img :src="book.poster" :alt="book.title">
+        </div>
+        <div class="book-info">
+            <h4 class="book-title">{{ vo.title }}</h4>
+            <p class="book-author">{{ vo.author }}</p>
+            <div class="book-meta">
+                <span>♡ {{ vo.like_count }}</span>
+                <span>👁 {{ vo.hit }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+<ul class="pagination">
+    <li v-if="store.startPage > 1">
+        <a class="a-link" @click="store.move(store.startPage - 1)">&laquo;</a>
+    </li>
+    <li v-for="(i, index) in store.range" :class="i === store.curpage ? 'active' : ''">
+        <a class="a-link" @click="store.move(i)">{{ i }}</a>
+    </li>
+    <li v-if="store.endPage < store.totalpage">
+        <a class="a-link" @click="store.move(store.endPage + 1)">&raquo;</a>
+    </li>
+</ul>
+
+<script>
+    const { createApp, onMounted } = Vue;
+    const { createPinia } = Pinia;
+    const bookApp = createApp({
+        setup() {
+            const store = useBookListStore();
+            onMounted(() => {
+                store.bookListData(); 
+            });
+            return { store };
+        }
+    });
+    bookApp.use(createPinia());
+    bookApp.mount("#app"); 
+</script>
+</body>
+</html>
