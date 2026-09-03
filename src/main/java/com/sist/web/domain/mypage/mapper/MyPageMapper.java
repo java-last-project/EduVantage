@@ -9,8 +9,8 @@ import java.util.*;
 @Mapper
 @Repository
 public interface MyPageMapper {
-	public List<CourseEnrollmentVO> mypageCourseListData(int member_id);
-	public List<CourseEnrollmentVO> lastAccessedCourse(int member_id);
+	public List<MyCourseEnrollmentVO> mypageCourseListData(int member_id);
+	public List<MyCourseEnrollmentVO> lastAccessedCourse(int member_id);
 	
 	@Select("SELECT COUNT(*) FROM course_enrollment "
 			+ "WHERE member_id=#{member_id} AND is_completed='N'")

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.sist.web.domain.mypage.vo.CourseEnrollmentVO;
+import com.sist.web.domain.mypage.vo.MyCourseEnrollmentVO;
 import com.sist.web.domain.mypage.vo.MyMemberVO;
 import com.sist.web.domain.mypage.mapper.*;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 public class MyPageServiceImpl implements MyPageService {
 	private final MyPageMapper mMapper;
 	@Override
-	public List<CourseEnrollmentVO> mypageCourseListData(int member_id) {
+	public List<MyCourseEnrollmentVO> mypageCourseListData(int member_id) {
 		// TODO Auto-generated method stub
 		return mMapper.mypageCourseListData(member_id);
 	}
@@ -24,7 +24,7 @@ public class MyPageServiceImpl implements MyPageService {
 		return mMapper.enrolledCount(member_id);
 	}
 	@Override
-	public List<CourseEnrollmentVO> lastAccessedCourse(int member_id) {
+	public List<MyCourseEnrollmentVO> lastAccessedCourse(int member_id) {
 		// TODO Auto-generated method stub
 		return mMapper.lastAccessedCourse(member_id);
 	}

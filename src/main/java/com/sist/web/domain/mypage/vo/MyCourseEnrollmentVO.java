@@ -11,7 +11,7 @@ PROGRESS              NUMBER(3)
 REGDATE               DATE
  */
 @Data
-public class CourseEnrollmentVO {
+public class MyCourseEnrollmentVO {
 	private int no,member_id,course_no,progress;
 	private String is_completed,dbday;
 	private Date regdate,last_accessed;

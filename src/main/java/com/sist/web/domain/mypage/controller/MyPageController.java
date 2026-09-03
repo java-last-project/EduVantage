@@ -7,7 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.sist.web.domain.mypage.service.MyPageService;
-import com.sist.web.domain.mypage.vo.CourseEnrollmentVO;
+import com.sist.web.domain.mypage.vo.MyCourseEnrollmentVO;
 import com.sist.web.domain.mypage.vo.MyMemberVO;
 
 import jakarta.servlet.http.HttpSession;
@@ -34,7 +34,7 @@ public class MyPageController {
 	@GetMapping("/mypage/dashboard")
 	public String mypage_dashboard(Model model) {
 		int member_id=3;
-		List<CourseEnrollmentVO> list=mService.lastAccessedCourse(member_id);
+		List<MyCourseEnrollmentVO> list=mService.lastAccessedCourse(member_id);
 		model.addAttribute("cLastList",list);
 		model.addAttribute("active","dashboard");
 		model.addAttribute("main_html","mypage/layout/main");
@@ -46,7 +46,7 @@ public class MyPageController {
 	public String mypage_course(Model model, HttpSession session) {
 		//int member_id=(int)session.getAttribute("id");
 		int member_id=3;
-		List<CourseEnrollmentVO> list=mService.mypageCourseListData(member_id);
+		List<MyCourseEnrollmentVO> list=mService.mypageCourseListData(member_id);
 		//System.out.println(list);
 		model.addAttribute("cList",list);
 		model.addAttribute("active","courses");
