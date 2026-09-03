@@ -159,7 +159,8 @@
 
 .price-value {
     flex: 1;
-    text-align: center;
+    text-align: right; 
+    padding-right: 30px; 
     color: #111;
 }
 
