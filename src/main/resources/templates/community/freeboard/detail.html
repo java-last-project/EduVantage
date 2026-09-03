@@ -1,6 +1,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <script th:inline="javascript">
 const SESSION_NAME=/*[[${session.name}]]*/ ''
+const SESSION_ID=/*[[${session.member_id}]]*/ ''
+const board_no = /*[[${vo.no}]]*/ 0
 </script>
 <main class="container py-5" style="max-width: 1000px;">
     
@@ -27,7 +29,7 @@ const SESSION_NAME=/*[[${session.name}]]*/ ''
         <div class="p-4 p-md-5 detail-content-area" th:utext="${vo.content}"></div>
 
         <div class="bg-light p-4 p-md-5 border-top" id="commentApp">
-		    <h5 class="fw-bold mb-4" style="color: #1e293b;">댓글 <span class="text-danger">{{ totalCount }}</span></h5>
+		    <h5 class="fw-bold mb-4" style="color: #1e293b;">댓글 <span class="text-danger">{{ store.count }}</span></h5>
 		    
 		    <div class="mb-5 bg-white p-3 rounded-3 border">
 		        <!-- 로그인 됨 -->
@@ -50,10 +52,10 @@ const SESSION_NAME=/*[[${session.name}]]*/ ''
 			</div>
 		
 		    <!-- 계층형 댓글 -->
-			<div v-for="reply in commentList" :key="reply.no" class="mb-4 d-flex gap-3" :style="{ marginLeft: reply.depth > 0 ? (reply.depth * 3) + 'rem' : '0' }">
+			<div v-for="reply in store.list" :key="reply.no" class="mb-4 d-flex gap-3" :style="{marginLeft: reply.group_tab>0?(reply.group_tab*3)+'rem':'0'}">
 		        
-				<div v-if="reply.depth > 0" class="text-muted mt-2">
-					<i class="fa-solid fa-arrow-turn-down fa-rotate-270"></i>
+				<div v-if="reply.group_tab > 0" class="text-muted mt-2">
+					<i class="fa-solid fa-reply fa-rotate-180"></i>
 				</div>
 		        
 				<div class="comment-avatar"><i class="fa-solid fa-user"></i></div>
@@ -61,23 +63,23 @@ const SESSION_NAME=/*[[${session.name}]]*/ ''
 		            
 					<div class="d-flex justify-content-between align-items-center mb-1">
 						<div>
-							<span class="fw-bold text-dark me-2">{{ reply.name }}</span>
-							<span class="text-muted small">{{ reply.dbday }}</span>
+							<span class="fw-bold text-dark me-2">{{reply.name}}</span>
+							<span class="text-muted small">{{reply.dbday}}</span>
 						</div>
 		        	 	       
 						<div class="d-flex gap-2">
 							<button v-if="sessionId" class="btn btn-sm btn-link text-muted text-decoration-none p-0" @click="toggleReplyForm(reply.no)">답글</button>
 		                    
-							<template v-if="sessionId !== '' && sessionId === reply.memberId">
+							<template v-if="sessionId!==''&&sessionId===reply.member_id">
 								<button class="btn btn-sm btn-link text-muted text-decoration-none p-0" @click="toggleEditForm(reply)">수정</button>
 								<button class="btn btn-sm btn-link text-danger text-decoration-none p-0" @click="deleteComment(reply.no)">삭제</button>
 							</template>
 						</div>
 					</div>
 		            
-		            <div v-if="editReplyNo !== reply.no" class="text-dark mb-2" style="font-size: 15px; white-space: pre-wrap;">{{ reply.msg }}</div>
+		            <div v-if="editReplyNo!==reply.no" class="text-dark mb-2" style="font-size: 15px; white-space: pre-wrap;">{{ reply.msg }}</div>
 		
-		            <div v-else-if="editReplyNo === reply.no" class="bg-white p-3 rounded-3 border mt-2 mb-3 shadow-sm">
+		            <div v-else-if="editReplyNo===reply.no" class="bg-white p-3 rounded-3 border mt-2 mb-3 shadow-sm">
 		                <textarea v-model="editCommentText" class="form-control border-0 shadow-none mb-2" rows="2" style="resize: none;"></textarea>
 		                <div class="d-flex justify-content-end align-items-center border-top pt-2">
 		                    <button type="button" class="btn btn-sm btn-outline-secondary px-3 rounded-3 me-2" @click="editReplyNo = 0">취소</button>
@@ -86,10 +88,10 @@ const SESSION_NAME=/*[[${session.name}]]*/ ''
 		            </div>
 		
 		            <div v-if="activeReplyNo === reply.no" class="bg-white p-3 rounded-3 border mt-3 shadow-sm">
-		                <textarea v-model="nestedComment" class="form-control border-0 shadow-none mb-2" rows="2" placeholder="대댓글을 남겨보세요." style="resize: none;"></textarea>
+		                <textarea v-model="coComment" class="form-control border-0 shadow-none mb-2" rows="2" placeholder="대댓글을 남겨보세요." style="resize: none;"></textarea>
 		                <div class="d-flex justify-content-end align-items-center border-top pt-2">
 		                    <button type="button" class="btn btn-sm btn-outline-secondary px-3 rounded-3 me-2" @click="activeReplyNo = 0">취소</button>
-		                    <button type="button" class="btn btn-sm text-white fw-bold px-3 rounded-3" style="background-color: #212529;" @click="writeNestedComment(reply.no)">등록</button>
+		                    <button type="button" class="btn btn-sm text-white fw-bold px-3 rounded-3" style="background-color: #212529;" @click="writeCoComment(reply.no)">등록</button>
 		                </div>
 		            </div>
 		            
@@ -98,21 +100,125 @@ const SESSION_NAME=/*[[${session.name}]]*/ ''
 		</div>
     </div>
 
-    <!-- 2. 하단 액션 버튼 영역 -->
     <div class="d-flex justify-content-between align-items-center">
-        <!-- 좌측: 목록으로 돌아가기 -->
         <div>
-            <a href="/board/list" class="btn btn-outline-secondary px-4 py-2 rounded-3 fw-medium">
+            <a href="/freeboard/list" class="btn btn-outline-secondary px-4 py-2 rounded-3 fw-medium">
                 <i class="fa-solid fa-list me-1"></i> 목록
             </a>
         </div>
-        
-        <!-- 우측: 작성자 본인일 경우만 보이는 버튼들 -->
-        <div class="d-flex gap-2">
-            <a type="button" class="btn btn-outline-danger px-4 py-2 rounded-3 fw-medium">삭제</a>
-            <a type="button" class="btn text-white px-4 py-2 rounded-3 fw-bold" style="background-color: #212529;">수정</a>
+
+        <div class="d-flex gap-2" th:if="${vo.member_id==null or session.member_id==vo.member_id}">
+			<!-- 회원 -->
+			<th:block th:if="${vo.member_id!=null}">
+				<button type="button" class="btn btn-outline-danger px-4 py-2 rounded-3 fw-medium" onclick="Delete()">삭제</button>
+				<a th:href="@{/freeboard/update(no=${vo.no})}" class="btn text-white px-4 py-2 rounded-3 fw-bold" style="background-color: #212529;">수정</a>
+			</th:block>
+			<!-- 비회원 -->
+			<th:block th:if="${vo.member_id==null}">
+				<button type="button" class="btn btn-outline-danger px-4 py-2 rounded-3 fw-medium" data-bs-toggle="modal" data-bs-target="#pwdModal" onclick="setModalAction('delete')">삭제</button>
+				<button type="button" class="btn text-white px-4 py-2 rounded-3 fw-bold" style="background-color: #212529;" data-bs-toggle="modal" data-bs-target="#pwdModal" onclick="setModalAction('update')">수정</button>
+			</th:block>
+
         </div>
+
+		<form id="deleteForm" action="/freeboard/delete" method="post" style="display: none;">
+			<input type="hidden" name="no" th:value="${vo.no}">
+		</form>
+
     </div>
+	<div th:replace="~{fragments/modal::pwdModal}"></div>
 
 </main>
+<script>
+	const urlParams=new URLSearchParams(window.location.search)
+	if(urlParams.get('error')==='pwd'){
+		alert('비밀번호가 일치하지 않습니다.')
+		window.history.replaceState({},document.title,window.location.pathname+'?no='+board_no)
+	}
+	function Delete(){
+		if (confirm('정말 삭제하시겠습니까?')) {
+			document.getElementById('deleteForm').submit();
+		}
+	}
+</script>
+<script src="/vue/axios.js"></script>
+<script src="/vue/community/freeboard/freeCommentStore.js"></script>
+<script>
+	const {onMounted,ref,createApp}=Vue
+	const {createPinia}=Pinia
+	const freeCommentApp=createApp({
+		setup(){
+			const store=useFreeCommentStore()
+			const sessionId=ref(SESSION_ID)
+			const newComment=ref('')
+			const activeReplyNo=ref(0)
+			const coComment=ref('')
+			const editReplyNo=ref(0)
+			const editCommentText=ref('')
+
+			onMounted(()=>{
+				store.board_no=board_no
+				store.freeCommentListData()
+			})
+
+			const toggleReplyForm=(no)=>{
+				activeReplyNo.value=activeReplyNo.value===no?0:no
+				editReplyNo.value=0
+				coComment.value=''
+			}
+			const toggleEditForm=(reply)=>{
+				editReplyNo.value=editReplyNo.value===reply.no?0:reply.no
+				activeReplyNo.value=0
+				editCommentText.value=reply.msg
+			}
+			const writeComment=async()=>{
+				if(!newComment.value.trim()){
+					return
+				}
+				await store.insertComment({
+					board_no:board_no,
+					member_id:sessionId.value,
+					msg:newComment.value,
+					parent_no:0
+				})
+				newComment.value=''
+			}
+			const writeCoComment=async(parent_no)=>{
+				if(!coComment.value.trim()){
+					return
+				}
+				await store.insertComment({
+					board_no:board_no,
+					member_id:sessionId.value,
+					msg:coComment.value,
+					parent_no:parent_no
+				})
+				activeReplyNo.value=0
+				coComment.value=''
+			}
+			const updateComment=async(no)=>{
+				if(!editCommentText.value.trim()){
+					return
+				}
+				await store.updateComment({
+					no:no,
+					msg:editCommentText.value
+				})
+				editReplyNo.value=0
+			}
+			const deleteComment=async(no)=>{
+				if(confirm('정말 삭제하시겠습니까?')){
+					await store.deleteComment(no)
+				}
+			}
+			return{
+				store,
+				sessionId,newComment,activeReplyNo,coComment,editReplyNo,editCommentText,
+				toggleReplyForm,toggleEditForm,writeComment,writeCoComment,updateComment,deleteComment
+			}
+		}
+	})
+	freeCommentApp.use(createPinia())
+	freeCommentApp.mount('#commentApp')
+</script>
 </html>
