@@ -23,9 +23,10 @@ public class ScheduledExamController {
     private final ScheduledExamService scheduledExamService;
 
     @GetMapping("/scheduled-exam")
-    public ResponseEntity<Page<ScheduledExamVO>> getScheduledExamByMonth(@RequestParam int year,
-                                                                         @RequestParam int month,
-                                                                         @RequestParam(defaultValue = "0", required = false) int page){
+    public ResponseEntity<Page<ScheduledExamVO>> getScheduledExamByMonth(@RequestParam("year") int year,
+                                                                         @RequestParam("month") int month,
+                                                                         @RequestParam(name="page", defaultValue = "0", required = false) int page){
+    	
         Pageable pageable = PageRequest.of(page,3, Sort.by("openDate").ascending());
         Page<ScheduledExamVO> result = scheduledExamService.getExamByMonth(year, month, pageable);
         return ResponseEntity.ok(result);
