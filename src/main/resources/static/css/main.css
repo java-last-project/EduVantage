@@ -515,3 +515,115 @@ body {
 .custom-page-btn:not(.active) {
     color: #212529;
 }
+
+/* --- 게시판 --- */
+
+.board-container {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.board-table {
+    table-layout: fixed;
+    margin-bottom: 0;
+}
+.board-table thead th {
+    font-weight: 500;
+    color: #6c757d;
+    background-color: #f8f9fa;
+    border-bottom: 0;
+    padding: 1rem 0;
+}
+.board-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.board-row:hover {
+    background-color: #f8fafc;
+}
+.board-row td {
+    padding: 1rem 0;
+    font-size: 15px;
+    color: #495057;
+    vertical-align: middle;
+}
+
+.board-title-text {
+    color: #1e293b;
+    font-weight: 500;
+}
+.board-row:hover .board-title-text {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+.category-badge {
+    background-color: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+    font-weight: 400;
+    padding: 0.35em 0.65em;
+}
+
+.board-search-input {
+    background-color: #f8f9fa;
+    border-radius: 50rem;
+    border: none;
+    padding: 0.5rem 2.5rem 0.5rem 1.5rem;
+    font-size: 14px;
+}
+.board-search-input:focus {
+    background-color: #fff;
+    box-shadow: 0 0 0 0.25rem rgba(33, 37, 41, 0.1);
+}
+
+.custom-pagination {
+    gap: 0.5rem;
+}
+.custom-pagination .page-link {
+    width: 40px;
+    height: 40px;
+    border-radius: 50% !important;
+    border: none;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.custom-pagination .page-link:hover {
+    background-color: #e9ecef;
+    color: #212529;
+}
+.custom-pagination .page-item.active .page-link {
+    background-color: #212529;
+    color: #ffffff;
+}
+/* --- 상세 페이지 --- */
+
+.detail-content-area {
+    min-height: 400px;
+    line-height: 1.8;
+    font-size: 16px;
+    color: #334155;
+    word-break: break-all;
+}
+
+.meta-text {
+    font-size: 14px;
+    color: #64748b;
+}
+
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #e2e8f0;
+    color: #64748b;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
