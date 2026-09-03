@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.web.domain.enrollment.mapper.EnrollmentMapper">
+	<select id="courseDetailData" resultType="com.sist.web.domain.course.vo.CourseVO" parameterType="int">
+		SELECT no,title,name as instructor,star,student_count,content,thumbnail
+		FROM course c
+		JOIN member m ON c.instructor_no=m.member_id
+		WHERE no=#{course_no}
+	</select>
+	<select id="evaluationListData" resultType="com.sist.web.domain.enrollment.vo.CourseEvaluationVO" parameterType="int">
+		SELECT no,name,rating,review,like_count,TO_CHAR(e.regdate,'yyyy-mm-dd') as dbday
+		FROM course_evaluation e
+		JOIN member m ON e.member_id=m.member_id
+		WHERE course_no=#{course_no}
+		ORDER BY e.regdate DESC
+	</select>
+</mapper>
