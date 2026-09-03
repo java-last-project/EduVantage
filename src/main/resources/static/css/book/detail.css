@@ -1,0 +1,388 @@
+@charset "UTF-8";
+
+/* 기본 레이아웃 및 폰트 */
+.detail-wrapper {
+	max-width: 1100px;
+	margin: 40px auto;
+	font-family: 'Pretendard', sans-serif;
+	color: #333;
+}
+
+/* 좌측 상단 경로 네비게이션 */
+.breadcrumb-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 30px;
+}
+.breadcrumb-nav a {
+    color: #888;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.breadcrumb-nav a:hover {
+    color: #333;
+}
+.breadcrumb-nav i {
+    font-size: 10px;
+    color: #ddd;
+}
+
+/* 상단 도서 정보 영역  */
+.top-section {
+	display: flex;
+	gap: 60px;
+	margin-bottom: 60px;
+}
+
+/* 포스터 및 뱃지 영역 */
+.poster-area {
+	flex: 0 0 340px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	border-radius: 16px;
+	padding: 30px;
+    background: linear-gradient(145deg, #f8f9fa, #ffffff);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.poster-area img {
+	width: 100%;
+	border-radius: 8px;
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.badge-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 25px;
+    width: 100%;
+    justify-content: center;
+}
+
+.badge-item {
+    background: #f1f3f5;
+    color: #666;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* 정보 텍스트 영역 */
+.info-area {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+.info-header {
+    margin-bottom: 25px;
+}
+
+.info-title {
+	font-size: 28px;
+	font-weight: 700;
+	color: #111;
+	margin-bottom: 12px;
+	line-height: 1.4;
+}
+
+.info-author-pub {
+	font-size: 15px;
+	color: #666;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.author-name {
+    font-weight: 800;
+    color: #111;
+}
+
+.divider {
+    color: #ddd;
+}
+
+/* 도서 스펙 테이블 */
+.spec-table {
+	width: 100%;
+	border-collapse: separate;
+    border-spacing: 0;
+	margin-bottom: 25px;
+	font-size: 14px;
+	background: #f8f9fa;
+	border-radius: 12px;
+}
+
+.spec-table th, .spec-table td {
+    padding: 14px 20px;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.spec-table tr:last-child th, .spec-table tr:last-child td {
+    border-bottom: none;
+}
+
+.spec-table th {
+	width: 120px;
+	text-align: left;
+	color: #888;
+	font-weight: 500;
+}
+
+.spec-table td {
+	font-weight: 600;
+	color: #333;
+}
+
+/* 가격 강조 박스 */
+.price-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    padding: 20px 25px;
+    margin-bottom: 25px;
+}
+
+.price-label {
+    color: #888;
+    font-size: 15px;
+    width: 80px;
+}
+
+.price-value {
+    flex: 1;
+    text-align: center;
+    color: #111;
+}
+
+.price-value strong {
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.price-value .currency {
+    font-size: 16px;
+    margin-left: 4px;
+    font-weight: 600;
+}
+
+.badge-free {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* 액션 버튼 및 혜택 패널 */
+.action-pannel {
+	margin-top: auto;
+}
+
+/* 버튼 래퍼 */
+.action-btn-wrap {
+    display: flex;
+    gap: 12px; 
+    width: 100%;
+}
+
+/* 버튼 공통 스타일  */
+.btn-custom {
+    padding: 18px 0; 
+    border-radius: 10px; 
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+/* 좋아요 버튼 */
+.btn-like {
+    flex: 0 0 75px;
+    background: #fff;
+    border: 1px solid #e1e4e8;
+    color: #888;
+}
+.btn-like:hover {
+    background: #f8f9fa;
+    color: #e0245e;
+}
+
+/* 장바구니 버튼 */
+.btn-cart {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #333;
+    color: #333;
+}
+.btn-cart:hover {
+    background: #f8f9fa;
+}
+
+/* 바로 구매하기 버튼  */
+.btn-buy {
+    flex: 1;
+    background: #000000; 
+    border: 1px solid #000000;
+    color: #fff;
+}
+.btn-buy:hover {
+    background: #b53d10;
+}
+
+/* 혜택 안내 박스  */
+.perk-list {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 25px;
+    font-size: 14px;
+    color: #666;
+}
+.perk-list li {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+.perk-list li::before {
+    content: "ㅁ";
+    color: #000000; 
+    font-weight: 900;
+    margin-right: 10px;
+    font-size: 16px;
+}
+
+/* 탭 네비게이션 */
+.tab-nav {
+	display: flex;
+	border-bottom: 2px solid #eaeaea;
+	margin-bottom: 40px;
+}
+
+.tab-nav span {
+	padding: 16px 24px;
+	font-size: 16px;
+	font-weight: 600;
+	color: #888;
+	cursor: pointer;
+	position: relative;
+}
+
+.tab-nav span.active {
+	color: #111;
+}
+
+.tab-nav span.active::after {
+	content: '';
+	position: absolute;
+	bottom: -2px;
+	left: 0;
+	width: 100%;
+	height: 3px;
+	background-color: #d34a17; 
+}
+
+/* 탭 컨텐츠 영역 */
+.tab-content-area {
+	min-height: 350px;
+	line-height: 1.8;
+	margin-bottom: 60px;
+}
+
+.tab-content-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+	font-size: 20px;
+	font-weight: 700;
+	margin-bottom: 25px;
+	color: #111;
+}
+
+.tab-content-title::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 18px;
+    background-color: #d34a17;
+    border-radius: 2px;
+}
+
+.desc-image {
+	width: 100%;
+	margin-top: 30px;
+	background: #f8f9fa;
+	min-height: 200px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #999;
+	border-radius: 12px;
+}
+
+/* 댓글 영역 틀 */
+.comment-section {
+	border-top: 1px solid #eaeaea;
+	padding-top: 40px;
+}
+
+.comment-title {
+	font-size: 20px;
+	font-weight: 700;
+	margin-bottom: 25px;
+	color: #111;
+}
+
+.comment-input-box {
+	display: flex;
+	gap: 10px;
+	margin-bottom: 40px;
+}
+
+.comment-input-box input {
+	flex: 1;
+	padding: 14px 18px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	background: #fdfdfd;
+}
+
+.comment-input-box button {
+	padding: 0 30px;
+	background: #333;
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: 600;
+}
+
+.comment-list-mockup {
+	color: #666;
+	font-size: 15px;
+}
+
+.comment-item {
+	padding: 20px 0;
+	border-bottom: 1px solid #f1f1f1;
+}
+
+.comment-header {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 8px;
+	font-weight: 600;
+	color: #333;
+}
