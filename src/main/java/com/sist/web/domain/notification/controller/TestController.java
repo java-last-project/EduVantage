@@ -1,5 +1,5 @@
 package com.sist.web.domain.notification.controller;
-
+/*
 import com.sist.web.domain.vector.VectorDataLoader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,6 +21,7 @@ import java.util.Map;
 @RequestMapping("/test")
 @RequiredArgsConstructor
 public class TestController {
+
     @Qualifier("vectorDataSource")
     private final DataSource vectorDataSource;
     private final VectorDataLoader vectorDataLoader;
@@ -63,4 +64,6 @@ public class TestController {
         vectorDataLoader.loadAllCourse();
         return ResponseEntity.ok("embedding-load complete");
     }
+
 }
+*/

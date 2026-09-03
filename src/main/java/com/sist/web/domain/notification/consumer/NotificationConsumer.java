@@ -52,7 +52,7 @@ public class NotificationConsumer {
                 .ifPresent(emitter -> {
                     try{
                        emitter.send(SseEmitter.event()
-                               .data(Map.of("title",title,"content",content)));
+                               .data(Map.of("type",NotificationType.COURSE_COMPLETED.toString(),"title",title,"content",content)));
                     }catch(IOException e){
                         emitterRepository.deleteByMemberId(event.getMemberId());
                     }

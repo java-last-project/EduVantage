@@ -1,5 +1,5 @@
 package com.sist.web.domain.vector;
-
+/*
 import com.pgvector.PGvector;
 import com.sist.web.domain.notification.entity.Course;
 import com.sist.web.domain.notification.entity.TechStack;
@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * [WHAT] (최초 1회)벡터 DB에 Data를 insert하는 컴포넌트
- */
+
+//[WHAT] (최초 1회)벡터 DB에 Data를 insert하는 컴포넌트
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -66,3 +66,4 @@ public class VectorDataLoader {
         return course.getTitle()+ " " + techStackText;
     }
 }
+*/

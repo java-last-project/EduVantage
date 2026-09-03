@@ -1,5 +1,6 @@
 package com.sist.web.domain.notification.producer;
 
+import com.sist.web.domain.notification.entity.NotificationTopics;
 import com.sist.web.domain.notification.vo.NotificationEventVO;
 import lombok.RequiredArgsConstructor;
 //카프카 템플릿: 메시지를 발행할 때 쓰는 스프링 제공 도구
@@ -18,7 +19,7 @@ public class CourseCompletedProducer {
     private final KafkaTemplate<String, NotificationEventVO> kafkaTemplate;
 
     public void publishCompletion(int memberId,  int courseNo, String courseTitle) {
-        kafkaTemplate.send("course-completed", new NotificationEventVO(
+        kafkaTemplate.send(NotificationTopics.COURSE_COMPLETED, new NotificationEventVO(
                 memberId, courseNo, courseTitle, UUID.randomUUID().toString()
         ));
     }
