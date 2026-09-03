@@ -1,7 +1,5 @@
 package com.sist.web.domain.notification.vo;
 
-
-
 import com.sist.web.domain.notification.entity.NotificationType;
 import com.sist.web.domain.notification.entity.Notifications;
 import lombok.Builder;

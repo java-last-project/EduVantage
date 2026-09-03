@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.web.domain.notification.mapper.ScheduledExamMapper">
+    <select id="getScheduledExamByMonth" resultType="ScheduledExamVO">
+        SELECT *
+        FROM scheduled_exam
+        WHERE open_date &gt;= TO_DATE(#{year}||'-'||#{month}||'-01','YYYY-MM-DD')
+            AND open_date &lt; ADD_MONTHS(TO_DATE(#{year}||'-'||#{month}||'-01','YYYY-MM-DD'),1)
+        ORDER BY open_date
+    </select>
+</mapper>

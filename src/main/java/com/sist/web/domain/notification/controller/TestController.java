@@ -1,4 +1,5 @@
 package com.sist.web.domain.notification.controller;
+
 /*
 import com.sist.web.domain.vector.VectorDataLoader;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,6 @@ public class TestController {
     @Qualifier("vectorDataSource")
     private final DataSource vectorDataSource;
     private final VectorDataLoader vectorDataLoader;
-
 
     @GetMapping
     public ResponseEntity<Map<String,Object>> testConnection(){

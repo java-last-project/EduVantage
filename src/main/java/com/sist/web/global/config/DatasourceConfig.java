@@ -26,6 +26,7 @@ public class DatasourceConfig {
             @Value("${spring.datasource.oracle.username}") String username,
             @Value("${spring.datasource.oracle.password}") String password,
             @Value("${spring.datasource.oracle.driver-class-name}") String driverClassName) {
+
         //spirng.datasource.oracle의 접속 정보를 DataSource에 채워서 반환
         /**
          *   datasource:

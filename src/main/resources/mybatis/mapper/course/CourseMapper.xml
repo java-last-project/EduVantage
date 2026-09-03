@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.web.domain.course.mapper.CourseMapper">
+<resultMap id="courseResultMap" type="com.sist.web.domain.course.vo.CourseVO">
+    <id property="no" column="no"/>
+    <result property="title" column="title"/>
+    <result property="instructor_no" column="instructor_no"/>
+    <result property="instructor" column="instructor"/>
+    <result property="star" column="star"/>
+    <result property="student_count" column="student_count"/>
+    <result property="pay_price" column="pay_price"/>
+    <result property="regular_price" column="regular_price"/>
+    <result property="thumbnail" column="thumbnail"/>
+    <result property="images" column="images"/>
+    <result property="content" column="content"/>
+    
+    <collection property="techList" ofType="com.sist.web.domain.course.vo.TechStackVO">
+        <id property="no" column="tech_no"/>
+        <result property="tech" column="tech_name"/>
+        <result property="category" column="category"/>
+    </collection>
+</resultMap>
+
+	<select id="courseMainList" resultType="com.sist.web.domain.course.vo.CourseVO">
+		SELECT *
+		FROM (
+		    SELECT c.no,c.title,m.name AS instructor, c.star, c.student_count, c.thumbnail,c.images
+		    FROM Course c JOIN member m
+		    ON c.instructor_no=m.member_id
+		    WHERE thumbnail IS NOT NULL AND content IS NOT NULL AND images IS NOT NULL
+		    ORDER BY no DESC
+		)
+		WHERE ROWNUM &lt;=10
+	</select>
+	
+	<select id="courseListData" resultMap="courseResultMap" parameterType="hashmap">
+		SELECT p_c.no, p_c.title, p_c.instructor_no, m.name AS instructor, 
+	           p_c.star, p_c.student_count, p_c.pay_price, p_c.regular_price, 
+	           p_c.thumbnail, p_c.images,
+	           t.no AS tech_no, t.tech AS tech_name, t.category
+	    FROM (
+	        SELECT c.* 
+	        FROM Course c
+	        WHERE c.thumbnail IS NOT NULL AND c.content IS NOT NULL AND c.images IS NOT NULL
+	        
+	        <if test="categories!=null and categories.size()>0">
+	            AND c.no IN (
+	                SELECT ctm.course_no 
+	                FROM course_tech_mapping ctm 
+	                JOIN tech_stack st ON ctm.tech_no=st.no 
+	                WHERE st.category IN 
+	                <foreach item="category" collection="categories" open="(" separator="," close=")">
+	                    #{category}
+	                </foreach>
+	            )
+	        </if>
+	        
+			<if test="fd!=null and fd!=''">
+				AND c.title LIKE '%'||#{fd}||'%'
+			</if>
+	        
+	        ORDER BY 
+	        <choose>
+				<when test="column=='star'">star DESC, no DESC</when>
+				<when test="column=='pay_price ASC'">pay_price ASC, no DESC</when>
+				<when test="column=='pay_price DESC'">pay_price DESC, no DESC</when>
+				<otherwise>no DESC</otherwise>
+	        </choose>
+	        OFFSET #{start} ROWS FETCH NEXT 15 ROWS ONLY
+	    ) p_c
+	    JOIN member m ON p_c.instructor_no=m.member_id
+	    LEFT JOIN course_tech_mapping ctm ON p_c.no=ctm.course_no
+	    LEFT JOIN tech_stack t ON ctm.tech_no=t.no
+		ORDER BY 
+		<choose>
+			<when test="column=='star'">p_c.star DESC, p_c.no DESC</when>
+			<when test="column=='pay_price ASC'">p_c.pay_price ASC, p_c.no DESC</when>
+			<when test="column=='pay_price DESC'">p_c.pay_price DESC, p_c.no DESC</when>
+			<otherwise>p_c.no DESC</otherwise>
+		</choose>
+	</select>
+	
+	<select id="courseCount" resultType="int" parameterType="hashmap">
+		SELECT COUNT(*)
+	    FROM Course c
+	    WHERE c.thumbnail IS NOT NULL AND c.content IS NOT NULL AND c.images IS NOT NULL
+	    
+	    <if test="categories != null and categories.size() > 0">
+	        AND c.no IN (
+	            SELECT ctm.course_no 
+	            FROM course_tech_mapping ctm 
+	            JOIN tech_stack st ON ctm.tech_no=st.no 
+	            WHERE st.category IN 
+	            <foreach item="category" collection="categories" open="(" separator="," close=")">
+	                #{category}
+	            </foreach>
+	        )
+	    </if>
+	    
+	    <if test="fd!=null and fd!=''">
+			AND c.title LIKE '%'||#{fd}||'%'
+		</if>
+		
+	</select>
+	
+	<select id="courseCategoryList" resultType="com.sist.web.domain.course.vo.TechStackVO">
+		SELECT DISTINCT category
+		FROM tech_stack
+		ORDER BY category
+	</select>
+	
+	<select id="courseDetail" resultMap="courseResultMap" parameterType="int">
+		SELECT c.no, c.title, c.instructor_no, m.name AS instructor, c.star, c.student_count, c.pay_price, c.regular_price, 
+           c.thumbnail, c.images, c.content,t.no AS tech_no, t.tech AS tech_name, t.category
+    	FROM Course c
+    	LEFT JOIN member m ON c.instructor_no=m.member_id
+    	LEFT JOIN course_tech_mapping ctm ON c.no=ctm.course_no
+    	LEFT JOIN tech_stack t ON ctm.tech_no=t.no
+    	WHERE c.no=#{no}
+	</select>
+</mapper>

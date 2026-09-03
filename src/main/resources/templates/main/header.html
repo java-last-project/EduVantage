@@ -9,14 +9,14 @@
 
             <div class="d-flex align-items-center gap-4">
                 <nav class="d-flex gap-4 fw-medium align-items-center" style="font-size: 15px;">
-                    <a href="#" class="text-decoration-none text-white header-nav-link">강의</a>
+                    <a href="/course/list" class="text-decoration-none text-white header-nav-link">강의</a>
                     <a href="/exam/detail" class="text-decoration-none text-white header-nav-link">시험</a>
                     <a href="#" class="text-decoration-none text-white header-nav-link">도서</a>
                     <a href="#" class="text-decoration-none text-white header-nav-link">커뮤니티</a>
                     <a sec:authorize="hasRole('USER')" href="#" class="text-decoration-none text-white header-nav-link">마이페이지</a>
                     <a sec:authorize="hasRole('INSTRUCTOR')" href="/instructor/profile" class="text-decoration-none text-white header-nav-link">강사페이지</a>
                     <a sec:authorize="hasRole('ADMIN')"  href="/admin/dashboard" class="text-decoration-none text-white header-nav-link">관리자페이지</a>
-
+                    <!-- 알림 -->
                     <a sec:authorize="isAuthenticated()" class="position-relative text-decoration-none text-white" style="font-size: 18px" title="알림" data-bs-toggle="modal" data-bs-target="#notificationModal">
                         <i class="fa-regular fa-bell"></i>
                         <!--새 알림용 뱃지-->
@@ -29,7 +29,7 @@
                 
                 <div class="d-flex gap-2 align-items-center">
                    <a sec:authorize="!isAuthenticated()" href="/member/login" class="text-decoration-none btn-light-custom">로그인</a>
-                    <a href="#" class="text-decoration-none btn-dark-custom">회원가입</a>
+					<a sec:authorize="!isAuthenticated()" href="/member/join" class="text-decoration-none btn-dark-custom">회원가입</a>
 				   
 				    <span sec:authorize="hasRole('ADMIN')" class="text-white">
 				        <strong th:text="${session.name}"></strong>(관리자)님
