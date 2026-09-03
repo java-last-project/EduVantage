@@ -13,7 +13,7 @@
                     <a href="/exam/detail" class="text-decoration-none text-white header-nav-link">시험</a>
                     <a href="/book/list" class="text-decoration-none text-white header-nav-link">도서</a>
                     <a href="#" class="text-decoration-none text-white header-nav-link">커뮤니티</a>
-                    <a sec:authorize="hasRole('USER')" href="#" class="text-decoration-none text-white header-nav-link">마이페이지</a>
+                    <a sec:authorize="hasRole('USER')" href="/mypage/dashboard" class="text-decoration-none text-white header-nav-link">마이페이지</a>
                     <a sec:authorize="hasRole('INSTRUCTOR')" href="/instructor/profile" class="text-decoration-none text-white header-nav-link">강사페이지</a>
                     <a sec:authorize="hasRole('ADMIN')"  href="/admin/dashboard" class="text-decoration-none text-white header-nav-link">관리자페이지</a>
                     <!-- 알림 -->
