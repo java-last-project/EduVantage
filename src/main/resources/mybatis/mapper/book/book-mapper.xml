@@ -13,7 +13,7 @@
             <when test="sort == '낮은 가격순'">ORDER BY price ASC</when>
             <when test="sort == '높은 가격순'">ORDER BY price DESC</when>
             <when test="sort == '조회 수 순'">ORDER BY hit DESC</when>
-            <otherwise>ORDER BY book_id ASC</otherwise>
+            <otherwise>ORDER BY no ASC</otherwise>
         </choose>
         OFFSET #{start} ROWS FETCH NEXT 12 ROWS ONLY
     </select>
@@ -24,5 +24,12 @@
         <if test="category != '전체'">
             WHERE category = #{category}
         </if>
+    </select>
+    <select id="bookTotalCount" resultType="int" parameterType="string">
+    	SELECT COUNT(*)
+    	FROM book
+    	<if test="category != '전체'">
+    	WHERE category=#{category}
+    	</if>
     </select>
 </mapper>

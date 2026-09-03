@@ -9,4 +9,6 @@ public interface BookService {
 	public List<BookVO> bookListData(Map map);
 	
 	public int[] bookTotalPage(int page, String category);
+	
+	public int bookTotalCount(String category);
 }

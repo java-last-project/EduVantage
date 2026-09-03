@@ -33,4 +33,10 @@ public class BookServiceImpl implements BookService{
 	        return new int[]{page, totalpage, startPage, endPage};
 	    }
 
+	 @Override
+	 public int bookTotalCount(String category) {
+		// TODO Auto-generated method stub
+		return bMapper.bookTotalCount(category);
+	 }
+
 }

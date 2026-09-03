@@ -35,12 +35,14 @@ public class BookRestController {
             // 목록
             List<BookVO> list = bService.bookListData(param);
             int[] pages = bService.bookTotalPage(page, category);
+            int count = bService.bookTotalCount(category);
 
             map.put("list", list);
             map.put("curpage", pages[0]);
             map.put("totalpage", pages[1]);
             map.put("startPage", pages[2]);
             map.put("endPage", pages[3]);
+            map.put("count", count);
             
         } catch (Exception e) {
             e.printStackTrace();

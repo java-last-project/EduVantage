@@ -3,11 +3,12 @@ const { defineStore } = Pinia;
 const useBookListStore = defineStore('bookList', {
     state: () => ({
         list: [],
+		count: 0, 
         curpage: 1,
         totalpage: 0,
         startPage: 0,
         endPage: 0,
-        range: [], 
+        range: [],
         
         categories: [
 			'전체', 
@@ -38,6 +39,7 @@ const useBookListStore = defineStore('bookList', {
                 });
                 
                 this.list = response.data.list;
+				this.count = response.data.count;
                 this.curpage = response.data.curpage;
                 this.totalpage = response.data.totalpage;
                 this.startPage = response.data.startPage;
