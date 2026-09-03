@@ -3,6 +3,7 @@ package com.sist.web.domain.mypage.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
+import com.sist.web.domain.enrollment.vo.*;
 import com.sist.web.domain.mypage.vo.*;
 import java.util.*;
 

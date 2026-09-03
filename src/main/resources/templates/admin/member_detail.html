@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<style>
+	/* ===== 헤더 영역 ===== */
+
+	.page-title{
+		font-size:26px;
+		font-weight:700;
+		margin:0 0 24px;
+		color:var(--text-main);
+	}
+
+
+	@media (max-width:900px){
+		.main{ padding:20px; }
+		.info-table th{ width:110px; }
+	}
+</style>
+
+<div class="layout">
+<!-- ================= Main ================= -->
+<main class="main">
+
+	<div>
+		<a href="/admin/member" class="back-link"><i class="fa-solid fa-arrow-left"></i> 목록으로</a>
+		<h1 class="page-title">회원 상세</h1>
+	</div>
+
+	<div class="profile-summary">
+		<div class="profile-summary-left">
+			<div class="profile-avatar-lg">김</div>
+			<div>
+				<div class="profile-name-row">
+					<span class="profile-name">김민수</span>
+					<span class="role-tag">일반</span>
+				</div>
+				<div class="profile-meta">minsu.kim &middot; 가입일 2024.03.15</div>
+			</div>
+		</div>
+
+		<div class="status-control">
+			<select class="status-select">
+				<option value="1" selected>정상</option>
+				<option value="0">휴면</option>
+				<option value="-1">정지</option>
+			</select>
+			<button class="btn-primary">저장</button>
+		</div>
+	</div>
+
+	<div class="info-card">
+		<div class="info-card-title">상세 정보</div>
+		<table class="info-table">
+			<tr>
+				<th>이름</th>
+				<td>김민수</td>
+			</tr>
+			<tr>
+				<th>아이디</th>
+				<td>minsu.kim</td>
+			</tr>
+			<tr>
+				<th>성별</th>
+				<td>남</td>
+			</tr>
+			<tr>
+				<th>생년월일</th>
+				<td>1995.04.12</td>
+			</tr>
+			<tr>
+				<th>연락처</th>
+				<td>010-1234-5678</td>
+			</tr>
+			<tr>
+				<th>이메일</th>
+				<td>minsu.kim@eduflow.kr</td>
+			</tr>
+			<tr>
+				<th>주소</th>
+				<td>(06236) 서울특별시 강남구 테헤란로 123, 4층 (역삼동)</td>
+			</tr>
+			<tr>
+				<th>가입일</th>
+				<td>2024.03.15</td>
+			</tr>
+			<tr>
+				<th>자기소개</th>
+				<td>안녕하세요, 백엔드 개발을 공부하고 있는 김민수입니다.</td>
+			</tr>
+		</table>
+	</div>
+
+</main>
+</div>
+
+</html>
