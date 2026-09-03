@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.web.domain.notification.mapper.NotificationMapper">
+    <!--MyBatis 로 VO에 주입할때는 기본생성자/전체생성자 필요-->
+    <select id="findRecentNotifications" resultType="NotificationVO">
+        SELECT *
+        FROM notifications
+        WHERE member_id = #{memberId} And regdate &gt;= #{targetDate}
+        ORDER BY regdate DESC
+    </select>
+</mapper>

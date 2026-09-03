@@ -54,8 +54,9 @@ public class SseController {
         }catch (IOException e){
             emitterRepository.deleteByMemberId(memberId);
         }
-         */
+
         courseCompletedProducer.publishCompletion(memberId, 2, "JAVA 기초");
+        */
 
         return emitter;
     }

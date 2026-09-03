@@ -54,7 +54,31 @@ function showToast(type, title, content){
     document.body.appendChild(toast);
 
     setTimeout(()=>{
+        //페이드 적용안됨 오류 [수정필요]
         toast.classList.add("fade-out")
         setTimeout(()=> toast.remove(), 300)
     }, 6000)
 }
+
+
+const notificationList = createApp({
+    setup(){
+
+        const nnList = ref([])
+        //최근 3일의 알림 조회
+        const nnListData = async () => {
+            try {
+                const res = await api.get("/notification")
+                console.log(res)
+                nnList.value = res.data
+            }catch(error){
+                console.error(error)
+            }
+        }
+        onMounted(()=>{
+            nnListData()
+        })
+
+        return {nnList}
+    }
+}).mount("#notificationModal")
