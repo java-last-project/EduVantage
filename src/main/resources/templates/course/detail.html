@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+	<main class="container py-5" style="max-width: 1300px;">
+	    
+	    <div class="mb-4">
+	        <div class="d-flex flex-wrap gap-1 mb-2">
+	            <span th:each="cat:${course.categoryList}" class="badge rounded-pill bg-light text-secondary border fw-normal" style="font-size: 12px; padding: 5px 10px;" th:text="${cat}"></span>
+	        </div>
+	        <h2 class="fw-bold mb-2" style="font-size: 26px; color: #1e293b;">[[${course.title}]]</h2>
+	        <div class="d-flex align-items-center gap-3 text-muted small">
+	            <span>지은이: <strong class="text-dark">[[${course.instructor}]]</strong></span>
+	            <span class="text-warning fw-bold"><i class="fa-solid fa-star"></i> [[${course.star}]]</span>
+	            <span>수강생 수: <strong class="text-dark">[[${course.student_count}]]명</strong></span>
+	        </div>
+	    </div>
+	
+	    <div class="row g-4">
+	        
+	        <section class="col-lg-8">
+	            
+	            <ul class="nav nav-tabs mb-4" role="tablist">
+	                <li class="nav-item" role="presentation"><button class="nav-link active fw-bold text-dark border-0 border-bottom border-2 border-dark rounded-0 pb-3" style="background: none;">강의소개</button></li>
+	            </ul>
+	
+	            <div class="bg-white p-4 rounded-4 border mb-4">
+	                <h4 class="fw-bold mb-3" style="font-size: 18px; color: #1e293b;">강의 소개</h4>
+	                <div class="text-secondary" style="line-height: 1.8; white-space: pre-line;" th:utext="${course.content}"></div>
+	            </div>
+	
+	            <div class="bg-white p-4 rounded-4 border mb-4">
+	                <h4 class="fw-bold mb-3" style="font-size: 18px; color: #1e293b;">상세 커리큘럼 및 안내 이미지</h4>
+	                <div class="d-flex flex-column gap-3">
+	                    <img th:each="imgUrl:${#strings.arraySplit(course.images,'^')}" th:src="${imgUrl}" class="w-100 rounded-3 border" alt="상세 이미지" style="object-fit: cover;">
+	                </div>
+	            </div>
+	
+	        </section>
+	
+	        <aside class="col-lg-4">
+	            <div class="bg-white p-4 rounded-4 border sticky-top" style="top: 20px; z-index: 10">
+	                
+	                <div class="position-relative rounded-3 overflow-hidden mb-4" style="padding-top: 56.25%; background-color: #000;">
+	                    <img th:src="${course.thumbnail}" class="position-absolute top-0 start-0 w-100 h-100" style="object-fit: cover;" alt="썸네일">
+	                </div>
+	
+	                <div class="mb-4">
+	                    <div class="d-flex align-items-baseline gap-2 mb-1" th:if="${course.regular_price>course.pay_price}">
+	                        <span class="badge bg-danger bg-opacity-10 text-danger fw-bold px-2 py-1" style="font-size: 12px;" th:text="${T(java.lang.Math).round((course.regular_price-course.pay_price)*100.0/course.regular_price)}+'% 할인'"></span>
+	                        <span class="text-muted text-decoration-line-through small" th:text="|₩${#numbers.formatInteger(course.regular_price,0,'COMMA')}|"></span>
+	                    </div>
+	                    <div style="color: #1e293b; font-weight: 800; font-size: 28px;" th:text="|₩${#numbers.formatInteger(course.pay_price,0,'COMMA')}|"></div>
+	                </div>
+	
+	                <div class="d-grid gap-2 mb-4">
+	                    <button type="button" class="btn text-white fw-bold py-3 rounded-3" style="background-color: #212529;">수강 신청하기</button>
+	                    <button type="button" class="btn btn-light fw-bold py-3 rounded-3 border text-dark">장바구니 담기</button>
+	                </div>
+	
+	                <hr class="text-muted mb-3">
+	
+	                <ul class="list-unstyled text-secondary small d-flex flex-column gap-2 m-0">
+	                    <li class="d-flex justify-content-between"><span>수료증 발급</span><strong class="text-success">발급 가능</strong></li>
+	                    <li class="d-flex justify-content-between"><span>학습 무제한</span><strong>평생 무제한 수강</strong></li>
+	                </ul>
+	
+	            </div>
+	        </aside>
+	
+	    </div>
+	</main>
+</html>
