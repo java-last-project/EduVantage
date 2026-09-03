@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sist.web.domain.mypage.mapper.MyPageMapper">
-  <select id="mypageCourseListData" resultType="com.sist.web.domain.mypage.vo.CourseEnrollmentVO"
+  <select id="mypageCourseListData" resultType="com.sist.web.domain.enrollment.vo.CourseEnrollmentVO"
   		parameterType="int"
   >
   	SELECT course_no,is_completed,progress,TO_CHAR(e.regdate,'yyyy-mm-dd') as dbday,title,m.name as instructor,thumbnail
@@ -10,7 +10,7 @@
 	WHERE e.member_id=#{member_id}
 	ORDER BY e.regdate DESC
   </select>
-  <select id="lastAccessedCourse" resultType="com.sist.web.domain.mypage.vo.CourseEnrollmentVO"
+  <select id="lastAccessedCourse" resultType="com.sist.web.domain.enrollment.vo.CourseEnrollmentVO"
   		parameterType="int"
   >
   	SELECT course_no,progress,title,m.name as instructor,thumbnail,last_accessed
