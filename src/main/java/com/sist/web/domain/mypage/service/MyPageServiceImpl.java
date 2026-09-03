@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.sist.web.domain.mypage.vo.CourseEnrollmentVO;
+import com.sist.web.domain.enrollment.vo.*;
 import com.sist.web.domain.mypage.vo.MyMemberVO;
 import com.sist.web.domain.mypage.mapper.*;
 import lombok.RequiredArgsConstructor;
