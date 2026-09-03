@@ -50,4 +50,9 @@ public class BookRestController {
         }
         return ResponseEntity.ok(map);
     }
+    @GetMapping("/book/detail_vue")
+    public ResponseEntity<BookVO>book_detail(@RequestParam("no") int no){
+    	BookVO vo = bService.bookDetailData(no);
+    	return new ResponseEntity<>(vo, HttpStatus.OK);
+    }
 }

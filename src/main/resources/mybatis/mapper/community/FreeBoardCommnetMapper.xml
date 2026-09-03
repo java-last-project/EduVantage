@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.web.domain.community.mapper.FreeBoardCommentMapper">
+   
+	<select id="freeBoardCommentList" resultType="com.sist.web.domain.community.vo.FreeCommentVO" parameterType="int">
+		SELECT no,board_no,member_id,msg,TO_CHAR(regdate,'yyyy-mm-dd HH24:mi:ss') AS dbday,parent_no,LEVEL-1 AS group_tab
+		FROM free_comment
+		WHERE board_no=#{no}
+		START WITH parent_no IS NULL
+		CONNECT BY PRIOR no=parent_no
+		ORDER SIBLINGS BY no ASC
+	</select>
+	
+	<select id="freeBoardCommentCount" resultType="int" parameterType="int">
+		SELECT COUNT(*)
+		FROM free_comment
+		WHERE board_no=#{no}
+	</select>
+</mapper>

@@ -1,0 +1,118 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<script th:inline="javascript">
+const SESSION_NAME=/*[[${session.name}]]*/ ''
+</script>
+<main class="container py-5" style="max-width: 1000px;">
+    
+    <div class="bg-white rounded-4 border shadow-sm overflow-hidden mb-4">
+        
+        <div class="p-4 p-md-5 border-bottom">
+            <h2 class="fw-bold mb-4" style="color: #1e293b; line-height: 1.4;">[[${vo.subject}]]</h2>
+            
+            <div class="d-flex justify-content-between align-items-center meta-text">
+                <div>
+                    <i class="fa-solid fa-user me-1"></i> 
+                    <span class="text-dark fw-medium me-3">[[${vo.name}]]</span>
+                    
+                    <i class="fa-regular fa-clock me-1 text-muted"></i> 
+                    <span class="text-muted">[[${vo.dbday}]]</span> <!-- 작성일 -->
+                </div>
+                <div>
+                    <i class="fa-regular fa-eye me-1 text-muted"></i> 
+                    <span class="text-muted">[[${vo.hit}]]</span> <!-- 조회수 -->
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 p-md-5 detail-content-area" th:utext="${vo.content}"></div>
+
+        <div class="bg-light p-4 p-md-5 border-top" id="commentApp">
+		    <h5 class="fw-bold mb-4" style="color: #1e293b;">댓글 <span class="text-danger">{{ totalCount }}</span></h5>
+		    
+		    <div class="mb-5 bg-white p-3 rounded-3 border">
+		        <!-- 로그인 됨 -->
+				<template v-if="sessionId">
+					<textarea v-model="newComment" class="form-control border-0 shadow-none mb-2" rows="3" placeholder="댓글을 남겨보세요. (비방, 욕설 시 제재될 수 있습니다)" style="resize: none;"></textarea>
+					<div class="d-flex justify-content-end align-items-center border-top pt-2">
+						<button type="button" class="btn text-white fw-bold px-4 rounded-3" style="background-color: #212529;" @click="writeComment">등록</button>
+					</div>
+				</template>
+		
+		        <!-- 비로그인 -->
+				<template v-else>
+					<div class="text-center py-4 text-muted">
+						<i class="fa-solid fa-lock mb-2 fs-4"></i>
+						<p class="mb-2">댓글을 작성하려면 로그인이 필요합니다.</p>
+						<a href="/member/login" class="btn btn-sm btn-outline-secondary px-3 rounded-3 fw-medium">로그인하러 가기</a>
+					</div>
+				</template>
+		        
+			</div>
+		
+		    <!-- 계층형 댓글 -->
+			<div v-for="reply in commentList" :key="reply.no" class="mb-4 d-flex gap-3" :style="{ marginLeft: reply.depth > 0 ? (reply.depth * 3) + 'rem' : '0' }">
+		        
+				<div v-if="reply.depth > 0" class="text-muted mt-2">
+					<i class="fa-solid fa-arrow-turn-down fa-rotate-270"></i>
+				</div>
+		        
+				<div class="comment-avatar"><i class="fa-solid fa-user"></i></div>
+				<div class="flex-grow-1">
+		            
+					<div class="d-flex justify-content-between align-items-center mb-1">
+						<div>
+							<span class="fw-bold text-dark me-2">{{ reply.name }}</span>
+							<span class="text-muted small">{{ reply.dbday }}</span>
+						</div>
+		        	 	       
+						<div class="d-flex gap-2">
+							<button v-if="sessionId" class="btn btn-sm btn-link text-muted text-decoration-none p-0" @click="toggleReplyForm(reply.no)">답글</button>
+		                    
+							<template v-if="sessionId !== '' && sessionId === reply.memberId">
+								<button class="btn btn-sm btn-link text-muted text-decoration-none p-0" @click="toggleEditForm(reply)">수정</button>
+								<button class="btn btn-sm btn-link text-danger text-decoration-none p-0" @click="deleteComment(reply.no)">삭제</button>
+							</template>
+						</div>
+					</div>
+		            
+		            <div v-if="editReplyNo !== reply.no" class="text-dark mb-2" style="font-size: 15px; white-space: pre-wrap;">{{ reply.msg }}</div>
+		
+		            <div v-else-if="editReplyNo === reply.no" class="bg-white p-3 rounded-3 border mt-2 mb-3 shadow-sm">
+		                <textarea v-model="editCommentText" class="form-control border-0 shadow-none mb-2" rows="2" style="resize: none;"></textarea>
+		                <div class="d-flex justify-content-end align-items-center border-top pt-2">
+		                    <button type="button" class="btn btn-sm btn-outline-secondary px-3 rounded-3 me-2" @click="editReplyNo = 0">취소</button>
+		                    <button type="button" class="btn btn-sm text-white fw-bold px-3 rounded-3" style="background-color: #212529;" @click="updateComment(reply.no)">저장</button>
+		                </div>
+		            </div>
+		
+		            <div v-if="activeReplyNo === reply.no" class="bg-white p-3 rounded-3 border mt-3 shadow-sm">
+		                <textarea v-model="nestedComment" class="form-control border-0 shadow-none mb-2" rows="2" placeholder="대댓글을 남겨보세요." style="resize: none;"></textarea>
+		                <div class="d-flex justify-content-end align-items-center border-top pt-2">
+		                    <button type="button" class="btn btn-sm btn-outline-secondary px-3 rounded-3 me-2" @click="activeReplyNo = 0">취소</button>
+		                    <button type="button" class="btn btn-sm text-white fw-bold px-3 rounded-3" style="background-color: #212529;" @click="writeNestedComment(reply.no)">등록</button>
+		                </div>
+		            </div>
+		            
+		        </div>
+		    </div> 
+		</div>
+    </div>
+
+    <!-- 2. 하단 액션 버튼 영역 -->
+    <div class="d-flex justify-content-between align-items-center">
+        <!-- 좌측: 목록으로 돌아가기 -->
+        <div>
+            <a href="/board/list" class="btn btn-outline-secondary px-4 py-2 rounded-3 fw-medium">
+                <i class="fa-solid fa-list me-1"></i> 목록
+            </a>
+        </div>
+        
+        <!-- 우측: 작성자 본인일 경우만 보이는 버튼들 -->
+        <div class="d-flex gap-2">
+            <a type="button" class="btn btn-outline-danger px-4 py-2 rounded-3 fw-medium">삭제</a>
+            <a type="button" class="btn text-white px-4 py-2 rounded-3 fw-bold" style="background-color: #212529;">수정</a>
+        </div>
+    </div>
+
+</main>
+</html>
