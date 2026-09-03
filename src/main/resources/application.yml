@@ -22,20 +22,52 @@ spring:
 # web => upload
 
   jpa:
+    # hibernate db 스키마 자동 변경 방어
+    hibernate:
+      ddl-auto: none
     database: oracle
     properties:
       hibernate:
         dialect: org.hibernate.dialect.OracleDialect
         format_sql: true
-        user_sql_comments: true
+        use_sql_comments: true
 #        => JPA / MyBatis / ThymeLeaf
   thymeleaf:
     cache: false
     encoding: UTF-8
     prefix: classpath:templates/
     suffix: .html
-    mode: HTML	
-
+    mode: HTML
+  # spring AI
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      embedding:
+        options:
+            model: text-embedding-3-small
+  # kafka
+  kafka:
+    # 카프카 브로커 위치
+    bootstrap-servers: localhost:29092
+    listener:
+      ack-mode: batch
+    producer:
+      # key 직렬화 방식: String으로 일관 적용
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # value 직렬화 방식: Json으로 일관 적용
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+    consumer:
+      # 컨슈머별로 groupId 개별 저장 => groupId 기본값 설정
+      group-id: notification-service
+      # key/value 역직렬화 일관적용
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      # 역직렬화 허용 클래스 지정
+      properties:
+        spring.json.trusted.packages: "*"
+      # 토픽에 쌓인 과거 메시지부터 다 읽음
+      auto-offset-reset: earliest
 mybatis:
   type-aliases-package: com.sist.web.domain
   mapper-locations: classpath:mybatis/mapper/**/*.xml
@@ -45,5 +77,4 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
 # security
-# spring ai
 # websocket => kafka
