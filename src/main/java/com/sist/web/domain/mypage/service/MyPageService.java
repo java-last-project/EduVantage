@@ -2,7 +2,7 @@ package com.sist.web.domain.mypage.service;
 
 import java.util.List;
 
-import com.sist.web.domain.mypage.vo.CourseEnrollmentVO;
+import com.sist.web.domain.enrollment.vo.*;
 import com.sist.web.domain.mypage.vo.MyMemberVO;
 
 public interface MyPageService {

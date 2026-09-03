@@ -7,7 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.sist.web.domain.mypage.service.MyPageService;
-import com.sist.web.domain.mypage.vo.CourseEnrollmentVO;
+import com.sist.web.domain.enrollment.vo.*;
 import com.sist.web.domain.mypage.vo.MyMemberVO;
 
 import jakarta.servlet.http.HttpSession;
