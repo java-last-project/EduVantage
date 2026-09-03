@@ -25,6 +25,7 @@
             WHERE category = #{category}
         </if>
     </select>
+    
     <select id="bookTotalCount" resultType="int" parameterType="string">
     	SELECT COUNT(*)
     	FROM book
@@ -32,4 +33,17 @@
     	WHERE category=#{category}
     	</if>
     </select>
+   
+    <select id="bookDetailData" resultType="com.sist.web.domain.book.vo.BookVO" parameterType="int">
+    	SELECT no, price, stock, hit, like_count, comment_count, title, poster, author, publisher,
+    			pages, isbn, book_desc, desc_img, author_desc, toc, category, TO_CHAR(pubdate, 'yyyy-MM-dd') as dbday
+    	FROM book
+    	WHERE  no = #{no}
+    </select>
+    
+    <update id="bookHitIncrement" parameterType="int">
+    	UPDATE book
+    	SET hit = hit +1
+    	WHERE no = #{no}
+    </update>
 </mapper>

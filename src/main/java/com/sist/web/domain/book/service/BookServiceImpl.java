@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sist.web.domain.book.mapper.BookMapper;
 import com.sist.web.domain.book.vo.BookVO;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BookServiceImpl implements BookService{
 	private final BookMapper bMapper;
 	@Override
@@ -38,5 +40,13 @@ public class BookServiceImpl implements BookService{
 		// TODO Auto-generated method stub
 		return bMapper.bookTotalCount(category);
 	 }
+
+	 @Override
+	 public BookVO bookDetailData(int no) {
+		// TODO Auto-generated method stub
+		bMapper.bookHitIncrement(no);
+		 return bMapper.bookDetailData(no);
+	 }
+
 
 }

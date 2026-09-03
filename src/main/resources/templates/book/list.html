@@ -79,6 +79,7 @@
 	width: 100%;
 	aspect-ratio: 1/1.4;
 	background: #f7f8fa;
+	cursor: pointer;
 }
 
 .book-image-wrapper img {
@@ -99,6 +100,8 @@
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	cursor: pointer;
+	
 }
 
 .book-author {
@@ -326,10 +329,10 @@
 				<div class="book-grid">
 					<div class="book-card" v-for="vo in store.list" :key="vo.no">
 						<div class="book-image-wrapper">
-							<img :src="vo.poster" :alt="vo.title">
+							<img :src="vo.poster" :alt="vo.title" @click="moveDetail(vo.no)">
 						</div>
 						<div class="book-info">
-							<h4 class="book-title">{{ vo.title }}</h4>
+							<h4 class="book-title" @click="moveDetail(vo.no)">{{ vo.title }}</h4>
 							<p class="book-author">{{ vo.author }}</p>
 							<div class="book-price">₩{{ vo.price }}</div>
 							<div class="book-meta mt-2 d-flex gap-3 text-secondary" style="font-size: 13px;">
@@ -362,19 +365,29 @@
 	<script src="/vue/book/bookListStore.js"></script>
 
 	<script>
-    const { createApp, onMounted } = Vue;
-    const { createPinia } = Pinia;
-    const bookApp = createApp({
-        setup() {
-            const store = useBookListStore();
-            onMounted(() => {
-                store.bookListData(); 
-            });
-            return { store };
-        }
-    });
-    bookApp.use(createPinia());
-    bookApp.mount("#app"); 
+	const { createApp, onMounted } = Vue;
+	const { createPinia } = Pinia;
+
+	const listApp = createApp({
+	    setup() {
+	        const store = useBookListStore();
+	        
+	        // 페이지가 처음 렌더링될 때 데이터 불러오기
+	        onMounted(() => {
+	            store.bookListData();
+	        });
+	        // 상세 페이지로 이동하는 함수
+	        const moveDetail = (no) => {
+	            location.href = `/book/detail?no=${no}`;
+	        };
+	        return { 
+	            store, 
+	            moveDetail 
+	        };
+	    }
+	});
+	listApp.use(createPinia());
+	listApp.mount("#app");
 </script>
 </body>
 </html>
