@@ -9,5 +9,10 @@ import java.util.List;
 @Mapper
 public interface ScheduledExamMapper {
     //특정 달의 정기시험 일정 조회
-    public List<ScheduledExamVO> getScheduledExamByMonth(@Param("year")int year, @Param("month")int month);
+    List<ScheduledExamVO> getScheduledExamByMonth(@Param("year")int year,
+                                                         @Param("month")int month,
+                                                         @Param("offset")int offset,
+                                                         @Param("size")int size);
+    int countScheduledExamByMonth(@Param("year")int year,
+                                  @Param("month")int month);
 }
