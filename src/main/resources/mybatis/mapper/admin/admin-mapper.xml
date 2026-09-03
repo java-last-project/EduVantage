@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.web.domain.admin.mapper.AdminMapper">
+	
+	<!-- 회원 리스트 데이터 조회 -->
+	<select id="adminMemberListData" resultType="hashmap" parameterType="int">
+		SELECT m.member_id,m.username,m.name,TO_CHAR(m.regdate,'yyyy-mm-dd') as dbday,a.authority,m.enabled
+		FROM member m
+		JOIN authority a
+		ON m.member_id=a.member_id
+		ORDER BY m.member_id ASC
+		OFFSET #{start} ROWS FETCH NEXT 10 ROWS ONLY
+	</select>
+	
+	<!-- 회원 이름으로 검색 -->
+	<select id="adminMemberFindByName" resultType="hashmap" parameterType="string">
+		SELECT m.member_id,m.username,m.name,TO_CHAR(m.regdate,'yyyy-mm-dd') as dbday,a.authority,m.enabled
+		FROM member m
+		JOIN authority a
+		ON m.member_id=a.member_id
+		WHERE m.name LIKE '%'||#{name}||'%'
+		ORDER BY m.member_id ASC
+	</select>
+	
+	<!-- 필터링 된 회원 리스트 데이터 조회 -->
+	<select id="adminMemberFilterListData" resultType="hashmap" parameterType="int">
+		SELECT m.member_id,m.username,m.name,TO_CHAR(m.regdate,'yyyy-mm-dd') as dbday,a.authority,m.enabled
+		FROM member m
+		JOIN authority a
+		ON m.member_id=a.member_id
+		
+		<where>
+			<if test="authority!='all'">
+				AND authority=#{authority}
+			</if>
+			<if test="enabled!=-1">
+				AND enabled=#{enabled}
+			</if>
+		</where>
+		
+		ORDER BY m.member_id ASC
+		OFFSET #{start} ROWS FETCH NEXT 10 ROWS ONLY
+	</select>
+	
+	<!-- 필터링 된 총 회원 수 -->
+	<select id="getCountFilterMember" resultType="int" parameterType="hashmap">
+		SELECT COUNT(*)
+		FROM member m
+		JOIN authority a
+		ON m.member_id=a.member_id
+		<where>
+			<if test="authority!='all'">
+				AND authority=#{authority}
+			</if>
+			<if test="enabled!=-1">
+				AND enabled=#{enabled}
+			</if>
+		</where>
+	</select>
+</mapper>
