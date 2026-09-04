@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.sist.web.domain.enrollment.vo.*;
+import com.sist.web.domain.member.vo.MemberVO;
 import com.sist.web.domain.mypage.vo.MyMemberVO;
 import com.sist.web.domain.mypage.mapper.*;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,11 @@ public class MyPageServiceImpl implements MyPageService {
 	public MyMemberVO memberProfileData(int member_id) {
 		// TODO Auto-generated method stub
 		return mMapper.memberProfileData(member_id);
+	}
+	@Override
+	public void memberUpdateData(MemberVO vo) {
+		// TODO Auto-generated method stub
+		mMapper.memberUpdateData(vo);
 	}
 
 }
