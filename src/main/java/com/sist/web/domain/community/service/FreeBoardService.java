@@ -5,6 +5,7 @@ import com.sist.web.domain.community.vo.FreeBoardVO;
 import com.sist.web.domain.community.vo.FreeCommentVO;
 import jakarta.servlet.http.HttpSession;
 
+
 public interface FreeBoardService {
 	public List<FreeBoardVO> freeBoardList(int page,String fd);
 	public int[] freeBoardPageData(int page,String fd);

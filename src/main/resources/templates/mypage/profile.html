@@ -3,68 +3,317 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<style>
+.section-title {
+	font-size: 16px;
+	font-weight: 800;
+	color: #333;
+	margin: 0 0 15px 0;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #eee;
+}
+
+.profile-row {
+	display: flex;
+	gap: 15px;
+	margin-bottom: 20px;
+}
+
+.profile-group {
+	margin-bottom: 20px;
+}
+
+.profile-row .profile-group {
+	flex: 1;
+	margin-bottom: 0;
+}
+
+.profile-label {
+	display: block;
+	font-size: 13px;
+	font-weight: 700;
+	color: #444;
+	margin-bottom: 8px;
+}
+
+.required {
+	color: #5a5cff;
+	margin-left: 3px;
+}
+
+.profile-control {
+	width: 100%;
+	padding: 14px 16px;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	font-size: 14px;
+	box-sizing: border-box;
+	outline: none;
+	transition: border-color 0.2s;
+}
+
+.profile-control::placeholder {
+	color: #bbb;
+}
+
+.profile-control:focus {
+	border-color: #5a5cff;
+}
+
+.input-with-btn {
+	display: flex;
+	gap: 10px;
+}
+
+.input-with-btn .profile-control {
+	flex: 1;
+}
+
+.btn-outline {
+	padding: 0 20px;
+	background-color: #fff;
+	border: 1px solid #666;
+	border-radius: 8px;
+	color: #444;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.btn-outline:hover {
+	background-color: #f9f9f9;
+}
+
+.radio-group {
+	display: flex;
+	gap: 20px;
+	padding: 10px 0;
+}
+
+.radio-label {
+	display: flex;
+	align-items: center;
+	font-size: 14px;
+	color: #444;
+	cursor: pointer;
+}
+
+.radio-label input[type="radio"] {
+	appearance: none;
+	width: 18px;
+	height: 18px;
+	border: 2px solid #ddd;
+	border-radius: 50%;
+	margin-right: 8px;
+	outline: none;
+	cursor: pointer;
+	position: relative;
+}
+
+.radio-label input[type="radio"]:checked {
+	border-color: #5a5cff;
+}
+
+.radio-label input[type="radio"]:checked::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 10px;
+	height: 10px;
+	background-color: #5a5cff;
+	border-radius: 50%;
+}
+
+.address-group {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+textarea.profile-control {
+	resize: none;
+	height: 100px;
+}
+
+.btn-submit {
+	width: 100%;
+	padding: 16px;
+	background-color: #5a5cff;
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	font-size: 16px;
+	font-weight: 700;
+	cursor: pointer;
+	margin-top: 20px;
+	transition: background-color 0.2s;
+}
+
+.btn-submit:hover {
+	background-color: #484ae6;
+}
+</style>
+<script th:inline="javascript">
+const SESSION_ID = /*[[${session.member_id}]]*/ 0
+</script>
+<script src="//t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 <body>
-<div class="container-fluid p-3">
+<div class="container-fluid p-3" id="profile">
   <div class="card border">
     <div class="card-body p-4">
- 		
       <div class="d-flex align-items-center justify-content-between gap-3 mb-4">
         <div class="d-flex align-items-center gap-3">
-          <div class="bg-light rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-               style="width: 88px; height: 88px;">
-            <img th:src="${vo.profile_image}">
+          <div class="bg-light rounded-circle d-flex align-items-center justify-content-center flex-shrink-0">
+            <img src="/icon/profile.png" style="width: 88px; height: 88px">
           </div>
           <div>
-            <div class="fw-bold fs-5">[[${vo.name}]]</div>
+            <div class="fw-bold fs-5">{{store.vo.name}}</div>
             <div class="d-flex align-items-center flex-wrap gap-3 text-secondary mt-1" style="font-size: 13px;">
-              <span th:if="${vo.email!=null}"><i class="bi bi-envelope me-1"></i>
-              	[[${vo.email}]]
+              <span v-if="store.vo.email!=null"><i class="bi bi-envelope me-1"></i>
+                {{store.vo.email}}
               </span>
-              <span th:else><i class="bi bi-envelope me-1"></i>
-              	이메일 없음
+              <span v-else><i class="bi bi-envelope me-1"></i>
+                이메일 없음
               </span>
-              <span><i class="bi bi-calendar3 me-1"></i>[[${vo.dbRday}]] 가입</span>
+              <span><i class="bi bi-calendar3 me-1"></i>{{store.vo.dbRday}} 가입</span>
             </div>
           </div>
         </div>
-        <a href="#" class="btn btn-outline-secondary btn-sm px-3 flex-shrink-0">
-          <i class="bi bi-pencil"></i> 프로필 수정
-        </a>
+        <button class="btn btn-outline-secondary btn-sm px-3 flex-shrink-0" @click.prevent="store.toggleProfileForm">
+          <div v-if="!store.showProfileForm"><i class="bi bi-pencil"></i> 프로필 수정</div>
+          <div v-if="store.showProfileForm"><i class="bi bi-pencil"></i> 닫기</div>
+        </button>
       </div>
- 
+
       <div class="border-top pt-4">
         <div class="text-secondary small mb-1">소개</div>
-        <p class="mb-0" th:if="${vo.profile_desc!=null}">
-          [[${vo.profile_desc}]]
+        <p class="mb-0" v-if="store.vo.profile_desc!=null">
+          {{store.vo.profile_desc}}
         </p>
-        <p class="mb-0" th:else>
+        <p class="mb-0" v-else>
           등록된 자기소개가 없습니다.
         </p>
       </div>
- 
     </div>
   </div>
+
+  <div class="card border mt-4" v-show="store.showProfileForm">
+    <div class="card-body p-4">
+      <div class="section-title">프로필 수정</div>
+      <form id="profileForm" action="/mypage/profile_process" method="post" @submit.prevent="store.submitForm">
+        <div class="profile-row">
+          <div class="profile-group">
+            <div class="profile-label">비밀번호<span class="required">*</span></div>
+            <input type="password" name="password" v-model="store.formData.u_password" class="profile-control" placeholder="비밀번호를 입력해 주세요 (숫자 포함 8자 이상)" required>
+          </div>
+
+          <div class="profile-group">
+            <div class="profile-label">비밀번호 확인<span class="required">*</span></div>
+            <input type="password" name="passwordConfirm" v-model="store.formData.u_passwordConfirm" class="profile-control" placeholder="입력한 비밀번호와 일치하게 입력해 주세요" required>
+          </div>
+        </div>
+
+        <div class="section-title mt-4">개인 정보</div>
+
+        <div class="profile-row">
+          <div class="profile-group">
+            <div class="profile-label">이름<span class="required">*</span></div>
+            <input type="text" name="name" v-model="store.formData.u_name" class="profile-control" placeholder="성함을 입력해 주세요" required>
+            <input type="hidden" name="member_id" th:value="${session.member_id}">
+          </div>
+
+          <div class="profile-group">
+            <label class="profile-label">성별<span class="required">*</span></label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="sex" value="M" v-model="store.formData.u_sex" required> 남자
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="sex" value="F" v-model="store.formData.u_sex"> 여자
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-row">
+          <div class="profile-group">
+            <div class="profile-label">생년월일<span class="required">*</span></div>
+            <input type="text" name="birthdate" v-model="store.formData.u_birthdate" class="profile-control" placeholder="YYYYMMDD (예: 19950815)" required>
+          </div>
+
+          <div class="profile-group">
+            <div class="profile-label">연락처<span class="required">*</span></div>
+            <input type="text" name="phone" v-model="store.formData.u_phone" class="profile-control" placeholder="'-' 없이 숫자만 입력해 주세요" required>
+          </div>
+        </div>
+
+        <div class="section-title mt-4">추가 정보</div>
+
+        <div class="profile-group">
+          <div class="profile-label">주소</div>
+          <div class="address-group">
+            <div class="input-with-btn" style="width: 50%;">
+              <input type="text" name="post" v-model="store.formData.u_post" class="profile-control" placeholder="우편번호" readonly>
+              <button type="button" class="btn-outline" @click="store.openPostcode">우편번호 찾기</button>
+            </div>
+            <input type="text" name="addr1" v-model="store.formData.u_addr1" class="profile-control" placeholder="기본 주소" readonly>
+            <input type="text" id="address2" name="addr2" v-model="store.formData.u_addr2" class="profile-control" placeholder="상세 주소 입력">
+          </div>
+        </div>
+
+        <div class="profile-group">
+          <div class="profile-label">자기소개</div>
+          <textarea name="profile_desc" v-model="store.formData.u_profile_desc" class="profile-control" placeholder="간단한 본인 소개 및 학습 목적 등을 기술해 주세요."></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit">수정하기</button>
+      </form>
+    </div>
+  </div>
+
   <div class="row g-3 mt-3">
-        <div class="col-4">
-          <div class="border rounded-3 p-3 text-center">
-            <div class="fw-bold fs-5 mt-1">1</div>
-            <div class="text-secondary small">작성글</div>
-          </div>
-        </div>
-        <div class="col-4">
-          <div class="border rounded-3 p-3 text-center">
-            <div class="fw-bold fs-5 mt-1">[[${eCount}]]</div>
-            <div class="text-secondary small">수강중인 강좌</div>
-          </div>
-        </div>
-        <div class="col-4">
-          <div class="border rounded-3 p-3 text-center">
-            <div class="fw-bold fs-5 mt-1">1</div>
-            <div class="text-secondary small">작성한 강의평</div>
-          </div>
-        </div>
+    <div class="col-4">
+      <div class="border rounded-3 p-3 text-center">
+        <div class="fw-bold fs-5 mt-1">1</div>
+        <div class="text-secondary small">작성글</div>
       </div>
+    </div>
+    <div class="col-4">
+      <div class="border rounded-3 p-3 text-center">
+        <div class="fw-bold fs-5 mt-1">{{store.eCount}}</div>
+        <div class="text-secondary small">수강중인 강좌</div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="border rounded-3 p-3 text-center">
+        <div class="fw-bold fs-5 mt-1">1</div>
+        <div class="text-secondary small">작성한 강의평</div>
+      </div>
+    </div>
+  </div>
 </div>
+<script src="/vue/mypage/mypageStore.js"></script>
+<script>
+  const {createApp,onMounted}=Vue
+  const {createPinia}=Pinia
+
+  const profileApp=createApp({
+    setup(){
+      const store=useMypageStore()
+      onMounted(()=>{
+        store.profileData(SESSION_ID)
+      })
+      return {
+        store
+      }
+    }
+  })
+  profileApp.use(createPinia())
+  profileApp.mount('#profile')
+</script>
 </body>
 </html>

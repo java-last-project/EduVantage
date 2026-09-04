@@ -23,4 +23,39 @@
   </select>
   
   <!-- UPDATE: 강의 학습 페이지 들어가면 last_accessed 갱신 -->
+  
+  <update id="memberUpdateData" parameterType="com.sist.web.domain.member.vo.MemberVO">
+	    UPDATE member SET
+	   		password=#{password},
+	   		name=#{name},
+	   		sex=#{sex}, 
+	    	birthdate=TO_DATE(#{birthdate}, 'YYYYMMDD'),
+	    	phone=#{phone},
+	    	post=#{post},
+	    	addr1=#{addr1},
+	    	addr2=#{addr2},
+	    	profile_desc=#{profile_desc}
+	    WHERE member_id=#{member_id}
+  </update>
+  
+  <select id="coursePaymentListData" resultType="com.sist.web.domain.mypage.vo.CoursePaymentVO" parameterType="int">
+		SELECT p.no,course_no,title,thumbnail,m.name as instructor,price,
+		TO_CHAR(p.regdate,'yyyy-mm-dd hh24:mi:ss') as dbday 
+		FROM course_payment p
+		JOIN course c ON p.course_no=c.no
+		JOIN member m ON c.instructor_no=m.member_id
+		WHERE p.member_id=#{member_id}
+		ORDER BY p.regdate DESC
+		OFFSET #{start} ROWS FETCH NEXT 3 ROWS ONLY
+  </select>
+  
+  <select id="courseCartListData" resultType="com.sist.web.domain.mypage.vo.CourseCartVO" parameterType="int">
+		SELECT a.no,course_no,title,thumbnail,m.name as instructor,pay_price,regular_price
+		FROM course_cart a
+		JOIN course c ON a.course_no=c.no
+		JOIN member m ON c.instructor_no=m.member_id
+		WHERE a.member_id=#{member_id}
+		ORDER BY a.regdate DESC
+		OFFSET #{start} ROWS FETCH NEXT 3 ROWS ONLY
+  </select>
 </mapper>

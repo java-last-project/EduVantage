@@ -2,8 +2,8 @@ const { defineStore } = Pinia;
 
 const useBookDetailStore = defineStore('bookDetail', {
     state: () => ({
-        vo: {}, // 도서 상세 정보 (BookVO)
-        activeTab: 'intro' // 'intro'(도서소개), 'author'(저자소개), 'toc'(목차)
+        vo: {}, 
+        activeTab: 'intro' // intro(도서소개), author(저자소개), toc(목차)
     }),
     
     actions: {
