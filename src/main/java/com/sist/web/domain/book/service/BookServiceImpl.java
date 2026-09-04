@@ -48,5 +48,23 @@ public class BookServiceImpl implements BookService{
 		 return bMapper.bookDetailData(no);
 	 }
 
+	 @Override
+	 public int bookFindCount(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return bMapper.bookFindCount(map);
+	 }
+
+	 @Override
+	 public List<BookVO> bookFindData(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return bMapper.bookFindData(map);
+	 }
+
+	
+
+
+
+
+
 
 }

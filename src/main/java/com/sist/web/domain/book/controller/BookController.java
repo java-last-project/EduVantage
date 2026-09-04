@@ -21,5 +21,4 @@ public class BookController {
     	return "main/main";
     }
     
-    
 }
