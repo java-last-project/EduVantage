@@ -4,11 +4,15 @@ import java.util.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sist.web.domain.book.service.BookService;
+import com.sist.web.domain.book.vo.BookLikeVO;
 import com.sist.web.domain.book.vo.BookVO;
+
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -104,6 +108,59 @@ public class BookRestController {
         
         return response; 
     }
+    // 책 상세페이지 진입 시 상ㅌ 확인
+    @GetMapping("/book/api/like/status")
+    public Map<String, Object> bookLikeStatus(
+            @RequestParam("book_no") int bookNo,
+            HttpSession session) {
+
+    	Integer memberId = (Integer) session.getAttribute("member_id");
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("likeCount", bService.bookLikeCount(bookNo));
+
+        boolean isLiked = false;
+        if (memberId != null) {
+            BookLikeVO vo = new BookLikeVO();
+            vo.setBook_no(bookNo);
+            vo.setMember_id(memberId);
+            isLiked = bService.bookLikeCheck(vo) > 0;
+        }
+        response.put("isLiked", isLiked);
+
+        return response;
+    }
+
+    // 좋아요 버튼 클릭 시 토글 처리
+    @PostMapping("/book/api/like/toggle")
+    public Map<String, Object> bookLikeToggle(
+            @RequestParam("book_no") int bookNo,
+            HttpSession session) {
+
+    	Integer memberId = (Integer) session.getAttribute("member_id");
+        Map<String, Object> response = new HashMap<>();
+
+        if (memberId == null) {
+            response.put("error", "로그인이 필요합니다.");
+            return response;
+        }
+
+        BookLikeVO vo = new BookLikeVO();
+        vo.setBook_no(bookNo);
+        vo.setMember_id(memberId);
+
+        if (bService.bookLikeCheck(vo) == 0) {
+            bService.bookLikeOn(vo);
+            response.put("isLiked", true);
+        } else {
+            bService.bookLikeOff(vo);
+            response.put("isLiked", false);
+        }
+        response.put("likeCount", bService.bookLikeCount(bookNo));
+
+        return response;
+    }
+    
 
     
     

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sist.web.domain.book.mapper.BookMapper">
-    <!-- 목록 출력 : 페이징 및 카테고리/정렬 -->
+    <!-- 도서 목록 -->
     <select id="bookListData" resultType="com.sist.web.domain.book.vo.BookVO" parameterType="hashmap">
         SELECT no, title, author, poster, like_count, price, TO_CHAR(pubdate, 'yyyy-MM-dd') as dbday, hit
         FROM book
@@ -33,7 +33,8 @@
     	WHERE category=#{category}
     	</if>
     </select>
-   
+    
+   <!-- 도서 상세목록 -->
     <select id="bookDetailData" resultType="com.sist.web.domain.book.vo.BookVO" parameterType="int">
     	SELECT no, price, stock, hit, like_count, comment_count, title, poster, author, publisher,
     			pages, isbn, book_desc, desc_img, author_desc, toc, category, TO_CHAR(pubdate, 'yyyy-MM-dd') as dbday
@@ -41,34 +42,64 @@
     	WHERE  no = #{no}
     </select>
     
+    <!-- 조회수 -->
     <update id="bookHitIncrement" parameterType="int">
     	UPDATE book
     	SET hit = hit +1
     	WHERE no = #{no}
     </update>
+    
+    <!-- 도서 검색 -->
 	<select id="bookFindCount" resultType="int" parameterType="hashmap">
-    SELECT COUNT(*)
-    FROM book
-    WHERE (title LIKE '%' || #{keyword} || '%' OR author LIKE '%' || #{keyword} || '%')
-    <if test="category != null and category != '전체'">
-        AND category = #{category}
-    </if>
-</select>
-
-<select id="bookFindData" resultType="com.sist.web.domain.book.vo.BookVO" parameterType="hashmap">
-    SELECT no, title, author, poster, like_count, price, TO_CHAR(pubdate, 'yyyy-MM-dd') as dbday, hit
-    FROM book
-    WHERE (title LIKE '%' || #{keyword} || '%' OR author LIKE '%' || #{keyword} || '%')
-    <if test="category != null and category != '전체'">
-        AND category = #{category}
-    </if>
-    <choose>
-        <when test="sort == '출간일 순'">ORDER BY pubdate DESC</when>
-        <when test="sort == '낮은 가격순'">ORDER BY price ASC</when>
-        <when test="sort == '높은 가격순'">ORDER BY price DESC</when>
-        <when test="sort == '조회 수 순'">ORDER BY hit DESC</when>
-        <otherwise>ORDER BY no DESC</otherwise>
-    </choose>
-    OFFSET #{start} ROWS FETCH NEXT 12 ROWS ONLY
-</select>
+	    SELECT COUNT(*)
+	    FROM book
+	    WHERE (title LIKE '%' || #{keyword} || '%' OR author LIKE '%' || #{keyword} || '%')
+	    <if test="category != null and category != '전체'">
+	        AND category = #{category}
+	    </if>
+	</select>
+	
+	<select id="bookFindData" resultType="com.sist.web.domain.book.vo.BookVO" parameterType="hashmap">
+	    SELECT no, title, author, poster, like_count, price, TO_CHAR(pubdate, 'yyyy-MM-dd') as dbday, hit
+	    FROM book
+	    WHERE (title LIKE '%' || #{keyword} || '%' OR author LIKE '%' || #{keyword} || '%')
+	    <if test="category != null and category != '전체'">
+	        AND category = #{category}
+	    </if>
+	    <choose>
+	        <when test="sort == '출간일 순'">ORDER BY pubdate DESC</when>
+	        <when test="sort == '낮은 가격순'">ORDER BY price ASC</when>
+	        <when test="sort == '높은 가격순'">ORDER BY price DESC</when>
+	        <when test="sort == '조회 수 순'">ORDER BY hit DESC</when>
+	        <otherwise>ORDER BY no DESC</otherwise>
+	    </choose>
+	    OFFSET #{start} ROWS FETCH NEXT 12 ROWS ONLY
+	</select>
+	
+	<!-- 도서 좋아요 -->
+	<insert id="bookLikeOn" parameterType="com.sist.web.domain.book.vo.BookLikeVO">
+		INSERT INTO book_like(no, book_no, member_id) 
+		VALUES (
+			BL_NO_SEQ.nextval,
+			#{book_no},
+			#{member_id}
+		)
+	</insert>
+	
+	<delete id="bookLikeOff" parameterType="com.sist.web.domain.book.vo.BookLikeVO">
+		DELETE FROM book_like
+		WHERE member_id=#{member_id} AND book_no=#{book_no}
+	</delete>
+	
+	<select id="bookLikeCount" resultType="int" parameterType="int">
+		SELECT COUNT(*)
+		FROM book_like
+		WHERE book_no=#{book_no}
+	</select>
+	
+	<select id="bookLikeCheck" resultType="int" parameterType="com.sist.web.domain.book.vo.BookLikeVO">
+		SELECT COUNT(*)
+		FROM book_like
+		WHERE book_no=#{book_no} AND member_id=#{member_id}
+	</select>
 </mapper>

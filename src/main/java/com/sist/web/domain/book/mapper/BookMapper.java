@@ -20,4 +20,12 @@ public interface BookMapper {
 	public int bookFindCount(Map<String, Object> map);
 
 	public List<BookVO> bookFindData(Map<String, Object> map);
+	
+	public int bookLikeOn(BookLikeVO vo);
+
+	public int bookLikeOff(BookLikeVO vo);
+
+	public int bookLikeCount(int book_no);
+
+	public int bookLikeCheck(BookLikeVO vo);
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sist.web.domain.book.mapper.BookMapper;
+import com.sist.web.domain.book.vo.BookLikeVO;
 import com.sist.web.domain.book.vo.BookVO;
 
 import lombok.RequiredArgsConstructor;
@@ -60,11 +61,27 @@ public class BookServiceImpl implements BookService{
 		return bMapper.bookFindData(map);
 	 }
 
-	
+	 @Override
+	 public int bookLikeOn(BookLikeVO vo) {
+		// TODO Auto-generated method stub
+		return bMapper.bookLikeOn(vo);
+	 }
 
+	 @Override
+	 public int bookLikeOff(BookLikeVO vo) {
+		// TODO Auto-generated method stub
+		return bMapper.bookLikeOff(vo);
+	 }
 
+	 @Override
+	 public int bookLikeCount(int book_no) {
+		// TODO Auto-generated method stub
+		return bMapper.bookLikeCount(book_no);
+	 }
 
-
-
-
+	 @Override
+	 public int bookLikeCheck(BookLikeVO vo) {
+		// TODO Auto-generated method stub
+		return bMapper.bookLikeCheck(vo);
+	 }
 }
