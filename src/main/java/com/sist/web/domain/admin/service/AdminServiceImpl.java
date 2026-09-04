@@ -1,8 +1,7 @@
 package com.sist.web.domain.admin.service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import com.sist.web.domain.member.vo.*;
 
 import org.springframework.stereotype.Service;
 
@@ -96,6 +95,21 @@ public class AdminServiceImpl implements AdminService
 		map.put("authority", authority);
 		map.put("enabled", Integer.parseInt(enabled));
 		return aMapper.getCountFilterMember(map);
+	}
+
+	@Override
+	public Map<String, Object> adminMemberDetailData(int member_id) {
+		// TODO Auto-generated method stub
+		return aMapper.adminMemberDetailData(member_id);
+	}
+
+	@Override
+	public void adminUpdateMemberEnabled(int enabled, int member_id) {
+		// TODO Auto-generated method stub
+		MemberVO vo = new MemberVO();
+		vo.setEnabled(enabled);
+		vo.setMember_id(member_id);
+		aMapper.adminUpdateMemberEnabled(vo);
 	}
 
 	
