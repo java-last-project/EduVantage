@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.web.domain.community.mapper.FreeBoardCommentMapper">
+   
+	<select id="freeBoardCommentList" resultType="com.sist.web.domain.community.vo.FreeCommentVO" parameterType="int">
+		SELECT c.no,c.board_no,c.member_id,m.name,c.msg,TO_CHAR(c.regdate,'yyyy-mm-dd HH24:mi:ss') AS dbday,c.parent_no,LEVEL-1 AS group_tab
+		FROM free_comment c
+		JOIN member m ON c.member_id=m.member_id
+		WHERE board_no=#{no}
+		START WITH parent_no IS NULL
+		CONNECT BY PRIOR no=parent_no
+		ORDER SIBLINGS BY no ASC
+	</select>
+	
+	<select id="freeBoardCommentCount" resultType="int" parameterType="int">
+		SELECT COUNT(*)
+		FROM free_comment
+		WHERE board_no=#{no}
+	</select>
+
+	<insert id="freeBoardCommentInsert" parameterType="com.sist.web.domain.community.vo.FreeCommentVO">
+		INSERT INTO free_comment (board_no,member_id,msg,parent_no)
+		VALUES (#{board_no},#{member_id},#{msg},NULLIF(#{parent_no},0))
+	</insert>
+
+	<update id="freeBoardCommentUpdate" parameterType="com.sist.web.domain.community.vo.FreeCommentVO">
+		UPDATE free_comment
+		SET msg=#{msg}
+		WHERE no=#{no}
+	</update>
+	
+	<select id="freeBoardCommentDeleteCount" parameterType="int" resultType="int">
+		SELECT COUNT(*)
+		FROM free_comment
+		WHERE parent_no=#{no}
+	</select>
+
+	<delete id="freeBoardCommentHardDelete" parameterType="int">
+		DELETE FROM free_comment
+		WHERE no=#{no}
+	</delete>
+
+	<update id="freeBoardCommentSoftDelete" parameterType="int">
+		UPDATE free_comment
+		SET msg='삭제된 메세지입니다.'
+		WHERE no=#{no}
+	</update>
+
+	<delete id="freeBoardCommentDeleteForBoardDelete" parameterType="int">
+		DELETE FROM free_comment
+		WHERE board_no=#{board_no}
+	</delete>
+
+</mapper>

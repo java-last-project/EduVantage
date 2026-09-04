@@ -7,7 +7,7 @@ const initialState=()=>({
 	totalpage:0,
 	startPage:0,
 	endPage:0,
-	count:0,
+	count:0
 })
 const useFreeboardStore=defineStore('freeboard_store',{
     state:initialState,
