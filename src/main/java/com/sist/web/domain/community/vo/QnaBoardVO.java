@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import lombok.Data;
 @Data
 public class QnaBoardVO {
-	private int no,member_id,category;
-	private String subject,content,status,dbday;
+	private Integer categoryNo,no,member_id;
+	private String subject,content,status,dbday,name,category;
 	private LocalDateTime regdate;
 }

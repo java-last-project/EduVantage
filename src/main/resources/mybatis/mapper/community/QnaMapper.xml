@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sist.web.domain.community.mapper.QnaMapper">
+
+	<select id="qnaListData" resultType="com.sist.web.domain.community.vo.QnaBoardVO" parameterType="hashmap">
+		SELECT q.no,q.member_id,m.name,c.category,q.subject,q.status,TO_CHAR(q.regdate,'yyyy-mm-dd') AS dbday
+		FROM qnaboard q
+		JOIN qna_category c ON q.category_no=c.no
+		JOIN member m ON q.member_id=m.member_id
+		<where>
+			<if test="fd!=null and fd!=''">
+				AND (subject LIKE '%'||#{fd, jdbcType=VARCHAR}||'%' OR content LIKE '%'||#{fd, jdbcType=VARCHAR}||'%')
+			</if>
+			<if test="categoryNo!=null">
+				AND q.category_no=#{categoryNo, jdbcType=INTEGER}
+			</if>
+		</where>
+		ORDER BY no DESC
+		OFFSET #{start} ROWS FETCH NEXT 20 ROWS ONLY
+	</select>
+	
+	<select id="qnaListCount" resultType="int" parameterType="hashmap">
+		SELECT COUNT(*)
+		FROM qnaboard
+		<where>
+			<if test="fd!=null and fd!=''">
+				AND (subject LIKE '%'||#{fd, jdbcType=VARCHAR}||'%' OR content LIKE '%'||#{fd, jdbcType=VARCHAR}||'%')
+			</if>
+			<if test="categoryNo!=null">
+				AND q.category_no=#{categoryNo}
+			</if>
+		</where>
+	</select>
+	
+	<select id="qnaDetailData" resultType="com.sist.web.domain.community.vo.QnaBoardVO" parameterType="int">
+		SELECT q.no,q.member_id,m.name,c.category,q.category_no AS categoryNo,q.subject,q.status,TO_CHAR(q.regdate,'yyyy-mm-dd') AS dbday,q.content
+		FROM qnaboard q
+		JOIN qna_category c ON q.category_no=c.no
+		JOIN member m ON q.member_id=m.member_id
+		WHERE q.no=#{no}
+	</select>
+	
+	<insert id="qnaInsert" parameterType="com.sist.web.domain.community.vo.QnaBoardVO"
+			useGeneratedKeys="true" keyProperty="no" keyColumn="NO">
+		INSERT INTO qnaboard (member_id,category_no,subject,content)
+		VALUES (#{member_id},#{categoryNo},#{subject},#{content})
+	</insert>
+	
+	<update id="qnaUpdate" parameterType="com.sist.web.domain.community.vo.QnaBoardVO">
+		UPDATE qnaboard SET
+		subject=#{subject}, content=#{content}, category_no=#{categoryNo}
+		WHERE no=#{no}
+	</update>
+	
+	<select id="qnaDeleteValidate" parameterType="int" resultType="string">
+		SELECT status
+		FROM qnaboard
+		WHERE no=#{no}
+	</select>
+	
+	<delete id="qnaDelete" parameterType="int">
+		DELETE FROM qnaboard
+		WHERE no=#{no}
+	</delete>
+	
+</mapper>
