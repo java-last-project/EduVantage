@@ -1,6 +1,7 @@
 package com.sist.web.domain.mypage.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 import com.sist.web.domain.enrollment.vo.*;
@@ -26,4 +27,18 @@ public interface MyPageMapper {
 			+ "WHERE member_id=#{member_id}")
 	public MyMemberVO memberProfileData(int member_id);
 	public void memberUpdateData(MemberVO vo);
+	public List<CoursePaymentVO> coursePaymentListData(
+			@Param("start") int start,
+			@Param("member_id") int member_id);
+	
+	@Select("SELECT COUNT(*) FROM course_payment "
+			+ "WHERE member_id=#{member_id}")
+	public int coursePaymentRowCount(int member_id);
+	
+	public List<CourseCartVO> courseCartListData(
+			@Param("start") int start,
+			@Param("member_id") int member_id);
+	@Select("SELECT COUNT(*) FROM course_cart "
+			+ "WHERE member_id=#{member_id}")
+	public int courseCartRowCount(int member_id);
 }

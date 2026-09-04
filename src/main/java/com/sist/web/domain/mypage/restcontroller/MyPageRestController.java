@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sist.web.domain.member.vo.MemberVO;
 import com.sist.web.domain.mypage.service.*;
+import com.sist.web.domain.mypage.vo.CourseCartVO;
+import com.sist.web.domain.mypage.vo.CoursePaymentVO;
 import com.sist.web.domain.mypage.vo.MyMemberVO;
 
 import lombok.RequiredArgsConstructor;
@@ -56,5 +58,48 @@ public class MyPageRestController {
 	    		             .build();
 	}
 	
+	// 강의 구매 목록 api
+	@GetMapping("/mypage/course_orders_vue")
+	public ResponseEntity<Map> mypage_course_orders_vue(
+			@RequestParam("page") int page,
+			@RequestParam("member_id") int member_id){
+		Map map=new HashMap();
+		try {
+			List<CoursePaymentVO> cList=mService.coursePaymentListData(page,member_id);
+			int[] pages=mService.pages("course_payment",page, member_id);
+			map.put("cList", cList);
+			map.put("page", pages[0]);
+			map.put("totalpage", pages[1]);
+			map.put("startpage", pages[2]);
+			map.put("endpage", pages[3]);
+			map.put("cCount", pages[4]);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().build();
+		}
+		return ResponseEntity.ok(map);
+	}
+	
+	// 강의 구매 목록 api
+	@GetMapping("/mypage/course_carts_vue")
+	public ResponseEntity<Map> mypage_course_carts_vue(
+			@RequestParam("page") int page,
+			@RequestParam("member_id") int member_id){
+		Map map=new HashMap();
+		try {
+			List<CourseCartVO> cList=mService.courseCartListData(page,member_id);
+			int[] pages=mService.pages("course_cart",page, member_id);
+			map.put("cList", cList);
+			map.put("page", pages[0]);
+			map.put("totalpage", pages[1]);
+			map.put("startpage", pages[2]);
+			map.put("endpage", pages[3]);
+			map.put("cCount", pages[4]);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().build();
+		}
+		return ResponseEntity.ok(map);
+	}
 	
 }
