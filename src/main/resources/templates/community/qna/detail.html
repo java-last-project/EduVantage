@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<script th:inline="javascript">
+    const serverMsg = /*[[${msg}]]*/ null
+    if (serverMsg) {
+        alert(serverMsg)
+    }
+</script>
+	<div class="app-wrapper">
+	
+	    <th:block th:replace="~{community/sidebar::sidebar('qna')}"></th:block>
+	
+	    <main class="main-content py-5 px-4">
+	        <div style="max-width: 1000px; margin: 0 auto;">
+	            
+	            <div class="d-flex justify-content-between align-items-center mb-4">
+	                <h2 class="fw-bold mb-0" style="font-size: 26px; color: #1e293b;">Q&A 상세</h2>
+	                <div>
+	                    <a href="/qna/list" class="btn btn-outline-secondary fw-bold px-4 py-2 rounded-3">
+	                        <i class="fa-solid fa-list me-1"></i> 목록
+	                    </a>
+	                </div>
+	            </div>
+	
+	            <div class="bg-white rounded-3 shadow-sm border mb-4">
+	                <div class="p-4 border-bottom">
+	                    <div class="d-flex align-items-center gap-2 mb-2">
+	                        <span class="badge bg-light text-secondary border px-2 py-1">[[${vo.category}]]</span>
+	                        <span class="status-badge" th:class="${vo.status=='Y'?'status-done':'status-wait'}">
+	                            [[${vo.status=='Y'?'답변완료':'답변대기'}]]
+	                        </span>
+	                    </div>
+	                    <h3 class="fw-bold mb-3" style="font-size: 22px;">[[${vo.subject}]]</h3>
+	                    <div class="d-flex justify-content-between text-muted small">
+	                        <div>
+	                            <i class="fa-regular fa-user me-1"></i> [[${vo.name}]]
+	                        </div>
+	                        <div>
+	                            <i class="fa-regular fa-clock me-1"></i> [[${vo.dbday}]]
+	                        </div>
+	                    </div>
+	                </div>
+	                <div class="p-4" style="min-height: 200px; white-space: pre-wrap; line-height: 1.6;" th:utext="${vo.content}"></div>
+	                
+	                <div class="p-3 border-top text-end bg-light" th:if="${session.member_id==vo.member_id && vo.status!='Y'}">
+	                    <a class="btn btn-sm btn-outline-primary me-2" th:href="@{/qna/update(no=${vo.no})}">수정</a>
+	                    <a class="btn btn-sm btn-outline-danger" th:href="@{/qna/delete(no=${vo.no})}">삭제</a>
+	                </div>
+	            </div>
+	
+	            <!-- <div class="bg-light rounded-3 shadow-sm border p-4 mb-5">
+	                <div class="d-flex align-items-center mb-3">
+	                    <i class="fa-solid fa-reply fa-rotate-180 text-primary me-2 fs-4"></i>
+	                    <h4 class="fw-bold mb-0 text-primary">관리자 답변</h4>
+	                </div>
+	
+	                <div th:if="${vo.status==='Y'}" class="bg-white p-4 border rounded-3">
+	                    <div class="text-muted small mb-3">
+	                        <i class="fa-solid fa-headset me-1"></i> 고객센터 담당자 | {{ qnaDetail.replyDate }}
+	                    </div>
+	                    <div style="white-space: pre-wrap; line-height: 1.6;">{{ qnaDetail.replyContent }}</div>
+	                </div>
+	
+	                <div v-if="qnaDetail.status === 'N' && !isAdmin" class="bg-white p-5 border rounded-3 text-center text-muted">
+	                    <i class="fa-regular fa-clock fs-1 mb-3 text-secondary"></i>
+	                    <h5>답변을 준비 중입니다.</h5>
+	                    <p class="mb-0">담당자가 내용을 확인한 후 신속하게 답변해 드리겠습니다.</p>
+	                </div>
+	
+	                <div v-if="qnaDetail.status === 'N' && isAdmin" class="bg-white p-4 border rounded-3">
+	                    <textarea class="form-control mb-3" rows="5" placeholder="답변 내용을 입력하세요..." v-model="replyText"></textarea>
+	                    <div class="text-end">
+	                        <button class="btn btn-primary px-4 fw-bold" @click="submitReply">답변 등록</button>
+	                    </div>
+	                </div>
+	            </div> -->
+	
+	        </div>
+	    </main>
+	</div>
+</html>
