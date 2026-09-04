@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.web.domain.community.mapper.QnaReplyMapper">
+
+	<select id="qnaReplyData" resultType="com.sist.web.domain.community.vo.QnaReplyVO" parameterType="int">
+		SELECT r.no,r.member_id,m.name,r.qna_no,r.content,TO_CHAR(r.regdate,'yyyy-mm-dd HH24:mi:ss) AS dbday
+		FROM qnareply r
+		JOIN member m ON r.member_id=m.member_id
+		WHERE r.qna_no=#{qnaNo}
+	</select>
+	
+	<update id="qnaStatusUpdate" parameterType="hashmap">
+		UPDATE qnaboard SET
+		status=#{status}
+		WHERE no=#{qnaNo}
+	</update>
+	
+	<insert id="qnaReplyInsert" parameterType="com.sist.web.domain.community.vo.QnaReplyVO">
+		INSERT INTO qnareply (member_id,qna_no,content)
+		VALUES (#{member_id},#{qnaNo},#{content})
+	</insert>
+	
+	<update id="qnaReplyUpdate" parameterType="com.sist.web.domain.community.vo.QnaReplyVO">
+		UPDATE qnareply SET
+		content=#{content}
+		WHERE no=#{no}
+	</update>
+	
+	<delete id="qnaReplyDelete" parameterType="int">
+		DELETE FROM qnareply
+		WHERE no=#{no}
+	</delete>
+	
+</mapper>

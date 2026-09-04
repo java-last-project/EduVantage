@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<script th:inline="javascript">
+const SESSION_ID=/*[[${session.member_id}]]*/ ''
+</script>
+	<div class="app-wrapper">
+	
+	    <th:block th:replace="~{community/sidebar::sidebar('qna')}"></th:block>
+	
+	    <main class="main-content py-5 px-4" id="qnaApp">
+	        <div style="max-width: 1200px; margin: 0 auto;">
+	            
+	            <div class="d-flex justify-content-between align-items-end mb-4">
+	                <div>
+	                    <h2 class="fw-bold mb-2" style="font-size: 26px; color: #1e293b;">고객센터 Q&A</h2>
+	                    <p class="text-muted mb-0">결제, 환불, 사이트 이용 등 서비스 관련 문의를 남겨주세요.</p>
+	                </div>
+	                <div>
+	                    <a href="/qna/insert" class="btn text-white fw-bold px-4 py-2 rounded-3 shadow-sm" style="background-color: #212529;" v-if="sessionId!=null">
+	                        <i class="fa-solid fa-headset me-1"></i> 문의하기
+	                    </a>
+	                </div>
+	            </div>
+	
+	            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
+	                <ul class="nav qna-category">
+	                    <li class="nav-item" v-for="cat in store.categoryList" :key="cat.name">
+	                    	<a href="#" class="nav-link" :class="store.category==cat.no?'active':''" @click.prevent="store.setCategory(cat.no)">{{cat.name}}</a>
+	                    </li>
+	                </ul>
+	                
+	                <div class="position-relative" style="width: 300px;">
+	                    <input type="text" class="form-control pe-5" placeholder="제목이나 내용을 검색하세요" v-model="store.fd" @keydown.enter="store.move(1)">
+	                    <button type="button" class="btn position-absolute top-50 translate-middle-y border-0 text-muted" style="right: 5px; background: none;" @click="store.move(1)">
+	                        <i class="fa-solid fa-magnifying-glass"></i>
+	                    </button>
+	                </div>
+	            </div>
+	
+	            <div class="bg-white rounded-3 shadow-sm p-3 border mb-4">
+	                <table class="table text-center mb-0 align-middle table-hover">
+	                    <thead class="table-light">
+	                        <tr>
+	                            <th style="width: 8%;">번호</th>
+	                            <th style="width: 14%;">분류</th>
+	                            <th style="width: 42%;" class="text-start ps-4">제목</th>
+	                            <th style="width: 12%;">작성자</th>
+	                            <th style="width: 12%;">작성일</th>
+	                            <th style="width: 12%;">상태</th>
+	                        </tr>
+	                    </thead>
+	                    <tbody>
+	                        <tr v-for="(qna,index) in store.list" :key="index">
+	                            <td class="text-muted">{{qna.no}}</td>
+	                            <td><span class="text-secondary small fw-bold">{{qna.category}}</span></td>
+	                            <td class="text-start ps-4 text-truncate">
+	                                <i class="fa-solid fa-lock text-muted small me-2" v-if="qna.status==='Y'"></i>
+	                                <a :href="'/qna/detail?no='+qna.no" class="text-dark text-decoration-none fw-medium">{{qna.subject}}</a>
+	                            </td>
+	                            <td style="text-overflow: ellipsis; white-space: nowrap;">{{qna.name}}</td>
+	                            <td class="text-muted small">{{qna.dbday}}</td>
+	                            <td><span class="status-badge" :class="qna.status==='Y'?'status-done':'status-wait'" v-text="qna.status==='Y'?'답변완료':'답변대기'"></span></td>
+	                        </tr>
+	                    </tbody>
+	                </table>
+	            </div>
+	
+	            <nav aria-label="Page navigation">
+	               <ul class="pagination custom-pagination justify-content-center mb-0">
+	                  <li :class="store.startPage>1?'page-item':'disabled'">
+	                     <a class="page-link border-0 rounded-circle" @click="store.startPage>1?store.move(store.startPage-1):null"><i class="fa-solid fa-angle-left"></i></a>
+	                  </li>
+	                  <li class="page-item" v-for="(i,index) in store.range" :key="index" :class="{'active':store.curpage===i}">
+	                     <a class="page-link border-0 rounded-circle" @click="store.move(i)">{{i}}</a>
+	                  </li>
+	                  <li :class="store.endPage<store.totalpage?'page-item':'disabled'">
+	                     <a class="page-link border-0 rounded-circle" @click="store.endPage<store.totalpage?store.move(store.endPage+1):null"><i class="fa-solid fa-angle-right"></i></a>
+	                  </li>
+	               </ul>
+	            </nav>
+	
+	        </div>
+	    </main>
+	</div>
+<script src="/vue/community/qnaboard/qnaStore.js"></script>
+<script>
+const {onMounted,ref,createApp}=Vue
+const {createPinia}=Pinia
+const qnaApp=createApp({
+	setup(){
+		const store=useQnaStore()
+		const sessionId=ref(SESSION_ID)
+		
+		onMounted(()=>{
+			store.qnaListData()
+		})
+		return{
+			store,
+			sessionId
+		}
+	}
+})
+qnaApp.use(createPinia())
+qnaApp.mount('#qnaApp')
+</script>
+</html>
