@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+
+<th:block th:fragment="sidebar(currentMenu)">
+    <aside class="exam-sidebar d-flex flex-column justify-content-between p-3">
+        <nav class="exam-nav" style="margin-top: 50px">
+            <a href="/freeboard/list" class="exam-nav-item" th:classappend="${currentMenu=='freeboard'}?'active':''"><i class="fa-solid fa-comments"></i> 자유게시판</a>
+            <a href="/notice/list" class="exam-nav-item" th:classappend="${currentMenu=='notice'} ? 'active' : ''"><i class="fa-solid fa-bullhorn"></i> 공지 사항</a>
+            <a href="/qna/list" class="exam-nav-item" th:classappend="${currentMenu=='qna'} ? 'active' : ''"><i class="fa-solid fa-circle-question"></i> QnA</a>
+        </nav>
+
+
+    </aside>
+</th:block>
+
+</html>

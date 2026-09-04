@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
 import lombok.Data;
 @Data
 public class FreeBoardVO {
-	private int no,member_id,hit;
+	private int no,hit,cCount;
+	private Integer member_id;
 	private String subject,content,pwd,name,dbday;
 	private LocalDateTime regdate;
 }

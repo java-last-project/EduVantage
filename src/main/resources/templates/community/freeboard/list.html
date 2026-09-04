@@ -3,79 +3,97 @@
 .page-item:hover{
 	cursor: pointer
 }
+.app-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+.exam-sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    border-right: 1px solid #e2e8f0;
+}
+.main-content {
+    flex-grow: 1;
+    background-color: #fcfcfc;
+}
 </style>
-<main class="container py-5" style="max-width: 1300px;" id="freeApp">
-    
-    <div class="d-flex justify-content-between align-items-end mb-4">
-        <div>
-            <h2 class="fw-bold mb-2" style="font-size: 26px; color: #1e293b;">자유게시판</h2>
-            <p class="text-muted mb-0">개발 고민, 일상 등 다양한 주제로 자유롭게 소통해보세요.</p>
-        </div>
-        <div>
-            <a href="/board/insert" class="btn text-white fw-bold px-4 py-2 rounded-3 shadow-sm" style="background-color: #212529;">
-                <i class="fa-solid fa-pen me-1"></i> 글쓰기
-            </a>
-        </div>
-    </div>
+<div class="app-wrapper">
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="text-secondary small">
-            총 <strong class="text-dark">{{store.count}}</strong>건의 게시글
+    <th:block th:replace="~{community/sidebar::sidebar('freeboard')}"></th:block>
+
+    <main class="container py-5" style="max-width: 1300px;" id="freeApp">
+
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="fw-bold mb-2" style="font-size: 26px; color: #1e293b;">자유게시판</h2>
+                <p class="text-muted mb-0">개발 고민, 일상 등 다양한 주제로 자유롭게 소통해보세요.</p>
+            </div>
+            <div>
+                <a href="/freeboard/insert" class="btn text-white fw-bold px-4 py-2 rounded-3 shadow-sm" style="background-color: #212529;">
+                    <i class="fa-solid fa-pen me-1"></i> 글쓰기
+                </a>
+            </div>
         </div>
-        
-        <div class="position-relative" style="width: 320px;">
-            <input type="text" class="form-control board-search-input" v-model="store.fd" placeholder="검색어를 입력하세요" @keydown.enter="store.move(1)">
-            <button type="button" @click="store.move(1)" class="btn position-absolute top-50 translate-middle-y border-0 text-muted" style="right: 5px; background: none;">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="text-secondary small">
+                총 <strong class="text-dark">{{store.count}}</strong>건의 게시글
+            </div>
+
+            <div class="position-relative" style="width: 320px;">
+                <input type="text" class="form-control board-search-input" v-model="store.fd" placeholder="검색어를 입력하세요" @keydown.enter="store.move(1)">
+                <button type="button" @click="store.move(1)" class="btn position-absolute top-50 translate-middle-y border-0 text-muted" style="right: 5px; background: none;">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
         </div>
-    </div>
 
-    <div class="board-container mb-4">
-        <table class="table board-table text-center">
-            <thead>
-                <tr>
-                    <th style="width: 8%;">번호</th>
-                    <th style="width: 55%;" class="text-start ps-4">제목</th>
-                    <th style="width: 12%;">작성자</th>
-                    <th style="width: 15%;">작성일</th>
-                    <th style="width: 10%;">조회</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="board-row" v-for="(vo,index) in store.list" :key="index">
-                    <td>{{vo.no}}</td>
-                    <td class="text-start ps-4 text-truncate">
-                    	<a :href="'/freeboard/detail?no='+vo.no" style="text-decoration: none">
-	                        <span class="board-title-text">{{vo.subject}}</span>
-	                        <span class="text-danger small ms-1 fw-bold"></span>
-                        </a>
-                    </td>
-                    <td>{{vo.name}}</td>
-                    <td class="text-muted small">{{vo.dbday}}</td>
-                    <td class="text-muted small">{{vo.hit}}</td>
-                </tr>
-                <!-- // 템플릿 종료 -->
-            </tbody>
-        </table>
-    </div>
+        <div class="board-container mb-4">
+            <table class="table board-table text-center">
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">번호</th>
+                        <th style="width: 55%;" class="text-start ps-4">제목</th>
+                        <th style="width: 12%;">작성자</th>
+                        <th style="width: 15%;">작성일</th>
+                        <th style="width: 10%;">조회</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="board-row" v-for="(vo,index) in store.list" :key="index">
+                        <td>{{vo.no}}</td>
+                        <td class="text-start ps-4 text-truncate">
+                            <a :href="'/freeboard/detail?no='+vo.no" style="text-decoration: none">
+                                <span class="board-title-text">{{vo.subject}}</span>
+                                <span class="text-danger small ms-1 fw-bold">{{vo.cCount}}</span>
+                            </a>
+                        </td>
+                        <td>{{vo.name}}</td>
+                        <td class="text-muted small">{{vo.dbday}}</td>
+                        <td class="text-muted small">{{vo.hit}}</td>
+                    </tr>
+                    <!-- // 템플릿 종료 -->
+                </tbody>
+            </table>
+        </div>
 
-    <!-- 페이지네이션 -->
-	<nav aria-label="Page navigation">
-		<ul class="pagination custom-pagination justify-content-center mb-0">
-			<li :class="store.startPage>1?'page-item':'disabled'">
-				<a class="page-link border-0 rounded-circle" @click="store.startPage>1?store.move(store.startPage-1):null"><i class="fa-solid fa-angle-left"></i></a>
-			</li>
-			<li class="page-item" v-for="(i,index) in store.range" :key="index" :class="{'active':store.curpage===i}">
-				<a class="page-link border-0 rounded-circle" @click="store.move(i)">{{i}}</a>
-			</li>
-			<li :class="store.endPage<store.totalpage?'page-item':'disabled'">
-				<a class="page-link border-0 rounded-circle" @click="store.endPage<store.totalpage?store.move(store.endPage+1):null"><i class="fa-solid fa-angle-right"></i></a>
-			</li>
-		</ul>
-	</nav>
+        <!-- 페이지네이션 -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination custom-pagination justify-content-center mb-0">
+                <li :class="store.startPage>1?'page-item':'disabled'">
+                    <a class="page-link border-0 rounded-circle" @click="store.startPage>1?store.move(store.startPage-1):null"><i class="fa-solid fa-angle-left"></i></a>
+                </li>
+                <li class="page-item" v-for="(i,index) in store.range" :key="index" :class="{'active':store.curpage===i}">
+                    <a class="page-link border-0 rounded-circle" @click="store.move(i)">{{i}}</a>
+                </li>
+                <li :class="store.endPage<store.totalpage?'page-item':'disabled'">
+                    <a class="page-link border-0 rounded-circle" @click="store.endPage<store.totalpage?store.move(store.endPage+1):null"><i class="fa-solid fa-angle-right"></i></a>
+                </li>
+            </ul>
+        </nav>
 
-</main>
+    </main>
+</div>
 <script src="/vue/axios.js"></script>
 <script src="/vue/community/freeboard/freeboardStore.js"></script>
 <script>
