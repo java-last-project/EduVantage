@@ -3,7 +3,7 @@
 <mapper namespace="com.sist.web.domain.community.mapper.QnaReplyMapper">
 
 	<select id="qnaReplyData" resultType="com.sist.web.domain.community.vo.QnaReplyVO" parameterType="int">
-		SELECT r.no,r.member_id,m.name,r.qna_no,r.content,TO_CHAR(r.regdate,'yyyy-mm-dd HH24:mi:ss) AS dbday
+		SELECT r.no,r.member_id,m.name,r.qna_no,r.content,TO_CHAR(r.regdate,'yyyy-mm-dd HH24:mi:ss') AS dbday
 		FROM qnareply r
 		JOIN member m ON r.member_id=m.member_id
 		WHERE r.qna_no=#{qnaNo}

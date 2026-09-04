@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import lombok.Data;
 @Data
 public class QnaReplyVO {
-	private Integer no,member_id,qna_no;
-	private String content,dbday;
+	private Integer no,member_id,qnaNo;
+	private String content,dbday,name;
 	private LocalDateTime regdate;
 }
