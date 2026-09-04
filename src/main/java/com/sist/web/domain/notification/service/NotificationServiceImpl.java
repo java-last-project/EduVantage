@@ -39,4 +39,9 @@ public class NotificationServiceImpl implements NotificationService{
         List<NotificationVO> list = notificationMapper.findRecentNotifications(memberId, targetDate);
         return list;
     }
+
+    @Override
+    public void markAllAsRead(List<Integer> nos) {
+        notificationMapper.markAllAsRead(nos);
+    }
 }

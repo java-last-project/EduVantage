@@ -8,4 +8,12 @@
         WHERE member_id = #{memberId} And regdate &gt;= #{targetDate}
         ORDER BY regdate DESC
     </select>
+    <update id="markAllAsRead">
+        UPDATE notifications
+        SET is_read = 'Y'
+        WHERE no IN
+        <foreach collection="nos" item="no" open="(" separator="," close=")">
+            #{no}
+        </foreach>
+    </update>
 </mapper>

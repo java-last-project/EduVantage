@@ -1,8 +1,4 @@
-const { createApp, ref, onMounted } = Vue
-
-//ref의 역할
-
-createApp({
+const scheduledExamApp = createApp({
     setup(){
         //정기시험 목록
         const sList = ref([])
@@ -76,4 +72,6 @@ createApp({
 
         return {sList,year,month, page, totalpage, prevMonth, nextMonth, prevPage, nextPage}
     }
-}).mount("#scheduled-exam-list")
+})
+
+scheduledExamApp.mount("#scheduled-exam-list")

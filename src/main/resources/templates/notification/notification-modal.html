@@ -51,7 +51,9 @@
 
             <!-- 푸터 -->
             <div class="modal-footer justify-content-center" style="border-top: 1px solid var(--border-color);">
-                <button type="button" class="btn btn-link btn-sm text-decoration-none p-0"
+                <button type="button"
+                        class="btn btn-link btn-sm text-decoration-none p-0"
+                        @click="markAllRead"
                         style="font-size: 13px; color: var(--text-muted);">
                     모두 읽음으로 표시
                 </button>
@@ -59,6 +61,6 @@
         </div>
     </div>
 </div>
-<!--<div th:fragment="notificationWidget" id="notification-widget"></div>-->
 </body>
+
 </html>

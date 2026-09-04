@@ -10,4 +10,5 @@ public interface NotificationService {
     //List<NotificationVO> getIsNotReadNotification(int memberId);
 
     List<NotificationVO> findRecentNotifications(int memberId);
+    void markAllAsRead(List<Integer> nos);
 }
