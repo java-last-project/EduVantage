@@ -3,7 +3,7 @@
 <mapper namespace="com.sist.web.domain.book.mapper.BookMapper">
     <!-- 목록 출력 : 페이징 및 카테고리/정렬 -->
     <select id="bookListData" resultType="com.sist.web.domain.book.vo.BookVO" parameterType="hashmap">
-        SELECT no, title, author, poster, like_count, price, pubdate, hit
+        SELECT no, title, author, poster, like_count, price, TO_CHAR(pubdate, 'yyyy-MM-dd') as dbday, hit
         FROM book
         <if test="category != '전체'">
             WHERE category = #{category}
@@ -46,4 +46,29 @@
     	SET hit = hit +1
     	WHERE no = #{no}
     </update>
+	<select id="bookFindCount" resultType="int" parameterType="hashmap">
+    SELECT COUNT(*)
+    FROM book
+    WHERE (title LIKE '%' || #{keyword} || '%' OR author LIKE '%' || #{keyword} || '%')
+    <if test="category != null and category != '전체'">
+        AND category = #{category}
+    </if>
+</select>
+
+<select id="bookFindData" resultType="com.sist.web.domain.book.vo.BookVO" parameterType="hashmap">
+    SELECT no, title, author, poster, like_count, price, TO_CHAR(pubdate, 'yyyy-MM-dd') as dbday, hit
+    FROM book
+    WHERE (title LIKE '%' || #{keyword} || '%' OR author LIKE '%' || #{keyword} || '%')
+    <if test="category != null and category != '전체'">
+        AND category = #{category}
+    </if>
+    <choose>
+        <when test="sort == '출간일 순'">ORDER BY pubdate DESC</when>
+        <when test="sort == '낮은 가격순'">ORDER BY price ASC</when>
+        <when test="sort == '높은 가격순'">ORDER BY price DESC</when>
+        <when test="sort == '조회 수 순'">ORDER BY hit DESC</when>
+        <otherwise>ORDER BY no DESC</otherwise>
+    </choose>
+    OFFSET #{start} ROWS FETCH NEXT 12 ROWS ONLY
+</select>
 </mapper>
