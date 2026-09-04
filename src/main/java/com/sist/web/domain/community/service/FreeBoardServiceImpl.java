@@ -20,6 +20,7 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	private final FreeBoardMapper fMapper;
 	private final FreeBoardCommentMapper cMapper;
 	private final int ROW=20;
+	
 	private final BCryptPasswordEncoder passwordEncoder;
 
 	@Override
