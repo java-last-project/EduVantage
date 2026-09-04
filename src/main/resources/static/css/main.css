@@ -626,6 +626,7 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 18px;
+<<<<<<< HEAD
 }
 /* 강의 상세 */
 .content-wrapper {
@@ -717,3 +718,6 @@ body {
     color: #12b886; 
     border: 1px solid #c3fae8; 
 }
+=======
+}
+>>>>>>> origin/dev

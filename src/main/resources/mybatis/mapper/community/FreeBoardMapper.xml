@@ -3,7 +3,12 @@
 <mapper namespace="com.sist.web.domain.community.mapper.FreeBoardMapper">
 
 	<select id="freeBoardList" resultType="com.sist.web.domain.community.vo.FreeBoardVO" parameterType="hashmap">
+<<<<<<< HEAD
 		SELECT b.no,m.member_id,b.hit,b.subject,NVL(m.name, b.name) AS name,TO_CHAR(b.regdate,'yyyy-mm-dd') AS dbday
+=======
+		SELECT b.no,m.member_id,b.hit,b.subject,NVL(m.name, b.name) AS name,TO_CHAR(b.regdate,'yyyy-mm-dd') AS dbday,
+		       (SELECT COUNT(*) FROM FREE_COMMENT WHERE BOARD_NO=b.no) as cCount
+>>>>>>> origin/dev
 		FROM free_board b
 		LEFT JOIN member m ON b.member_id=m.member_id
 		<if test="fd!=null and fd!=''">
@@ -20,5 +25,35 @@
 			WHERE subject LIKE '%'||#{fd}||'%'
 		</if>
 	</select>
+<<<<<<< HEAD
+=======
+
+	<insert id="freeBoardInsert" parameterType="com.sist.web.domain.community.vo.FreeBoardVO"
+			useGeneratedKeys="true" keyProperty="no" keyColumn="NO">
+		INSERT INTO FREE_BOARD (MEMBER_ID,SUBJECT,CONTENT,PWD,NAME)
+		VALUES (#{member_id, jdbcType=INTEGER},#{subject},#{content},#{pwd, jdbcType=VARCHAR},#{name, jdbcType=VARCHAR})
+	</insert>
+
+	<update id="freeBoardUpdate" parameterType="com.sist.web.domain.community.vo.FreeBoardVO">
+		UPDATE FREE_BOARD
+		SET
+		<if test="name!=null and name!=''">
+			name=#{name},
+		</if>
+			subject=#{subject},content=#{content}
+		WHERE no=#{no}
+	</update>
+
+	<delete id="freeBoardDelete" parameterType="int">
+		DELETE FROM FREE_BOARD
+		WHERE no=#{no}
+	</delete>
+
+	<select id="freeBoardPwdData" parameterType="int" resultType="String">
+		SELECT pwd
+		FROM FREE_BOARD
+		WHERE no=#{no}
+	</select>
+>>>>>>> origin/dev
 	
 </mapper>

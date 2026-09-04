@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<div class="d-flex flex-column h-100 p-3" style="background: #2c3e50;">
+  <div class="d-flex flex-column gap-1 flex-grow-1">
+  
+    <div class="d-flex align-items-center flex-wrap" style="margin-bottom: 25px;">
+      <a th:href="@{'/enrollment/' + ${course_no}}" class="text-decoration-none fw-bold d-flex align-items-center" style="color: #ffffff;">
+        <img src="/icon/main_icon.png" style="height: 28px">&nbsp;나의 강의실
+      </a>
+    </div>
+
+    <a th:href="@{'/enrollment/' + ${course_no}}" class="d-flex align-items-center gap-2 rounded-2 px-2 py-2 text-decoration-none"
+       th:style="${menu == 'dashboard'} ? 'font-weight: 700; background: #415161; color: white' : 'color: #bfc9d1;'">
+      <i class="bi bi-grid-fill"></i> 대시보드
+    </a>
+    <a th:href="@{/enrollment/{course_no}/video(course_no=${course_no})}" class="d-flex align-items-center gap-2 rounded-2 px-2 py-2 text-decoration-none"
+       th:style="${menu == 'video'} ? 'font-weight: 700; background: #415161; color: white' : 'color: #bfc9d1;'">
+      <i class="bi bi-camera-reels"></i> 강의 영상
+    </a>
+    <a th:href="@{/enrollment/{course_no}/notice(course_no=${course_no})}" class="d-flex align-items-center gap-2 rounded-2 px-2 py-2 text-decoration-none"
+       th:style="${menu == 'notice'} ? 'font-weight: 700; background: #415161; color: white' : 'color: #bfc9d1;'">
+      <i class="bi bi-folder"></i> 자료실
+    </a>
+    <a th:href="@{/enrollment/{course_no}/qna(course_no=${course_no})}" class="d-flex align-items-center gap-2 rounded-2 px-2 py-2 text-decoration-none"
+       th:style="${menu == 'qna'} ? 'font-weight: 700; background: #415161; color: white' : 'color: #bfc9d1;'">
+      <i class="bi bi-chat-dots"></i> QnA
+    </a>
+    <a th:href="@{/enrollment/{course_no}/exam(course_no=${course_no})}" class="d-flex align-items-center gap-2 rounded-2 px-2 py-2 text-decoration-none"
+       th:style="${menu == 'exam'} ? 'font-weight: 700; background: #415161; color: white' : 'color: #bfc9d1;'">
+      <i class="bi bi-file-earmark-text"></i> 온라인 시험
+    </a>
+    <a th:href="@{/enrollment/{course_no}/evaluation(course_no=${course_no})}" class="d-flex align-items-center gap-2 rounded-2 px-2 py-2 text-decoration-none"
+       th:style="${menu == 'evaluation'} ? 'font-weight: 700; background: #415161; color: white' : 'color: #bfc9d1;'">
+      <i class="bi bi-star"></i> 강의 평가
+    </a>
+  </div>
+
+</div>
+</body>
+</html>

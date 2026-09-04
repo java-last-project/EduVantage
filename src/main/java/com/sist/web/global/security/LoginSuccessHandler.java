@@ -32,7 +32,9 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler{
             // 2. 안전장치: 데이터가 정상적으로 들어왔을 때만 세션에 담기
             if (vo != null) {
                 HttpSession session = request.getSession();
+                session.setAttribute("member_id", vo.getMember_id());
                 session.setAttribute("username", vo.getUsername());
+                session.setAttribute("member_id", vo.getMember_id());
                 session.setAttribute("name", vo.getName());
                 session.setAttribute("sex", vo.getSex());
                 System.out.println(" 로그인 성공! 세션 저장 완료: " + vo.getUsername());

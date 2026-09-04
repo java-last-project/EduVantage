@@ -2,6 +2,10 @@ package com.sist.web.domain.community.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+<<<<<<< HEAD
+=======
+import org.apache.ibatis.annotations.Update;
+>>>>>>> origin/dev
 import org.springframework.stereotype.Repository;
 import com.sist.web.domain.community.vo.FreeBoardVO;
 
@@ -20,4 +24,17 @@ public interface FreeBoardMapper {
 			WHERE b.no=#{no}
 			""")
 	public FreeBoardVO freeBoardDetail(int no);
+<<<<<<< HEAD
+=======
+	@Update("""
+ 			UPDATE FREE_BOARD SET
+ 			hit=hit+1
+ 			WHERE no=#{no}
+ 			""")
+	public void freeBoardHitIncrement(int no);
+	public void freeBoardInsert(FreeBoardVO vo);
+	public void freeBoardUpdate(FreeBoardVO vo);
+	public void freeBoardDelete(int no);
+	public String freeBoardPwdData(int no);
+>>>>>>> origin/dev
 }
