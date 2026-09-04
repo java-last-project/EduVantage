@@ -15,4 +15,8 @@ public interface AdminService {
 	public List<Map<String,Object>> adminMemberFilterListData(String authority, String enabled, int page);
 	public int getCountFilterMember(String authority, String enabled);
 	public int[] getPageData(int page, String authority, String enabled);
+	
+	public Map<String, Object> adminMemberDetailData(int member_id);	// 회원 상세 정보 조회
+	
+	public void adminUpdateMemberEnabled(int enabled, int member_id);
 }
