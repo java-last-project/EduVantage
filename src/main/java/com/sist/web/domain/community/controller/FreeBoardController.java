@@ -1,17 +1,11 @@
 package com.sist.web.domain.community.controller;
 
-<<<<<<< HEAD
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-=======
 import jakarta.servlet.http.HttpSession;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
->>>>>>> origin/dev
 import java.util.*;
 import com.sist.web.domain.community.service.FreeBoardService;
 import com.sist.web.domain.community.vo.FreeBoardVO;
@@ -36,8 +30,6 @@ public class FreeBoardController {
 		model.addAttribute("main_html", "community/freeboard/detail");
 		return "main/main";
 	}
-<<<<<<< HEAD
-=======
 
 	@GetMapping("/freeboard/insert")
 	public String freeboard_insert(Model model){
@@ -68,7 +60,7 @@ public class FreeBoardController {
 			if ("update".equals(actionType)) {
 				FreeBoardVO vo=fService.freeBoardUpdateData(no);
 				model.addAttribute("vo",vo);
-				model.addAttribute("main_html","community/freeboard/update");
+				model.addAttribute("main_html","community/freeboard/form");
 				return "main/main";
 			} else {
 				fService.freeBoardDelete(no);
@@ -88,5 +80,4 @@ public class FreeBoardController {
 		fService.freeBoardDelete(no);
 		return "redirect:/freeboard/list";
 	}
->>>>>>> origin/dev
 }

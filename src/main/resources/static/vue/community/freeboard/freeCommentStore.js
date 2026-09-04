@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-/**
- * 
- */
-=======
 /** @type {import('pinia')}*/
 const {defineStore}=Pinia
 const initialState=()=>({
@@ -84,4 +79,3 @@ const useFreeCommentStore=defineStore('freecomment_store',{
         }
     }
 })
->>>>>>> origin/dev

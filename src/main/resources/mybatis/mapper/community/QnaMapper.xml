@@ -48,7 +48,7 @@
 	</insert>
 	
 	<update id="qnaUpdate" parameterType="com.sist.web.domain.community.vo.QnaBoardVO">
-		UPDATE TABLE qnaboard SET
+		UPDATE qnaboard SET
 		subject=#{subject}, content=#{content}, category_no=#{categoryNo}
 		WHERE no=#{no}
 	</update>

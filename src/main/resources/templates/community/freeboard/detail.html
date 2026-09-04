@@ -1,11 +1,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <script th:inline="javascript">
 const SESSION_NAME=/*[[${session.name}]]*/ ''
-<<<<<<< HEAD
-=======
 const SESSION_ID=/*[[${session.member_id}]]*/ ''
 const board_no = /*[[${vo.no}]]*/ 0
->>>>>>> origin/dev
 </script>
 <main class="container py-5" style="max-width: 1000px;">
     
@@ -32,11 +29,7 @@ const board_no = /*[[${vo.no}]]*/ 0
         <div class="p-4 p-md-5 detail-content-area" th:utext="${vo.content}"></div>
 
         <div class="bg-light p-4 p-md-5 border-top" id="commentApp">
-<<<<<<< HEAD
-		    <h5 class="fw-bold mb-4" style="color: #1e293b;">댓글 <span class="text-danger">{{ totalCount }}</span></h5>
-=======
 		    <h5 class="fw-bold mb-4" style="color: #1e293b;">댓글 <span class="text-danger">{{ store.count }}</span></h5>
->>>>>>> origin/dev
 		    
 		    <div class="mb-5 bg-white p-3 rounded-3 border">
 		        <!-- 로그인 됨 -->
@@ -59,17 +52,10 @@ const board_no = /*[[${vo.no}]]*/ 0
 			</div>
 		
 		    <!-- 계층형 댓글 -->
-<<<<<<< HEAD
-			<div v-for="reply in commentList" :key="reply.no" class="mb-4 d-flex gap-3" :style="{ marginLeft: reply.depth > 0 ? (reply.depth * 3) + 'rem' : '0' }">
-		        
-				<div v-if="reply.depth > 0" class="text-muted mt-2">
-					<i class="fa-solid fa-arrow-turn-down fa-rotate-270"></i>
-=======
 			<div v-for="reply in store.list" :key="reply.no" class="mb-4 d-flex gap-3" :style="{marginLeft: reply.group_tab>0?(reply.group_tab*3)+'rem':'0'}">
 		        
 				<div v-if="reply.group_tab > 0" class="text-muted mt-2">
 					<i class="fa-solid fa-reply fa-rotate-180"></i>
->>>>>>> origin/dev
 				</div>
 		        
 				<div class="comment-avatar"><i class="fa-solid fa-user"></i></div>
@@ -77,38 +63,23 @@ const board_no = /*[[${vo.no}]]*/ 0
 		            
 					<div class="d-flex justify-content-between align-items-center mb-1">
 						<div>
-<<<<<<< HEAD
-							<span class="fw-bold text-dark me-2">{{ reply.name }}</span>
-							<span class="text-muted small">{{ reply.dbday }}</span>
-=======
 							<span class="fw-bold text-dark me-2">{{reply.name}}</span>
 							<span class="text-muted small">{{reply.dbday}}</span>
->>>>>>> origin/dev
 						</div>
 		        	 	       
 						<div class="d-flex gap-2">
 							<button v-if="sessionId" class="btn btn-sm btn-link text-muted text-decoration-none p-0" @click="toggleReplyForm(reply.no)">답글</button>
 		                    
-<<<<<<< HEAD
-							<template v-if="sessionId !== '' && sessionId === reply.memberId">
-=======
 							<template v-if="sessionId!==''&&sessionId===reply.member_id">
->>>>>>> origin/dev
 								<button class="btn btn-sm btn-link text-muted text-decoration-none p-0" @click="toggleEditForm(reply)">수정</button>
 								<button class="btn btn-sm btn-link text-danger text-decoration-none p-0" @click="deleteComment(reply.no)">삭제</button>
 							</template>
 						</div>
 					</div>
 		            
-<<<<<<< HEAD
-		            <div v-if="editReplyNo !== reply.no" class="text-dark mb-2" style="font-size: 15px; white-space: pre-wrap;">{{ reply.msg }}</div>
-		
-		            <div v-else-if="editReplyNo === reply.no" class="bg-white p-3 rounded-3 border mt-2 mb-3 shadow-sm">
-=======
 		            <div v-if="editReplyNo!==reply.no" class="text-dark mb-2" style="font-size: 15px; white-space: pre-wrap;">{{ reply.msg }}</div>
 		
 		            <div v-else-if="editReplyNo===reply.no" class="bg-white p-3 rounded-3 border mt-2 mb-3 shadow-sm">
->>>>>>> origin/dev
 		                <textarea v-model="editCommentText" class="form-control border-0 shadow-none mb-2" rows="2" style="resize: none;"></textarea>
 		                <div class="d-flex justify-content-end align-items-center border-top pt-2">
 		                    <button type="button" class="btn btn-sm btn-outline-secondary px-3 rounded-3 me-2" @click="editReplyNo = 0">취소</button>
@@ -117,17 +88,10 @@ const board_no = /*[[${vo.no}]]*/ 0
 		            </div>
 		
 		            <div v-if="activeReplyNo === reply.no" class="bg-white p-3 rounded-3 border mt-3 shadow-sm">
-<<<<<<< HEAD
-		                <textarea v-model="nestedComment" class="form-control border-0 shadow-none mb-2" rows="2" placeholder="대댓글을 남겨보세요." style="resize: none;"></textarea>
-		                <div class="d-flex justify-content-end align-items-center border-top pt-2">
-		                    <button type="button" class="btn btn-sm btn-outline-secondary px-3 rounded-3 me-2" @click="activeReplyNo = 0">취소</button>
-		                    <button type="button" class="btn btn-sm text-white fw-bold px-3 rounded-3" style="background-color: #212529;" @click="writeNestedComment(reply.no)">등록</button>
-=======
 		                <textarea v-model="coComment" class="form-control border-0 shadow-none mb-2" rows="2" placeholder="대댓글을 남겨보세요." style="resize: none;"></textarea>
 		                <div class="d-flex justify-content-end align-items-center border-top pt-2">
 		                    <button type="button" class="btn btn-sm btn-outline-secondary px-3 rounded-3 me-2" @click="activeReplyNo = 0">취소</button>
 		                    <button type="button" class="btn btn-sm text-white fw-bold px-3 rounded-3" style="background-color: #212529;" @click="writeCoComment(reply.no)">등록</button>
->>>>>>> origin/dev
 		                </div>
 		            </div>
 		            
@@ -136,25 +100,6 @@ const board_no = /*[[${vo.no}]]*/ 0
 		</div>
     </div>
 
-<<<<<<< HEAD
-    <!-- 2. 하단 액션 버튼 영역 -->
-    <div class="d-flex justify-content-between align-items-center">
-        <!-- 좌측: 목록으로 돌아가기 -->
-        <div>
-            <a href="/board/list" class="btn btn-outline-secondary px-4 py-2 rounded-3 fw-medium">
-                <i class="fa-solid fa-list me-1"></i> 목록
-            </a>
-        </div>
-        
-        <!-- 우측: 작성자 본인일 경우만 보이는 버튼들 -->
-        <div class="d-flex gap-2">
-            <a type="button" class="btn btn-outline-danger px-4 py-2 rounded-3 fw-medium">삭제</a>
-            <a type="button" class="btn text-white px-4 py-2 rounded-3 fw-bold" style="background-color: #212529;">수정</a>
-        </div>
-    </div>
-
-</main>
-=======
     <div class="d-flex justify-content-between align-items-center">
         <div>
             <a href="/freeboard/list" class="btn btn-outline-secondary px-4 py-2 rounded-3 fw-medium">
@@ -276,5 +221,4 @@ const board_no = /*[[${vo.no}]]*/ 0
 	freeCommentApp.use(createPinia())
 	freeCommentApp.mount('#commentApp')
 </script>
->>>>>>> origin/dev
 </html>

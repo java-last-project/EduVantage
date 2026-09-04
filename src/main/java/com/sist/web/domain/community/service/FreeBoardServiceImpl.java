@@ -2,11 +2,8 @@ package com.sist.web.domain.community.service;
 
 import java.util.*;
 
-<<<<<<< HEAD
-=======
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
->>>>>>> origin/dev
 import org.springframework.stereotype.Service;
 
 import com.sist.web.domain.community.mapper.FreeBoardCommentMapper;
@@ -15,10 +12,7 @@ import com.sist.web.domain.community.vo.FreeBoardVO;
 import com.sist.web.domain.community.vo.FreeCommentVO;
 
 import lombok.RequiredArgsConstructor;
-<<<<<<< HEAD
-=======
 import org.springframework.transaction.annotation.Transactional;
->>>>>>> origin/dev
 
 @Service
 @RequiredArgsConstructor
@@ -26,12 +20,9 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	private final FreeBoardMapper fMapper;
 	private final FreeBoardCommentMapper cMapper;
 	private final int ROW=20;
-<<<<<<< HEAD
 	
-=======
 	private final BCryptPasswordEncoder passwordEncoder;
 
->>>>>>> origin/dev
 	@Override
 	public List<FreeBoardVO> freeBoardList(int page,String fd) {
 		Map<String,Object> map=new HashMap<>();
@@ -60,19 +51,13 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	}
 
 	@Override
-<<<<<<< HEAD
-	public FreeBoardVO freeBoardDetail(int no) {
-=======
 	@Transactional
 	public FreeBoardVO freeBoardDetail(int no) {
 		fMapper.freeBoardHitIncrement(no);
->>>>>>> origin/dev
 		return fMapper.freeBoardDetail(no);
 	}
 
 	@Override
-<<<<<<< HEAD
-=======
 	public void freeBoardInsert(FreeBoardVO vo, HttpSession session) {
 		Integer memberId=(Integer)session.getAttribute("member_id");
 		if(memberId!=null){
@@ -113,16 +98,11 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	}
 
 	@Override
->>>>>>> origin/dev
 	public List<FreeCommentVO> freeCommentList(int no) {
 		return cMapper.freeBoardCommentList(no);
 	}
 
 	@Override
-<<<<<<< HEAD
-	public int freeCommentCount(int no) {
-		return cMapper.freeBoardCommentCount(no);
-=======
 	public int[] freeCommentCount(int no,int page) {
 		int count= cMapper.freeBoardCommentCount(no);
 		int totalpage=(int)Math.ceil(count/(double)ROW);
@@ -156,7 +136,6 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 		}else{
 			cMapper.freeBoardCommentHardDelete(no);
 		}
->>>>>>> origin/dev
 	}
 
 }

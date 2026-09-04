@@ -1,17 +1,12 @@
 package com.sist.web.domain.community.restcontroller;
 
-<<<<<<< HEAD
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-=======
 import com.sist.web.domain.community.vo.FreeCommentVO;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
->>>>>>> origin/dev
 
 import com.sist.web.domain.community.service.FreeBoardService;
 import com.sist.web.domain.community.vo.FreeBoardVO;
@@ -41,8 +36,6 @@ public class FreeBoardRestController {
 		}
 		return ResponseEntity.ok(map);
 	}
-<<<<<<< HEAD
-=======
 
 	@GetMapping("/freeboard/comment_vue")
 	public ResponseEntity<Map<String,Object>> freeboard_comment_vue(@RequestParam(value="page",defaultValue="1")int page,@RequestParam("board_no")int board_no){
@@ -98,5 +91,4 @@ public class FreeBoardRestController {
 		}
 		return ResponseEntity.ok(map);
 	}
->>>>>>> origin/dev
 }

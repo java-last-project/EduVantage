@@ -7,11 +7,7 @@ const initialState=()=>({
 	totalpage:0,
 	startPage:0,
 	endPage:0,
-<<<<<<< HEAD
-	count:0,
-=======
 	count:0
->>>>>>> origin/dev
 })
 const useFreeboardStore=defineStore('freeboard_store',{
     state:initialState,
