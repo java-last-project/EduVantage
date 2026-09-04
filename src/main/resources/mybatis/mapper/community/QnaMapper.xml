@@ -28,13 +28,13 @@
 				AND (subject LIKE '%'||#{fd, jdbcType=VARCHAR}||'%' OR content LIKE '%'||#{fd, jdbcType=VARCHAR}||'%')
 			</if>
 			<if test="categoryNo!=null">
-				AND q.category_no=#{categoryNo}
+				AND category_no=#{categoryNo}
 			</if>
 		</where>
 	</select>
 	
 	<select id="qnaDetailData" resultType="com.sist.web.domain.community.vo.QnaBoardVO" parameterType="int">
-		SELECT q.no,q.member_id,m.name,c.category,q.category_no AS categoryNo,q.subject,q.status,TO_CHAR(q.regdate,'yyyy-mm-dd') AS dbday,q.content
+		SELECT q.no,q.member_id,m.name,c.category,q.category_no AS categoryNo,q.subject,q.status,TO_CHAR(q.regdate,'yyyy-mm-dd HH24:mi:ss') AS dbday,q.content
 		FROM qnaboard q
 		JOIN qna_category c ON q.category_no=c.no
 		JOIN member m ON q.member_id=m.member_id

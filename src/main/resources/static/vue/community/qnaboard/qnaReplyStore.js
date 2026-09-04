@@ -31,9 +31,7 @@ const useQnaReplyStore=defineStore('qnaReply_store',{
 		},
 		async updateReply(updateData){
 			try{
-				await api.post('/qna/reply/update',null,{
-					params:updateData
-					})
+				await api.post('/qna/reply/update',updateData)
 					await this.qnaReplyData()
 			}catch(error){
 				console.error(error)
@@ -43,7 +41,8 @@ const useQnaReplyStore=defineStore('qnaReply_store',{
 			try{
 				await api.get('/qna/reply/delete',{
 					params:{
-						no:this.no
+						no:this.no,
+						qnaNo:this.qnaNo
 					}
 				})
 				await this.qnaReplyData()
