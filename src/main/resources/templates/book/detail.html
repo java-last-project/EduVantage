@@ -65,8 +65,12 @@
 				<!-- 구매 버튼 -->
 				<div class="action-pannel">
 					<div class="action-btn-wrap">
-						<button class="btn-custom btn-like">
+						<!-- <button class="btn-custom btn-like" @click="store.likeClick'">
 							<i class="fa-regular fa-heart"></i> {{ store.vo.like_count }}
+						</button> -->
+						<button class="btn-custom btn-like" @click="store.toggleLike">
+						    <i :class="store.isLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
+						    {{ store.likeCount }}
 						</button>
 						<button class="btn-custom btn-cart" @click="store.goToCart">
 							장바구니 담기</button>
@@ -156,6 +160,7 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const no = urlParams.get('no') || 1; 
                 store.fetchBookDetail(no);
+                store.fetchLikeStatus(no);
             });
 
             const formattedToc = computed(() => {
