@@ -34,7 +34,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler{
                 HttpSession session = request.getSession();
                 session.setAttribute("member_id", vo.getMember_id());
                 session.setAttribute("username", vo.getUsername());
-                session.setAttribute("member_id", vo.getMember_id());
                 session.setAttribute("name", vo.getName());
                 session.setAttribute("sex", vo.getSex());
                 String role=authentication.getAuthorities().stream()

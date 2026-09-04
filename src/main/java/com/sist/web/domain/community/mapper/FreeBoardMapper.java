@@ -21,7 +21,7 @@ public interface FreeBoardMapper {
 			WHERE b.no=#{no}
 			""")
 	public FreeBoardVO freeBoardDetail(int no);
-
+	
 	@Update("""
  			UPDATE FREE_BOARD SET
  			hit=hit+1
