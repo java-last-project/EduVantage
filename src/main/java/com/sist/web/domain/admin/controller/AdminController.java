@@ -95,11 +95,26 @@ public class AdminController
 	}
 	
 	@GetMapping("/admin/member_detail")
-	public String admin_member_detail(Model model)
+	public String admin_member_detail(@RequestParam("member_id") int member_id, Model model)
 	{
+		Map<String, Object> vo = aService.adminMemberDetailData(member_id);
+		
+
+		model.addAttribute("vo", vo);
+		
 		model.addAttribute("admin_html", "admin/member_detail");
 		model.addAttribute("main_html", "admin/main");
 		return "main/main";
+	}
+	
+	@GetMapping("/admin/member_update_enabled")
+	public String admin_member_update_enabled(
+			@RequestParam("member_id") String member_id, 
+			@RequestParam("enabled") int enabled, 
+			Model model)
+	{
+		aService.adminUpdateMemberEnabled(enabled, Integer.parseInt(member_id));
+		return "redirect:/admin/member_detail?member_id="+member_id;
 	}
 	
 	@GetMapping("/admin/course")

@@ -2,6 +2,7 @@ package com.sist.web.domain.admin.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
 import com.sist.web.domain.member.vo.MemberVO;
@@ -84,4 +85,22 @@ public interface AdminMapper
 		</select>
 	 */
 	public int getCountFilterMember(Map<String, Object> map);
+	
+	// 회원 상세 정보 조회
+	/*
+	 * 	<select id="adminMemberDetailData" resultType="hashmap" parameterType="string">
+			SELECT m.member_id,m.username,m.name,m.sex,TO_CHAR(m.birthdate,'yyyy-mm-dd') as birthday,m.phone,m.email,m.post,m.addr1,m.addr2,TO_CHAR(m.regdate,'yyyy-mm-dd') as dbday,m.profile_desc,a.authority,m.enabled
+			FROM member m
+			JOIN authority a
+			ON m.member_id=a.member_id
+			WHERE username=#{username};
+		</select>
+	 */
+	public Map<String, Object> adminMemberDetailData(int member_id);
+	
+	// 회원 enabled 상태 변경
+	@Update("UPDATE member "
+			+ "SET enabled=#{enabled}"
+			+ "WHERE member_id=#{member_id}")
+	public void adminUpdateMemberEnabled(MemberVO vo);
 }

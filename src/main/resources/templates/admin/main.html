@@ -8,7 +8,7 @@
 		<aside class="exam-sidebar">
 		<nav class="exam-nav">
 			<a href="/admin/dashboard" class="exam-nav-item" th:classappend="${admin_html == 'admin/dashboard'} ? 'active':''"><i class="fa-solid fa-border-all"></i> 대시보드</a>
-			<a href="/admin/member" class="exam-nav-item" th:classappend="${admin_html == 'admin/member'} ? 'active':''"><i class="fa-solid fa-user"></i> 회원관리</a>
+			<a href="/admin/member" class="exam-nav-item" th:classappend="${admin_html == 'admin/member' || admin_html == 'admin/member_detail'} ? 'active':''"><i class="fa-solid fa-user"></i> 회원관리</a>
 			<a href="/admin/course" class="exam-nav-item" th:classappend="${admin_html == 'admin/course'} ? 'active':''"><i class="fa-solid fa-book-open"></i> 강의관리</a>
 			<a href="/admin/order" class="exam-nav-item" th:classappend="${admin_html == 'admin/order'} ? 'active':''"><i class="fa-solid fa-credit-card"></i> 결제/주문 관리</a>
 			<a href="/admin/notice" class="exam-nav-item"  th:classappend="${admin_html == 'admin/notice'} ? 'active':''"><i class="fa-solid fa-bullhorn"></i> 공지사항 관리</a>
