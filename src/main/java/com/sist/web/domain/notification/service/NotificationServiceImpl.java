@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +38,7 @@ public class NotificationServiceImpl implements NotificationService{
         cal.add(Calendar.DATE, -3);
         Date targetDate = cal.getTime();
         List<NotificationVO> list = notificationMapper.findRecentNotifications(memberId, targetDate);
+        list.forEach(n -> System.out.println("no=" + n.getNo() + ", read=" + n.isRead()));
         return list;
     }
 

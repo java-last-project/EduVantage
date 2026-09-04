@@ -24,8 +24,9 @@ const useNotificationStore = defineStore('notification', {
             if(this.nnList.length === 0) return
             const nos = this.nnList.map(n => n.no)
             try {
-                const res = await api.patch("/notification/read-all",{nos})
+                await api.patch("/notification/read-all",{nos})
                 //읽은 알림 회색처리 or 재조회해서 읽은알림/안읽은알림 UI 분기처리
+                await this.fetchNotifications()
             }catch(err){
                 console.error(err)
             }
