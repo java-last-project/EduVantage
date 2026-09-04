@@ -48,7 +48,7 @@
 	                </div>
 	            </div>
 	
-	            <!-- <div class="bg-light rounded-3 shadow-sm border p-4 mb-5">
+	            <div class="bg-light rounded-3 shadow-sm border p-4 mb-5" id="replyApp">
 	                <div class="d-flex align-items-center mb-3">
 	                    <i class="fa-solid fa-reply fa-rotate-180 text-primary me-2 fs-4"></i>
 	                    <h4 class="fw-bold mb-0 text-primary">관리자 답변</h4>
@@ -73,9 +73,88 @@
 	                        <button class="btn btn-primary px-4 fw-bold" @click="submitReply">답변 등록</button>
 	                    </div>
 	                </div>
-	            </div> -->
+	            </div>
 	
 	        </div>
 	    </main>
 	</div>
+<script src="/vue/community/qnaboard/qnaReplyStore.js"></script>
+<script>
+const {onMounted,ref,createApp}=Vue
+const {createPinia}=Pinia
+const replyApp=createApp({
+	setup(){
+		const store=useQnaReplyStore()
+		const sessionId=ref(SESSION_ID)
+		const newComment=ref('')
+		const activeReplyNo=ref(0)
+		const coComment=ref('')
+		const editReplyNo=ref(0)
+		const editCommentText=ref('')
+
+		onMounted(()=>{
+			store.qnaNo=qnaNo
+			store.qnaReplyData()
+		})
+
+		const toggleReplyForm=(no)=>{
+			activeReplyNo.value=activeReplyNo.value===no?0:no
+			editReplyNo.value=0
+			coComment.value=''
+		}
+		const toggleEditForm=(reply)=>{
+			editReplyNo.value=editReplyNo.value===reply.no?0:reply.no
+			activeReplyNo.value=0
+			editCommentText.value=reply.msg
+		}
+		const writeComment=async()=>{
+			if(!newComment.value.trim()){
+				return
+			}
+			await store.insertComment({
+				board_no:board_no,
+				member_id:sessionId.value,
+				msg:newComment.value,
+				parent_no:0
+			})
+			newComment.value=''
+		}
+		const writeCoComment=async(parent_no)=>{
+			if(!coComment.value.trim()){
+				return
+			}
+			await store.insertComment({
+				board_no:board_no,
+				member_id:sessionId.value,
+				msg:coComment.value,
+				parent_no:parent_no
+			})
+			activeReplyNo.value=0
+			coComment.value=''
+		}
+		const updateComment=async(no)=>{
+			if(!editCommentText.value.trim()){
+				return
+			}
+			await store.updateComment({
+				no:no,
+				msg:editCommentText.value
+			})
+			editReplyNo.value=0
+		}
+		const deleteComment=async(no)=>{
+			if(confirm('정말 삭제하시겠습니까?')){
+				await store.deleteComment(no)
+			}
+		}
+		return{
+			store,
+			sessionId,newComment,activeReplyNo,coComment,editReplyNo,editCommentText,
+			toggleReplyForm,toggleEditForm,writeComment,writeCoComment,updateComment,deleteComment
+		}
+	}
+})
+replyApp.use(createPinia())
+replyApp.mount('#replyApp')
+</script>
 </html>
