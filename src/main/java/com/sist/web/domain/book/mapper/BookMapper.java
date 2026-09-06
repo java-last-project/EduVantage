@@ -12,4 +12,12 @@ public interface BookMapper {
 	public int bookTotalPage(String category);
 	
 	public int bookTotalCount(String category);
+	
+	public BookVO bookDetailData (int no);
+	
+	public void bookHitIncrement (int no);
+	
+	public int bookFindCount(Map<String, Object> map);
+
+	public List<BookVO> bookFindData(Map<String, Object> map);
 }

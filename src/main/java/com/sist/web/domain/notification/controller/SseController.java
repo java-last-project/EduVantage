@@ -57,8 +57,6 @@ public class SseController {
         courseCompletedProducer.publishCompletion(memberId, 2, "JAVA 기초");
 */
 
-
-
         return emitter;
     }
 }

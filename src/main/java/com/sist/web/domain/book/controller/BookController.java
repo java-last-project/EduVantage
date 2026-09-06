@@ -14,4 +14,11 @@ public class BookController {
         model.addAttribute("main_html", "book/list");
     	return "main/main"; 
     }
+    
+    @GetMapping("/book/detail")
+    public String book_detail(Model model) {
+    	model.addAttribute("main_html", "book/detail");
+    	return "main/main";
+    }
+    
 }
