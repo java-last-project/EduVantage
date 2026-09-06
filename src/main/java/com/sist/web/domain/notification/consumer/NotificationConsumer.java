@@ -45,6 +45,7 @@ public class NotificationConsumer {
                 .eventKey(event.getEventKey())
                 .build();
         notificationRepository.save(notification);
+        int no = notification.getNo();
 
         //유저 접속 여부 확인(emitter)
         emitterRepository.findByMemberId(event.getMemberId())
@@ -52,7 +53,7 @@ public class NotificationConsumer {
                 .ifPresent(emitter -> {
                     try{
                        emitter.send(SseEmitter.event()
-                               .data(Map.of("type",NotificationType.COURSE_COMPLETED.toString(),"title",title,"content",content)));
+                               .data(Map.of("no", no,"type",NotificationType.COURSE_COMPLETED.toString(),"title",title,"content",content)));
                     }catch(IOException e){
                         emitterRepository.deleteByMemberId(event.getMemberId());
                     }

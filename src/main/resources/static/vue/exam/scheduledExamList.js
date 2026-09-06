@@ -1,3 +1,7 @@
+(function(){
+const { createApp, ref, onMounted } = Vue;
+
+
 const scheduledExamApp = createApp({
     setup(){
         //정기시험 목록
@@ -75,3 +79,4 @@ const scheduledExamApp = createApp({
 })
 
 scheduledExamApp.mount("#scheduled-exam-list")
+})()

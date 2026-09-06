@@ -8,6 +8,10 @@ const useNotificationStore = defineStore('notification', {
     state: ()=> ({
         nnList: []
     }),
+    //[getters]: ...
+    getters: {
+        hasUnread: (state)=>state.nnList.some(n=>n.read === false)
+    },
     //[actions]: 기존 함수들
     actions: {
         async fetchNotifications() {
@@ -33,6 +37,7 @@ const useNotificationStore = defineStore('notification', {
         },
         //sse로 새알림이 온 경우
         addNotification(data){
+            console.log(data)
             this.nnList.unshift(data)
         }
     }

@@ -524,4 +524,5 @@ body {
 }
 .notification-unread {
     background-color: var(--bg-light-blue);
+    color: var(--main-color);
 }

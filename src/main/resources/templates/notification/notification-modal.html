@@ -27,7 +27,7 @@
                         <!-- 아이콘 -->
                         <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
                              style="width: 40px; height: 40px;"
-                             :class="notification.read === 'false' ?
+                             :class="notification.read === false ?
                             'notification-unread'
                             : 'notification-read'">
 
@@ -38,7 +38,7 @@
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-start">
                                 <span class="fw-semibold" style="font-size: 14px;">{{notification.title}}</span>
-                                <span v-if="notification.read === 'false'" class="rounded-circle bg-primary flex-shrink-0"
+                                <span v-if="notification.read === false" class="rounded-circle bg-primary flex-shrink-0"
                                       style="width: 8px; height: 8px; margin-top: 6px;"></span>
                             </div>
                             <p class="mb-1" style="font-size: 13px; color: var(--text-muted);">{{notification.content}}</p>
