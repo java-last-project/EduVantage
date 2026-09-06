@@ -55,4 +55,26 @@ public class ScheduledExamServiceImpl implements ScheduledExamService {
             notificationRepository.save(noti);
 
     }
+
+    @Override
+    @Transactional
+    public void unsubscribeExam(int memberId, int examNo) {
+        //1. 구독 취소
+        scheduledExamMapper.unsubscribeExam(memberId, examNo);
+
+        //2. 알림 전송
+        SubscribeExamVO exam = scheduledExamMapper.subscribeExamInfo(examNo);
+
+        Notifications noti = Notifications.builder()
+                .memberId(memberId)
+                .type(NotificationType.EXAM_SUBSCRIBED)
+                .title("정기 시험 알림 구독 취소")
+                .content(exam.getExamTitle()+ " 시험 알림 신청이 취소되었습니다")
+                .relatedId(examNo)
+                .eventKey(UUID.randomUUID().toString())
+                .build();
+
+        notificationRepository.save(noti);
+
+    }
 }

@@ -25,4 +25,7 @@ public interface ScheduledExamMapper {
     //알림 아직 못받은 유저 조회
     List<Integer> findUnnotifiedSubscribers(@Param("examNo")int examNo, @Param("column")String column);
     void markNotified(@Param("memberId")int memberId, @Param("examNo")int examNo, @Param("column")String column);
+
+    //알림 삭제
+    void unsubscribeExam(@Param("memberId")int memberId, @Param("examNo")int examNo);
 }

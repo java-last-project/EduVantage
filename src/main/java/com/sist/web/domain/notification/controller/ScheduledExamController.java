@@ -61,4 +61,13 @@ public class ScheduledExamController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message","이미 구독한 시험입니다"));
         }
     }
+
+    @DeleteMapping("/exam/subscribe/{examNo}")
+    public ResponseEntity<Void> unsubscribeExam(@PathVariable("examNo") int examNo, Authentication authentication){
+        String username = authentication.getName();
+        int memberId = memberMapper.memberInfoData(username).getMember_id();
+
+        scheduledExamService.unsubscribeExam(memberId, examNo);
+        return ResponseEntity.ok().build();
+    }
 }

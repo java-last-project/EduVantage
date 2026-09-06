@@ -54,6 +54,11 @@
     <update id="markNotified">
         UPDATE exam_subscription
         SET ${column} = 'Y'
-        WHERE memberId=#{memberId} AND exam_no=#{examNo}
+        WHERE member_id=#{memberId} AND exam_no=#{examNo}
     </update>
+    <!--알림 삭제-->
+    <delete id="unsubscribeExam">
+        DELETE FROM exam_subscription
+        WHERE member_id=#{memberId} AND exam_no=#{examNo}
+    </delete>
 </mapper>
