@@ -73,8 +73,8 @@ const scheduledExamApp = createApp({
         //알림등록
         const examNotiRegister = async (exam) => {
             try{
-                await api.post("/notification/exam/subscribe",{examNo: exam.no})
-                showToast("default", "정기 시험 알림 구독", exam.title+" 시험이 다가오면 알려드릴게요")
+                await api.post("/exam/subscribe",{examNo: exam.no})
+                showToast("EXAM_SUBSCRIBED", "정기 시험 알림 구독", exam.title+" 시험이 다가오면 알려드릴게요")
 
                 //알림목록 새로고침
                 const store = useNotificationStore()

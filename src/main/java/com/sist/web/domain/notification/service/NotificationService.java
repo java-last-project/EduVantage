@@ -11,5 +11,4 @@ public interface NotificationService {
 
     List<NotificationVO> findRecentNotifications(int memberId);
     void markAllAsRead(List<Integer> nos);
-    void subscribeExam(int memberId, int examNo);
 }

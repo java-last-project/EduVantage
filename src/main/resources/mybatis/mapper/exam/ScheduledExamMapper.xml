@@ -15,4 +15,31 @@
         WHERE open_date &gt;= TO_DATE(#{year}||'-'||#{month}||'-01','YYYY-MM-DD')
         AND open_date &lt; ADD_MONTHS(TO_DATE(#{year}||'-'||#{month}||'-01','YYYY-MM-DD'),1)
     </select>
+    <insert id="subscribeExam">
+        INSERT INTO exam_subscription(member_id, exam_no, notified_d3, notified_dd)
+        VALUES(#{memberId}, #{examNo}, 'N', 'N')
+    </insert>
+    <select id="subscribeExamInfo" resultType="SubscribeExamVO">
+        SELECT no AS examNo, title AS examTitle
+        FROM scheduled_exam
+        WHERE no = #{examNo}
+    </select>
+    <!--d-3/dday인 시험 조회-->
+    <select id="findScheduledExamByDday" resultType="SubscribeExamVO">
+        SELECT no AS examNo, title AS examTitle
+        FROM scheduled_exam
+        WHERE TRUNC(open_date) = TRUNC(SYSDATE + #{targetDate})
+    </select>
+    <!--알림 못받은 유저 조회-->
+    <select id="findUnnotifiedSubscribers" resultType="int">
+        SELECT member_id
+        FROM exam_subscription
+        WHERE exam_no=#{examNo} AND ${column} = 'N'
+    </select>
+    <!--스케줄러 > 알림 수신 후 > 수신여부 업데이트-->
+    <update id="markNotified">
+        UPDATE exam_subscription
+        SET ${column} = 'Y'
+        WHERE memberId=#{memberId} AND exam_no=#{examNo}
+    </update>
 </mapper>

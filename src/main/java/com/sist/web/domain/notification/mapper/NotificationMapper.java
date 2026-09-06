@@ -14,6 +14,4 @@ import java.util.List;
 public interface NotificationMapper {
     List<NotificationVO> findRecentNotifications(@Param("memberId") int memberId, @Param("targetDate") Date targetDate);
     void markAllAsRead(@Param("nos") List<Integer> nos);
-    void subscribeExam(@Param("memberId")int memberId, @Param("examNo")int examNo);
-    SubscribeExamVO subscribeExamInfo(@Param("examNo")int examNo);
 }

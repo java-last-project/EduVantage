@@ -42,20 +42,4 @@ public class NotificationController {
 
         return ResponseEntity.ok().build();
     }
-
-    /**
-     * 정기 시험 알림 구독
-     * @param request: examNo
-     * @param authentication: 유저정보
-     * @return -> 정기시험알림구독 테이블에 insert
-     */
-    @PostMapping("exam/subscribe")
-    public ResponseEntity<Void> subscribeExam(@RequestBody ExamSubscribeRequest request, Authentication authentication){
-        String username = authentication.getName();
-        int memberId = memberMapper.memberInfoData(username).getMember_id();
-
-        notificationService.subscribeExam(memberId, request.getExamNo());
-
-        return  ResponseEntity.ok().build();
-    }
 }
