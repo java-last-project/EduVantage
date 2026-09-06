@@ -2,6 +2,8 @@
     const { createApp, onMounted, computed } = Vue;
     const { createPinia } = Pinia;
 
+    window.notificationPinia = createPinia()
+
     const notificationApp = createApp({
         setup(){
             const store = useNotificationStore()
@@ -16,6 +18,6 @@
         }
     })
 
-    notificationApp.use(createPinia())
+    notificationApp.use(window.notificationPinia)
     notificationApp.mount("#notificationModal")
 })()

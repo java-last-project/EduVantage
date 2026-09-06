@@ -23,15 +23,15 @@
                         :class="notification.read === 'false' ?
                             'notification-unread'
                             : 'notification-read'">
-
                         <!-- 아이콘 -->
                         <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
                              style="width: 40px; height: 40px;"
                              :class="notification.read === false ?
                             'notification-unread'
                             : 'notification-read'">
-
-                            <i class="fa-solid fa-bell"></i>
+                            <i v-if="notification.type === 'COURSE_COMPLETED'" class="fa-solid fa-award"></i>
+                            <i v-else-if="notification.type === 'EXAM_SUBSCRIBED'" class="fa-solid fa-calendar-check"></i>
+                            <i v-else class="fa-solid fa-bell"></i>
                         </div>
 
                         <!-- 텍스트 영역 -->

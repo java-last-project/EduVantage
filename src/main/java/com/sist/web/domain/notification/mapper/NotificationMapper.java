@@ -1,6 +1,7 @@
 package com.sist.web.domain.notification.mapper;
 
 import com.sist.web.domain.notification.vo.NotificationVO;
+import com.sist.web.domain.notification.vo.SubscribeExamVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
@@ -13,4 +14,6 @@ import java.util.List;
 public interface NotificationMapper {
     List<NotificationVO> findRecentNotifications(@Param("memberId") int memberId, @Param("targetDate") Date targetDate);
     void markAllAsRead(@Param("nos") List<Integer> nos);
+    void subscribeExam(@Param("memberId")int memberId, @Param("examNo")int examNo);
+    SubscribeExamVO subscribeExamInfo(@Param("examNo")int examNo);
 }

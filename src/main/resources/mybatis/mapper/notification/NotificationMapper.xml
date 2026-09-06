@@ -23,4 +23,13 @@
             #{no}
         </foreach>
     </update>
+    <insert id="subscribeExam">
+        INSERT INTO exam_subscription(member_id, exam_no, notified_d3, notified_dd)
+        VALUES(#{memberId}, #{examNo}, 'N', 'N')
+    </insert>
+    <select id="subscribeExamInfo" resultType="SubscribeExamVO">
+        SELECT no AS examNo, title AS examTitle
+        FROM scheduled_exam
+        WHERE no = #{examNo}
+    </select>
 </mapper>

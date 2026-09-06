@@ -70,11 +70,25 @@ const scheduledExamApp = createApp({
             scheduledExamListData()
         }
 
+        //알림등록
+        const examNotiRegister = async (exam) => {
+            try{
+                await api.post("/notification/exam/subscribe",{examNo: exam.no})
+                showToast("default", "정기 시험 알림 구독", exam.title+" 시험이 다가오면 알려드릴게요")
+
+                //알림목록 새로고침
+                const store = useNotificationStore()
+                await store.fetchNotifications()
+            }catch(error){
+                console.error(error)
+            }
+        }
+
         onMounted(()=>{
             scheduledExamListData()
         })
 
-        return {sList,year,month, page, totalpage, prevMonth, nextMonth, prevPage, nextPage}
+        return {sList,year,month, page, totalpage, prevMonth, nextMonth, prevPage, nextPage, examNotiRegister}
     }
 })
 

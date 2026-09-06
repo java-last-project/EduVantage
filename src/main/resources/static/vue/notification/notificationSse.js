@@ -35,6 +35,10 @@ function showToast(type, title, content) {
         badgeEl.classList.add("text-success", "bg-success-subtle")
         iconEl.className = "fa-solid fa-award"
     }
+    if (type === "EXAM_SUBSCRIBED") {
+        badgeEl.classList.add("text-info", "bg-info-subtle")
+        iconEl.className = "fa-solid fa-calendar-check"
+    }
 
 
     const titleEl = document.createElement("strong")
