@@ -5,6 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ScheduledExamService {
-    Page<ScheduledExamVO> getExamByMonth(int year, int month, Pageable pageable);
+    Page<ScheduledExamVO> getExamByMonth(Integer memberId, int year, int month, Pageable pageable);
     void subscribeExam(int memberId, int examNo);
 }

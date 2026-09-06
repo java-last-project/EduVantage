@@ -10,9 +10,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 
 @RestController
@@ -22,11 +25,20 @@ public class ScheduledExamController {
     private final MemberMapper memberMapper;
 
     @GetMapping("/scheduled-exam")
-    public ResponseEntity<Page<ScheduledExamVO>> getScheduledExamByMonth(@RequestParam int year,
-                                                                         @RequestParam int month,
-                                                                         @RequestParam(defaultValue = "0", required = false) int page){
+    public ResponseEntity<Page<ScheduledExamVO>> getScheduledExamByMonth(
+            Authentication authentication,
+            @RequestParam int year,
+            @RequestParam int month,
+            @RequestParam(defaultValue = "0", required = false) int page){
+
+        Integer memberId = null;
+        if(authentication != null) {
+            String username = authentication.getName();
+            memberId = memberMapper.memberInfoData(username).getMember_id();
+        }
+
         Pageable pageable = PageRequest.of(page,3, Sort.by("openDate").ascending());
-        Page<ScheduledExamVO> result = scheduledExamService.getExamByMonth(year, month, pageable);
+        Page<ScheduledExamVO> result = scheduledExamService.getExamByMonth(memberId, year, month, pageable);
         return ResponseEntity.ok(result);
     }
 
@@ -37,12 +49,16 @@ public class ScheduledExamController {
      * @return -> 정기시험알림구독 테이블에 insert
      */
     @PostMapping("exam/subscribe")
-    public ResponseEntity<Void> subscribeExam(@RequestBody ExamSubscribeRequest request, Authentication authentication){
+    public ResponseEntity<?> subscribeExam(@RequestBody ExamSubscribeRequest request, Authentication authentication){
         String username = authentication.getName();
         int memberId = memberMapper.memberInfoData(username).getMember_id();
+        try {
+            scheduledExamService.subscribeExam(memberId, request.getExamNo());
 
-        scheduledExamService.subscribeExam(memberId, request.getExamNo());
-
-        return  ResponseEntity.ok().build();
+            return ResponseEntity.ok().build();
+        }
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message","이미 구독한 시험입니다"));
+        }
     }
 }

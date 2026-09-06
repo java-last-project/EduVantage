@@ -2,8 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sist.web.domain.notification.mapper.ScheduledExamMapper">
     <select id="getScheduledExamByMonth" resultType="ScheduledExamVO">
-        SELECT *
-        FROM scheduled_exam
+        SELECT
+        se.no,
+        se.title,
+        se.open_date,
+        se.close_date,
+        <if test="memberId != null">
+            CASE WHEN es.no IS NOT NULL THEN 1 ELSE 0 END AS subscribed
+        </if>
+        <if test="memberId == null">
+            0 AS subscribed
+        </if>
+        FROM scheduled_exam se
+        <if test="memberId != null">
+            LEFT JOIN exam_subscription es
+                ON se.no = es.exam_no AND es.member_id = #{memberId}
+        </if>
         WHERE open_date &gt;= TO_DATE(#{year}||'-'||#{month}||'-01','YYYY-MM-DD')
             AND open_date &lt; ADD_MONTHS(TO_DATE(#{year}||'-'||#{month}||'-01','YYYY-MM-DD'),1)
         ORDER BY open_date

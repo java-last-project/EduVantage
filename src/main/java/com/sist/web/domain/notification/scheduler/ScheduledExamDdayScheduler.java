@@ -22,9 +22,9 @@ public class ScheduledExamDdayScheduler {
     private final ScheduledExamMapper scheduledExamMapper;
     private final NotificationRepository notificationRepository;
     private final EmitterRepository emitterRepository;
-
     
-    @Scheduled(fixedRate = 30000)
+    //@Scheduled(fixedRate = 30000)
+    @Scheduled(cron = "0 0 7 * * *")
     public void scheduledExamDday() {
         checkDday(3, "notified_d3", NotificationType.EXAM_SUBSCRIBED);
         checkDday(0, "notified_dd", NotificationType.EXAM_SUBSCRIBED);

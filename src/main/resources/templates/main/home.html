@@ -153,8 +153,13 @@
 									</h6>
 									<p class="card-text text-muted small mb-0">{{ exam.open_date.split('T')[0] }} ~ {{ exam.close_date.split('T')[0] }}</p>
 								</div>
-								<a class="position-relative text-decoration-none" style="font-size: 15px;cursor:pointer" title="알림" @click="examNotiRegister(exam)">
-									<i class="fa-regular fa-bell"></i>
+								<a class="position-relative text-decoration-none"
+								   style="font-size: 15px;"
+								   :style="{cursor: exam.subscribed ? 'default' : 'pointer'}"
+								   title="알림"
+								   @click="examNotiRegister(exam)">
+									<i class="fa-solid fa-bell" v-if="exam.subscribed" style="color:var(--text-muted)"></i>
+									<i class="fa-regular fa-bell" v-else></i>
 								</a>
 							</div>
 						</div>

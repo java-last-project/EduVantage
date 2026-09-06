@@ -21,7 +21,7 @@ public class NotificationController {
     private final MemberMapper memberMapper;
 
     @GetMapping
-    public ResponseEntity<List<NotificationVO>> getIsNotReadNotification(Authentication authentication){
+    public ResponseEntity<List<NotificationVO>> getRecentNotifications(Authentication authentication){
         String username = authentication.getName();
         int memberId = memberMapper.memberInfoData(username).getMember_id();
         List<NotificationVO> result = notificationService.findRecentNotifications(memberId);
