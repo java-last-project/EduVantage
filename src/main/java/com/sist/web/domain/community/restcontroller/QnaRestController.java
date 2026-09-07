@@ -2,11 +2,7 @@ package com.sist.web.domain.community.restcontroller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.sist.web.domain.community.service.QnaService;
 import com.sist.web.domain.community.vo.QnaBoardVO;
@@ -54,10 +50,10 @@ public class QnaRestController {
 	}
 	
 	@PostMapping("/qna/reply/insert")
-	public ResponseEntity<Map<String,Object>> qnaReplyInsert(@RequestParam("qnaNo")Integer qnaNo,@ModelAttribute QnaReplyVO insertData){
+	public ResponseEntity<Map<String,Object>> qnaReplyInsert(@RequestBody QnaReplyVO insertData){
 		Map<String,Object> map=new HashMap<>();
 		try {
-			qService.qnaReplyInsert(insertData, qnaNo);
+			qService.qnaReplyInsert(insertData, insertData.getQnaNo());
 		}catch(Exception ex) {
 			ex.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -66,10 +62,10 @@ public class QnaRestController {
 	}
 	
 	@PostMapping("/qna/reply/update")
-	public ResponseEntity<Map<String,Object>> qnaReplyUpdate(@RequestParam("qnaNo")Integer qnaNo,@ModelAttribute QnaReplyVO updateData){
+	public ResponseEntity<Map<String,Object>> qnaReplyUpdate(@RequestBody QnaReplyVO updateData){
 		Map<String,Object> map=new HashMap<>();
 		try {
-			qService.qnaReplyUpdate(updateData, qnaNo);
+			qService.qnaReplyUpdate(updateData, updateData.getQnaNo());
 		}catch(Exception ex) {
 			ex.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

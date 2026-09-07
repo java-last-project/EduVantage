@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <script th:inline="javascript">
-    const serverMsg = /*[[${msg}]]*/ null
+    const serverMsg=/*[[${msg}]]*/ null
+	const qnaNo=/*[[${vo.no}]]*/ 0
+	const SESSION_ID=/*[[${session.member_id}]]*/ ''
+	const ROLE=/*[[${session.role}]]*/ 'ROLE_USER'
     if (serverMsg) {
         alert(serverMsg)
     }
@@ -22,11 +25,11 @@
 	                </div>
 	            </div>
 	
-	            <div class="bg-white rounded-3 shadow-sm border mb-4">
+	            <div class="bg-white rounded-3 border mb-4">
 	                <div class="p-4 border-bottom">
 	                    <div class="d-flex align-items-center gap-2 mb-2">
 	                        <span class="badge bg-light text-secondary border px-2 py-1">[[${vo.category}]]</span>
-	                        <span class="status-badge" th:class="${vo.status=='Y'?'status-done':'status-wait'}">
+	                        <span class="status-badge" th:classappend="${vo.status=='Y'?'status-done':'status-wait'}">
 	                            [[${vo.status=='Y'?'답변완료':'답변대기'}]]
 	                        </span>
 	                    </div>
@@ -48,29 +51,45 @@
 	                </div>
 	            </div>
 	
-	            <div class="bg-light rounded-3 shadow-sm border p-4 mb-5" id="replyApp">
+	            <div class="bg-light rounded-3 border p-4 mb-5" id="replyApp">
 	                <div class="d-flex align-items-center mb-3">
-	                    <i class="fa-solid fa-reply fa-rotate-180 text-primary me-2 fs-4"></i>
-	                    <h4 class="fw-bold mb-0 text-primary">관리자 답변</h4>
+	                    <i class="fa-solid fa-reply fa-rotate-180 me-2 fs-4" style="color: #64748b;"></i>
+	                    <h4 class="fw-bold mb-0" style="color: #1e293b;">관리자 답변</h4>
 	                </div>
 	
-	                <div th:if="${vo.status==='Y'}" class="bg-white p-4 border rounded-3">
-	                    <div class="text-muted small mb-3">
-	                        <i class="fa-solid fa-headset me-1"></i> 고객센터 담당자 | {{ qnaDetail.replyDate }}
-	                    </div>
-	                    <div style="white-space: pre-wrap; line-height: 1.6;">{{ qnaDetail.replyContent }}</div>
+	                <div v-if="store.reply && store.reply.no" class="bg-white p-4 border rounded-3">
+						<div class="d-flex justify-content-between align-items-center mb-3">
+							<div class="text-muted small mb-3">
+								<i class="fa-solid fa-headset me-1"></i> {{store.reply.name}} | {{store.reply.dbday}}
+							</div>
+
+							<div v-if="isAdmin">
+								<button class="btn btn-sm btn-outline-secondary me-2" @click="toggleEditForm">수정</button>
+								<button class="btn btn-sm btn-outline-danger" @click="deleteReply">삭제</button>
+							</div>
+						</div>
+
+	                    <div v-if="!editMode" style="white-space: pre-wrap; line-height: 1.6;">{{store.reply.content}}</div>
+
+						<div v-if="editMode" class="mt-3 border-top pt-3">
+							<textarea class="form-control mb-2" rows="5" v-model="editReplyText"></textarea>
+							<div class="text-end">
+								<button class="btn btn-sm btn-light me-2" @click="toggleEditForm">취소</button>
+								<button class="btn btn-sm btn-primary" @click="updateReply">수정 완료</button>
+							</div>
+						</div>
 	                </div>
 	
-	                <div v-if="qnaDetail.status === 'N' && !isAdmin" class="bg-white p-5 border rounded-3 text-center text-muted">
+	                <div v-if="(!store.reply || !store.reply.no) && !isAdmin" class="bg-white p-5 border rounded-3 text-center text-muted">
 	                    <i class="fa-regular fa-clock fs-1 mb-3 text-secondary"></i>
 	                    <h5>답변을 준비 중입니다.</h5>
 	                    <p class="mb-0">담당자가 내용을 확인한 후 신속하게 답변해 드리겠습니다.</p>
 	                </div>
 	
-	                <div v-if="qnaDetail.status === 'N' && isAdmin" class="bg-white p-4 border rounded-3">
+	                <div v-if="(!store.reply || !store.reply.no) && isAdmin" class="bg-white p-4 border rounded-3">
 	                    <textarea class="form-control mb-3" rows="5" placeholder="답변 내용을 입력하세요..." v-model="replyText"></textarea>
 	                    <div class="text-end">
-	                        <button class="btn btn-primary px-4 fw-bold" @click="submitReply">답변 등록</button>
+	                        <button class="btn btn-primary px-4 fw-bold" @click="writeReply">답변 등록</button>
 	                    </div>
 	                </div>
 	            </div>
@@ -86,71 +105,55 @@ const replyApp=createApp({
 	setup(){
 		const store=useQnaReplyStore()
 		const sessionId=ref(SESSION_ID)
-		const newComment=ref('')
-		const activeReplyNo=ref(0)
-		const coComment=ref('')
-		const editReplyNo=ref(0)
-		const editCommentText=ref('')
+		const isAdmin=ref(ROLE?ROLE.includes('ADMIN'):false)
+
+		const replyText=ref('')
+		const editMode=ref(false)
+		const editReplyText=ref('')
 
 		onMounted(()=>{
 			store.qnaNo=qnaNo
 			store.qnaReplyData()
 		})
 
-		const toggleReplyForm=(no)=>{
-			activeReplyNo.value=activeReplyNo.value===no?0:no
-			editReplyNo.value=0
-			coComment.value=''
+		const toggleEditForm=()=>{
+			editMode.value=!editMode.value
+			if(editMode.value){
+				editReplyText.value=store.reply.content
+			}
 		}
-		const toggleEditForm=(reply)=>{
-			editReplyNo.value=editReplyNo.value===reply.no?0:reply.no
-			activeReplyNo.value=0
-			editCommentText.value=reply.msg
-		}
-		const writeComment=async()=>{
-			if(!newComment.value.trim()){
+		const writeReply=async()=>{
+			if(!replyText.value.trim()){
 				return
 			}
-			await store.insertComment({
-				board_no:board_no,
+			await store.insertReply({
 				member_id:sessionId.value,
-				msg:newComment.value,
-				parent_no:0
+				qnaNo:qnaNo,
+				content:replyText.value,
 			})
-			newComment.value=''
+			replyText.value=''
 		}
-		const writeCoComment=async(parent_no)=>{
-			if(!coComment.value.trim()){
+		const updateReply=async()=>{
+			if(!editReplyText.value.trim()){
 				return
 			}
-			await store.insertComment({
-				board_no:board_no,
-				member_id:sessionId.value,
-				msg:coComment.value,
-				parent_no:parent_no
+			await store.updateReply({
+				no:store.reply.no,
+				qnaNo:qnaNo,
+				content:editReplyText.value
 			})
-			activeReplyNo.value=0
-			coComment.value=''
+			editMode.value=false
 		}
-		const updateComment=async(no)=>{
-			if(!editCommentText.value.trim()){
-				return
-			}
-			await store.updateComment({
-				no:no,
-				msg:editCommentText.value
-			})
-			editReplyNo.value=0
-		}
-		const deleteComment=async(no)=>{
+		const deleteReply=async()=>{
 			if(confirm('정말 삭제하시겠습니까?')){
-				await store.deleteComment(no)
+				store.no=store.reply.no
+				await store.deleteReply()
 			}
 		}
 		return{
 			store,
-			sessionId,newComment,activeReplyNo,coComment,editReplyNo,editCommentText,
-			toggleReplyForm,toggleEditForm,writeComment,writeCoComment,updateComment,deleteComment
+			isAdmin,replyText,editMode,
+			editReplyText,toggleEditForm,writeReply,updateReply,deleteReply
 		}
 	}
 })
