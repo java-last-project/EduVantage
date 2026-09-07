@@ -86,7 +86,7 @@ const scheduledExamApp = createApp({
                 }else{
                     //미구독 -> 알림신청
                     await api.post("/exam/subscribe",{examNo: exam.no})
-                    showToast("EXAM_SUBSCRIBED", "정기 시험 알림 구독", exam.title+" 시험이 다가오면 알려드릴게요")
+                    showToast("EXAM_SUBSCRIBED", "정기 시험 알림 구독", exam.title+"이 다가오면 알려드릴게요")
                     //DOM 실시간 반영
                     exam.subscribed = true
 

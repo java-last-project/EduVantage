@@ -32,4 +32,12 @@ public interface FreeBoardMapper {
 	public void freeBoardUpdate(FreeBoardVO vo);
 	public void freeBoardDelete(int no);
 	public String freeBoardPwdData(int no);
+
+	//댓글 알림용 게시판 정보
+	@Select("""
+			SELECT member_id, subject
+			FROM FREE_BOARD
+			WHERE no=#{freeBoardNo}
+			""")
+	FreeBoardVO freeBoardInfo(int freeBoardNo);
 }

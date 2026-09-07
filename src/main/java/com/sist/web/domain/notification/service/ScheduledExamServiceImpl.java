@@ -47,7 +47,7 @@ public class ScheduledExamServiceImpl implements ScheduledExamService {
                     .memberId(memberId)
                     .type(NotificationType.EXAM_SUBSCRIBED)
                     .title("정기 시험 알림 구독")
-                    .content(exam.getExamTitle()+ " 시험이 다가오면 알려드릴게요")
+                    .content(exam.getExamTitle()+ " 이 다가오면 알려드릴게요")
                     .relatedId(examNo)
                     .eventKey(UUID.randomUUID().toString())
                     .build();
