@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 
 <style>
-	/* ===== 헤더 영역 ===== */
-
 	.page-title{
 		font-size:26px;
 		font-weight:700;
@@ -29,24 +27,31 @@
 
 	<div class="profile-summary">
 		<div class="profile-summary-left">
-			<div class="profile-avatar-lg">김</div>
+			<!-- <div class="profile-avatar-lg">김</div> -->
 			<div>
 				<div class="profile-name-row">
-					<span class="profile-name">김민수</span>
-					<span class="role-tag">일반</span>
+					<span class="profile-name">[[${vo.NAME}]]</span>
+					<span class="role-tag" th:switch=${vo.AUTHORITY}>
+						<span th:case="'ROLE_ADMIN'">관리자</span>
+						<span th:case="'ROLE_INSTRUCTOR'">강사</span>
+						<span th:case="'ROLE_USER'">일반</span>
+					</span>
 				</div>
-				<div class="profile-meta">minsu.kim &middot; 가입일 2024.03.15</div>
+				<div class="profile-meta">[[${vo.USERNAME}]] &middot; 가입일 [[${vo.DBDAY}]]</div>
 			</div>
 		</div>
 
-		<div class="status-control">
-			<select class="status-select">
-				<option value="1" selected>정상</option>
-				<option value="0">휴면</option>
-				<option value="-1">정지</option>
-			</select>
-			<button class="btn-primary">저장</button>
-		</div>
+		<form th:action="@{/admin/member_update_enabled}" method="get">
+			<div class="status-control">
+				<select class="status-select" name="enabled">
+					<option value="1" th:selected="${vo.ENABLED==1}">정상</option>
+					<option value="0" th:selected="${vo.ENABLED==0}">휴면</option>
+					<option value="2" th:selected="${vo.ENABLED==2}">정지</option>
+				</select>
+				<input type="hidden" th:value="${vo.MEMBER_ID}" name="member_id">
+				<button class="btn-primary" type="submit">저장</button>
+			</div>
+		</form>
 	</div>
 
 	<div class="info-card">
@@ -54,39 +59,44 @@
 		<table class="info-table">
 			<tr>
 				<th>이름</th>
-				<td>김민수</td>
+				<td>[[${vo.NAME}]]</td>
 			</tr>
 			<tr>
 				<th>아이디</th>
-				<td>minsu.kim</td>
+				<td>[[${vo.USERNAME}]]</td>
 			</tr>
 			<tr>
 				<th>성별</th>
-				<td>남</td>
+				<td th:switch=${vo.SEX}>
+					<span th:case="'M'">남</span>
+					<span th:case="'F'">여</span>
+				</td>
 			</tr>
 			<tr>
 				<th>생년월일</th>
-				<td>1995.04.12</td>
+				<td>[[${vo.BIRTHDAY}]]</td>
 			</tr>
 			<tr>
 				<th>연락처</th>
-				<td>010-1234-5678</td>
+				<td>[[${vo.PHONE}]]</td>
 			</tr>
 			<tr>
 				<th>이메일</th>
-				<td>minsu.kim@eduflow.kr</td>
+				<td>
+					[[${vo.EMAIL}]]
+				</td>
 			</tr>
 			<tr>
 				<th>주소</th>
-				<td>(06236) 서울특별시 강남구 테헤란로 123, 4층 (역삼동)</td>
+				<td>([[${vo.POST}]]) [[${vo.ADDR1}]], [[${vo.ADDR2}]]</td>
 			</tr>
 			<tr>
 				<th>가입일</th>
-				<td>2024.03.15</td>
+				<td>[[${vo.DBDAY}]]</td>
 			</tr>
 			<tr>
 				<th>자기소개</th>
-				<td>안녕하세요, 백엔드 개발을 공부하고 있는 김민수입니다.</td>
+				<td>[[${vo.PROFILEDESC}]]</td>
 			</tr>
 		</table>
 	</div>

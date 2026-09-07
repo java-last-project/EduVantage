@@ -3,21 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<script th:inline="javascript">
+const SESSION_ID = /*[[${session.member_id}]]*/ 0
+</script>
 </head>
 <body>
-<div class="container-fluid p-3">
+<div class="container-fluid p-3" id="orders">
 
-  <!-- 탭 -->
   <ul class="nav nav-tabs mb-3">
     <li class="nav-item">
-      <a class="nav-link active fw-semibold" href="#">강의 구매목록 <span class="text-secondary">(3)</span></a>
+      <button type="button" class="nav-link fw-semibold" :class="store.activeTab==='course'?'active':'text-secondary'" @click="store.setTab('course')">
+      	강의 구매목록 <span class="text-secondary">({{store.cCount}})</span>
+      </button>
     </li>
     <li class="nav-item">
-      <a class="nav-link text-secondary" href="#">도서 구매목록 <span class="text-secondary">(2)</span></a>
+      <button type="button" class="nav-link fw-semibold" :class="store.activeTab==='book'?'active':'text-secondary'" @click="store.setTab('book')">
+      	도서 구매목록 <span class="text-secondary">({{store.bCount}})</span>
+      </button>
     </li>
   </ul>
 
-  <div class="card border">
+  <div class="card border" v-if="store.activeTab==='course'">
     <div class="card-body">
 
 		<div class="d-flex justify-content-between align-items-center mb-4">
@@ -33,42 +39,71 @@
 		  </select>
 		</div>
 
-      <div class="border rounded-3 mb-3 overflow-hidden">
+      <div class="border rounded-3 mb-3 overflow-hidden" v-for="(cvo,i) in store.cList" :key="index">
 
-        <div class="d-flex justify-content-between align-items-center bg-light px-3 py-2">
-          <div>
-            <span class="fw-bold small">2026.09.01</span>
-            <span class="text-secondary small ms-2">주문번호 123123123</span>
-          </div>
-          <span class="badge rounded-pill text-bg-light border">결제완료</span>
-        </div>
+		<div class="d-flex justify-content-between align-items-center bg-light px-3 py-2">
+		  <div>
+		    <span class="fw-bold small">{{cvo.dbday}}</span>
+		  </div>
+		  <div class="d-flex align-items-center">
+		    <span class="text-secondary small rounded-pill ms-2">주문번호 {{cvo.no}}</span>
+		    <span class="badge rounded-pill text-bg-light border ms-2">결제완료</span>
+		  </div>
+		</div>
 
-        <!-- 주문 항목 반복 (th:each="item : ${order.items}") -->
         <div class="d-flex align-items-center gap-3 px-3 py-3 border-top">
-          <div class="bg-light rounded-2 flex-shrink-0" style="width: 70px; height: 50px; overflow: hidden;">
-            <img src="" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+          <div class="bg-light rounded-2 flex-shrink-0" style="width: 150px; height: 100px; overflow: hidden;">
+            <img :src="cvo.thumbnail" style="width: 100%; height: 100%; object-fit: cover; display: block;">
           </div>
           <div class="flex-grow-1" style="min-width: 0">
-            <div class="fw-semibold text-truncate">수강명</div>
-            <div class="text-secondary small">강사</div>
+            <div class="fw-semibold text-truncate">{{cvo.title}}</div>
+            <div class="text-secondary small">{{cvo.instructor}}</div>
           </div>
-          <div class="fw-bold" style="min-width: 90px;">가격</div>
-          <a href="#" class="btn btn-dark btn-sm px-3 flex-shrink-0">수강하기</a>
+          <div class="fw-bold" style="min-width: 90px;">{{cvo.price.toLocaleString()}} 원</div>
+          <a :href="'/enrollment/'+cvo.course_no" class="btn btn-dark btn-sm px-3 flex-shrink-0">수강하기</a>
         </div>
 
       </div>
 
-      <nav class="d-flex justify-content-center mt-4">
-        <ul class="pagination pagination-sm mb-0">
-          <li class="page-item active"><a class="page-link" href="#">1</a></li>
-          <li class="page-item"><a class="page-link" href="#">2</a></li>
-          <li class="page-item"><a class="page-link" href="#">3</a></li>
-        </ul>
-      </nav>
-
+                <ul class="pagination justify-content-center border-0">
+                    <li class="page-item" v-if="startpage>1">
+                    	<a class="page-link border-0 text-muted" style="cursor: pointer;" @click="store.moveCourse(store.startpage-1)">
+                    		<i class="fa-solid fa-chevron-left"></i>
+                    	</a>
+                    </li>
+                    <li class="page-item" v-for="(i,index) in store.range" :key="index">
+                    <a class="page-link border-0 rounded-circle mx-1 custom-page-btn" :class="{'active':store.curpage===i}" @click="store.moveCourse(i)">
+                    {{i}}
+                    </a>
+                    </li>
+                    <li class="page-item" v-if="endpage<totalpage">
+                    <a class="page-link border-0 text-muted" style="cursor: pointer;" @click="store.moveCourse(store.endpage+1)">
+                    	<i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                    </li>
+                </ul>
     </div>
   </div>
 
 </div>
+<script src="/vue/mypage/orders/ordersStore.js"></script>
+<script>
+  const {createApp,onMounted}=Vue
+  const {createPinia}=Pinia
+
+  const ordersApp=createApp({
+    setup(){
+      const store=useOrdersStore()
+      onMounted(()=>{
+        store.coursePaymentListData(SESSION_ID)
+      })
+      return {
+        store
+      }
+    }
+  })
+  ordersApp.use(createPinia())
+  ordersApp.mount('#orders')
+</script>
 </body>
 </html>

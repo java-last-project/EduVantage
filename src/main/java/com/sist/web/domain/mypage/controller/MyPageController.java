@@ -19,8 +19,9 @@ public class MyPageController {
 	private final MyPageService mService;
 	
 	@GetMapping("/mypage")
-	public String mypage_profile(Model model) {
-		int member_id=3;
+	public String mypage_profile(HttpSession session, Model model) {
+		int member_id=(int)session.getAttribute("member_id");
+		//int member_id=3;
 		int eCount=mService.enrolledCount(member_id);
 		MyMemberVO vo=mService.memberProfileData(member_id);
 		model.addAttribute("eCount",eCount);
@@ -32,8 +33,8 @@ public class MyPageController {
 	}
 	
 	@GetMapping("/mypage/dashboard")
-	public String mypage_dashboard(Model model) {
-		int member_id=3;
+	public String mypage_dashboard(HttpSession session, Model model) {
+		int member_id=(int)session.getAttribute("member_id");
 		List<CourseEnrollmentVO> list=mService.lastAccessedCourse(member_id);
 		model.addAttribute("cLastList",list);
 		model.addAttribute("active","dashboard");
@@ -44,10 +45,8 @@ public class MyPageController {
 	
 	@GetMapping("/mypage/courses")
 	public String mypage_course(Model model, HttpSession session) {
-		//int member_id=(int)session.getAttribute("id");
-		int member_id=3;
+		int member_id=(int)session.getAttribute("member_id");
 		List<CourseEnrollmentVO> list=mService.mypageCourseListData(member_id);
-		//System.out.println(list);
 		model.addAttribute("cList",list);
 		model.addAttribute("active","courses");
 		model.addAttribute("main_html","mypage/layout/main");
@@ -56,7 +55,8 @@ public class MyPageController {
 	}
 	
 	@GetMapping("/mypage/carts")
-	public String mypage_carts(Model model) {
+	public String mypage_carts(HttpSession session, Model model) {
+		int member_id=(int)session.getAttribute("member_id");
 		model.addAttribute("active","carts");
 		model.addAttribute("main_html","mypage/layout/main");
 		model.addAttribute("mypage_html","mypage/carts");
@@ -64,7 +64,8 @@ public class MyPageController {
 	}
 	
 	@GetMapping("/mypage/orders")
-	public String mypage_orders(Model model) {
+	public String mypage_orders(HttpSession session, Model model) {
+		int member_id=(int)session.getAttribute("member_id");
 		model.addAttribute("active","orders");
 		model.addAttribute("main_html","mypage/layout/main");
 		model.addAttribute("mypage_html","mypage/orders");

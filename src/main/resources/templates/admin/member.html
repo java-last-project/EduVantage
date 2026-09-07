@@ -76,10 +76,10 @@
 					<td th:switch=${vo.ENABLED}>
 						<span th:case="'1'" class="badge badge-active">정상</span>
 						<span th:case="'0'" class="badge badge-pending">휴면</span>
-						<span th:case="'0'" class="badge badge-suspended">정지</span>					
+						<span th:case="'2'" class="badge badge-suspended">정지</span>					
 					</td>
 					<td style="text-align:right;">
-						<button class="btn-detail">상세보기</button>
+						<a class="btn btn-detail" th:href="@{/admin/member_detail(member_id=${vo.MEMBER_ID})}">상세보기</a>
 					</td>
 				</tr>
 				

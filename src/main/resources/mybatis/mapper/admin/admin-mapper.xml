@@ -57,4 +57,13 @@
 			</if>
 		</where>
 	</select>
+	
+	<!-- 회원 상세 정보 조회 -->
+	<select id="adminMemberDetailData" resultType="hashmap" parameterType="int">
+		SELECT m.member_id,m.username,m.name,m.sex,TO_CHAR(m.birthdate,'yyyy.mm.dd') as birthday,m.phone,m.email,m.post,m.addr1,m.addr2,TO_CHAR(m.regdate,'yyyy.mm.dd') as dbday,TO_CHAR(m.profile_desc) as profiledesc,a.authority,m.enabled
+		FROM member m
+		JOIN authority a
+		ON m.member_id=a.member_id
+		WHERE m.member_id=#{member_id}
+	</select>
 </mapper>
