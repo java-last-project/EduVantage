@@ -22,7 +22,7 @@ public class BookServiceImpl implements BookService{
 		// TODO Auto-generated method stub
 		return bMapper.bookListData(map);
 	}
-
+	/*
 	 @Override
 	    public int[] bookTotalPage(int page, String category) {
 	        int totalpage = bMapper.bookTotalPage(category);
@@ -35,7 +35,7 @@ public class BookServiceImpl implements BookService{
 	        // 배열 반환
 	        return new int[]{page, totalpage, startPage, endPage};
 	    }
-
+	*/
 	 @Override
 	 public int bookTotalCount(String category) {
 		// TODO Auto-generated method stub
@@ -64,15 +64,22 @@ public class BookServiceImpl implements BookService{
 	 @Override
 	 public int bookLikeOn(BookLikeVO vo) {
 		// TODO Auto-generated method stub
-		return bMapper.bookLikeOn(vo);
+	     int result = bMapper.bookLikeOn(vo); 
+	     
+	     bMapper.bookLikeIncrement(vo.getBook_no()); 
+	     
+	     return result;
 	 }
 
 	 @Override
 	 public int bookLikeOff(BookLikeVO vo) {
 		// TODO Auto-generated method stub
-		return bMapper.bookLikeOff(vo);
+	     int result = bMapper.bookLikeOff(vo); 
+	     
+	     bMapper.bookLikeDecrement(vo.getBook_no()); 
+	     
+	     return result;
 	 }
-
 	 @Override
 	 public int bookLikeCount(int book_no) {
 		// TODO Auto-generated method stub
@@ -83,5 +90,15 @@ public class BookServiceImpl implements BookService{
 	 public int bookLikeCheck(BookLikeVO vo) {
 		// TODO Auto-generated method stub
 		return bMapper.bookLikeCheck(vo);
+	 }
+	 @Override
+	 public void bookLikeIncrement(int book_no) {
+		// TODO Auto-generated method stub
+		bMapper.bookLikeIncrement(book_no);
+	 }
+	 @Override
+	 public void bookLikeDecrement(int book_no) {
+		// TODO Auto-generated method stub
+		bMapper.bookLikeDecrement(book_no);
 	 }
 }

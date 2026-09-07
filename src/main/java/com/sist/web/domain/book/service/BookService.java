@@ -9,7 +9,7 @@ import com.sist.web.domain.book.vo.BookVO;
 public interface BookService {
 	public List<BookVO> bookListData(Map map);
 	
-	public int[] bookTotalPage(int page, String category);
+	// public int[] bookTotalPage(int page, String category);
 	
 	public int bookTotalCount(String category);
 	
@@ -26,5 +26,9 @@ public interface BookService {
 	public int bookLikeCount(int book_no);
 
 	public int bookLikeCheck(BookLikeVO vo);
+	
+	public void bookLikeIncrement(int book_no);
+	
+	public void bookLikeDecrement(int book_no);
 	
 }

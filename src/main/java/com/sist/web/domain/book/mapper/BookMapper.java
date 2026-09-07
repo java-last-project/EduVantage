@@ -9,7 +9,7 @@ public interface BookMapper {
 
 	public List<BookVO> bookListData(Map map);
 
-	public int bookTotalPage(String category);
+	// public int bookTotalPage(String category);
 	
 	public int bookTotalCount(String category);
 	
@@ -28,4 +28,8 @@ public interface BookMapper {
 	public int bookLikeCount(int book_no);
 
 	public int bookLikeCheck(BookLikeVO vo);
+	
+	public void bookLikeIncrement(int book_no);
+	
+	public void bookLikeDecrement(int book_no);
 }

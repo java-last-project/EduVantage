@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sist.web.domain.book.service.BookService;
 import com.sist.web.domain.book.vo.BookLikeVO;
 import com.sist.web.domain.book.vo.BookVO;
+import com.sist.web.domain.book.commons.PaginationUtil; 
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -36,30 +37,30 @@ public class BookRestController {
             param.put("category", category);
             param.put("sort", sort);
 
-            // 목록
+            // 목록 및 총 데이터 갯수 조회
             List<BookVO> list = bService.bookListData(param);
-            int[] pages = bService.bookTotalPage(page, category);
             int count = bService.bookTotalCount(category);
 
+            // 공통 유틸리티를 통한 페이징 계산
+            Map<String, Object> pageInfo = PaginationUtil.getPageInfo(count, page);
+
             map.put("list", list);
-            map.put("curpage", pages[0]);
-            map.put("totalpage", pages[1]);
-            map.put("startPage", pages[2]);
-            map.put("endPage", pages[3]);
             map.put("count", count);
+            map.putAll(pageInfo); 
             
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
         return ResponseEntity.ok(map);
-        
     }
+    
     @GetMapping("/book/detail_vue")
-    public ResponseEntity<BookVO>book_detail(@RequestParam("no") int no){
-    	BookVO vo = bService.bookDetailData(no);
-    	return new ResponseEntity<>(vo, HttpStatus.OK);
+    public ResponseEntity<BookVO> book_detail(@RequestParam("no") int no){
+        BookVO vo = bService.bookDetailData(no);
+        return new ResponseEntity<>(vo, HttpStatus.OK);
     }
+    
     @GetMapping("/book/api/find")
     public Map<String, Object> bookFindData(
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
@@ -72,7 +73,6 @@ public class BookRestController {
             return response; 
         }
         
-        int rowSize = 12; 
         int start = (page * 12) - 12;
         
         Map<String, Object> dbParam = new HashMap<>();
@@ -85,36 +85,24 @@ public class BookRestController {
         List<BookVO> list = bService.bookFindData(dbParam);
         int count = bService.bookFindCount(dbParam); 
         
-        // 페이지네이션 
-        int totalpage = (int) (Math.ceil(count / (double) rowSize));
-        if (totalpage == 0) totalpage = 1;
+        // 공통 유틸리티를 통한 페이징 계산 
+        Map<String, Object> pageInfo = PaginationUtil.getPageInfo(count, page);
         
-        final int BLOCK = 10; 
-        int startPage = ((page - 1) / BLOCK) * BLOCK + 1;
-        int endPage = ((page - 1) / BLOCK) * BLOCK + BLOCK;
-        if (endPage > totalpage) endPage = totalpage;
-        
-        List<Integer> range = new ArrayList<>();
-        for (int i = startPage; i <= endPage; i++) range.add(i);
-        
-        // 프론트로 보낼 데이터
+        // 프론트로 보낼 데이터 구성
         response.put("list", list);
         response.put("count", count);
-        response.put("curpage", page);
-        response.put("totalpage", totalpage);
-        response.put("startPage", startPage);
-        response.put("endPage", endPage);
-        response.put("range", range);
+        response.putAll(pageInfo);
         
         return response; 
     }
-    // 책 상세페이지 진입 시 상ㅌ 확인
+    
+    // 책 상세페이지 진입 시 상태 확인
     @GetMapping("/book/api/like/status")
     public Map<String, Object> bookLikeStatus(
             @RequestParam("book_no") int bookNo,
             HttpSession session) {
 
-    	Integer memberId = (Integer) session.getAttribute("member_id");
+        Integer memberId = (Integer) session.getAttribute("member_id");
 
         Map<String, Object> response = new HashMap<>();
         response.put("likeCount", bService.bookLikeCount(bookNo));
@@ -137,7 +125,7 @@ public class BookRestController {
             @RequestParam("book_no") int bookNo,
             HttpSession session) {
 
-    	Integer memberId = (Integer) session.getAttribute("member_id");
+        Integer memberId = (Integer) session.getAttribute("member_id");
         Map<String, Object> response = new HashMap<>();
 
         if (memberId == null) {
@@ -160,8 +148,4 @@ public class BookRestController {
 
         return response;
     }
-    
-
-    
-    
 }
