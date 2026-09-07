@@ -32,4 +32,10 @@ public interface BookMapper {
 	public void bookLikeIncrement(int book_no);
 	
 	public void bookLikeDecrement(int book_no);
+	
+	public int bookCartCheck(BookCartVO vo);
+
+	public void bookCartUpdate(BookCartVO vo);
+
+	public void bookCartInsert(BookCartVO vo);
 }

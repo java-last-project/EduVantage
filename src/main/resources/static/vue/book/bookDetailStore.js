@@ -54,10 +54,10 @@ const useBookDetailStore = defineStore('bookDetail', {
             this.activeTab = tabName;
         },
         goToCart() {
-            location.href = '/book/cart';
+            location.href = '/mypage/carts?tab=book';
         },
         goToOrder() {
-            location.href = '/book/order';
+            location.href = '/mypage/orders?tab=book';
         }
     }
 });
