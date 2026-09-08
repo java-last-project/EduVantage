@@ -72,4 +72,3 @@ function showToast(type, title, content, related_id) {
         setTimeout(() => toast.remove(), 300)
     }, 6000)
 }
-

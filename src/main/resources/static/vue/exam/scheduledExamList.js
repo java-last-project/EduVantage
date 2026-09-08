@@ -73,7 +73,6 @@ const scheduledExamApp = createApp({
         //알림등록 및 취소
         const examNotiRegister = async (exam) => {
             try{
-
                 if(exam.subscribed){
                     //구독중 -> 알림취소
                     await api.delete(`/exam/subscribe/${exam.no}`)

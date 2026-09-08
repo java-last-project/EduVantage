@@ -20,5 +20,10 @@ public class BookController {
     	model.addAttribute("main_html", "book/detail");
     	return "main/main";
     }
+    @GetMapping("/book/cart")
+    public String book_cart(Model model) {
+    	model.addAttribute("main_html", "mypage/carts");
+    	return "main/main";
+    }
     
 }
