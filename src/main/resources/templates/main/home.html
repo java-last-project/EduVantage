@@ -31,7 +31,7 @@
 	</section>
 	-->
 
-    <section class="mb-5 pb-4" style="margin-top: 20px">
+    <section class="mb-5 pb-4" style="margin-top: 10px">
         <div id="mainBannerCarousel" class="carousel carousel-dark slide rounded-3 overflow-hidden" data-bs-ride="carousel">
             <!-- 하단 인디케이터 (버튼) -->
             <div class="carousel-indicators">
@@ -43,26 +43,65 @@
             <!-- 슬라이드 아이템 -->
             <div class="carousel-inner">
                 <!-- 슬라이드 1 -->
-                <div class="carousel-item active" data-bs-interval="4000">
-                    <div class="img-placeholder" style="height: 350px; width: 100%;">
-                        <i class="fa-regular fa-image fa-3x"></i>
-                        <span class="ms-3 text-muted fw-bold">첫 번째 추천 강의/도서 배너</span>
-                    </div>
-                </div>
+				<div class="carousel-item active" data-bs-interval="4000">
+					<a th:href="@{/exam/list}" class="main-banner banner-dark px-4">
+						<i class="fa-solid fa-microchip deco-icon text-white" style="font-size: 140px; top: 15%; left: 8%;"></i>
+						<i class="fa-solid fa-rocket deco-icon text-danger" style="font-size: 120px; bottom: 10%; right: 10%;"></i>
+
+						<div class="position-relative z-1">
+                			<span class="badge rounded-pill px-3 py-2 mb-3 fw-bold" style="background-color: rgba(255,255,255,0.1); color: #38bdf8; font-size: 13px; border: 1px solid rgba(56, 189, 248, 0.3);">
+                    			EduVantage ONLINE EXAM
+                			</span>
+							<h1 class="fw-bolder text-white mb-2" style="font-size: 38px; letter-spacing: -1px;">
+								실전 감각을 완성하는<br>
+								<span style="color: #60a5fa;">가장 확실한 모의고사</span>
+							</h1>
+							<p class="mb-0 fw-semibold" style="color: #4ade80; font-size: 17px; margin-top: 14px;">
+								정보처리 · 정보보안 · SQLD 기출 실시간 CBT 풀이 바로가기 <i class="fa-solid fa-chevron-right small"></i>
+							</p>
+						</div>
+					</a>
+				</div>
                 <!-- 슬라이드 2 -->
-                <div class="carousel-item" data-bs-interval="4000">
-                    <div class="img-placeholder" style="height: 350px; width: 100%;">
-                        <i class="fa-regular fa-image fa-3x"></i>
-                        <span class="ms-3 text-muted fw-bold">두 번째 추천 강의/도서 배너</span>
-                    </div>
-                </div>
+				<div class="carousel-item" data-bs-interval="4000">
+					<a th:href="@{/book/list}" class="main-banner banner-mint px-4">
+						<i class="fa-solid fa-book-open-reader deco-icon text-success" style="font-size: 150px; top: -10px; right: 8%;"></i>
+						<i class="fa-solid fa-bookmark deco-icon text-success" style="font-size: 110px; bottom: 10px; left: 7%;"></i>
+
+						<div class="position-relative z-1">
+							<div class="fw-bold mb-2" style="color: #059669; font-size: 16px; letter-spacing: -0.5px;">
+								<i class="fa-solid fa-book me-1"></i> 합격을 앞당기는 필독서
+							</div>
+							<h1 class="fw-bolder mb-3" style="color: #064e3b; font-size: 38px; letter-spacing: -1px;">
+								이론부터 실전 기출까지<br>
+								<span style="color: #059669;">검증된 베스트셀러 도서전</span>
+							</h1>
+							<div class="d-inline-flex gap-2 align-items-center bg-white px-3 py-1 rounded-pill shadow-sm border border-success-subtle">
+								<span class="badge bg-success rounded-pill px-2 py-1">추천 도서</span>
+								<span class="small fw-bold text-dark">자격증·IT 전문 교재 전체보기 <i class="fa-solid fa-chevron-right small"></i></span>
+							</div>
+						</div>
+					</a>
+				</div>
                 <!-- 슬라이드 3 -->
-                <div class="carousel-item" data-bs-interval="4000">
-                    <div class="img-placeholder" style="height: 350px; width: 100%;">
-                        <i class="fa-regular fa-image fa-3x"></i>
-                        <span class="ms-3 text-muted fw-bold">세 번째 추천 강의/도서 배너</span>
-                    </div>
-                </div>
+				<div class="carousel-item" data-bs-interval="4000">
+					<a th:href="@{/course/list}" class="main-banner banner-blue px-4">
+						<i class="fa-solid fa-laptop-code deco-icon text-primary" style="font-size: 150px; top: 10%; right: 12%;"></i>
+
+						<div class="position-relative z-1">
+							<span class="badge bg-primary px-3 py-2 mb-3 fw-bold rounded-pill" style="font-size: 12px;">
+								HOT NEW COURSE
+							</span>
+							<h1 class="fw-bolder mb-2 text-dark" style="font-size: 38px; letter-spacing: -1px;">
+								현직 실무진의 노하우를 담은<br>
+								<span style="color: #2563eb;">백엔드 & 풀스택 마스터 클래스</span>
+							</h1>
+							<p class="text-secondary fw-semibold mb-0" style="font-size: 16px; margin-top: 10px;">
+								신규 개설 강의 전체보기 <i class="fa-solid fa-chevron-right small"></i>
+							</p>
+						</div>
+					</a>
+				</div>
             </div>
             
             <!-- 좌우 이동 컨트롤 -->
