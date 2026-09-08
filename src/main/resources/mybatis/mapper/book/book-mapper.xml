@@ -59,6 +59,7 @@
 	    </if>
 	</select>
 	
+	<!-- 도서 검색 목록 -->
 	<select id="bookFindData" resultType="com.sist.web.domain.book.vo.BookVO" parameterType="hashmap">
 	    SELECT no, title, author, poster, like_count, price, TO_CHAR(pubdate, 'yyyy-MM-dd') as dbday, hit
 	    FROM book
@@ -86,30 +87,72 @@
 		)
 	</insert>
 	
+	<!-- 좋아요 재차 눌렀을 시 -->
 	<delete id="bookLikeOff" parameterType="com.sist.web.domain.book.vo.BookLikeVO">
 		DELETE FROM book_like
 		WHERE member_id=#{member_id} AND book_no=#{book_no}
 	</delete>
 	
+	<!-- 좋아요 수 -->
 	<select id="bookLikeCount" resultType="int" parameterType="int">
 		SELECT COUNT(*)
 		FROM book_like
 		WHERE book_no=#{book_no}
 	</select>
 	
+	<!-- 좋아요 체크 -->
 	<select id="bookLikeCheck" resultType="int" parameterType="com.sist.web.domain.book.vo.BookLikeVO">
 		SELECT COUNT(*)
 		FROM book_like
 		WHERE book_no=#{book_no} AND member_id=#{member_id}
 	</select>
+	
+	<!-- 좋아요 증가 -->
 	<update id="bookLikeIncrement" parameterType="int">
 		UPDATE book 
 		SET like_count = like_count + 1
 		WHERE no = #{book_no}
 	</update>
+	
+	<!-- 좋아요 감소 -->
 	<update id="bookLikeDecrement" parameterType="int">
 		UPDATE book 
 		SET like_count = like_count - 1
 		WHERE no = #{book_no}
 	</update>
+	
+    <!-- 장바구니에 담았는지 확인 -->
+    <select id="bookCartCheck" resultType="int" parameterType="com.sist.web.domain.book.vo.BookCartVO">
+        SELECT COUNT(*) 
+        FROM book_cart 
+        WHERE member_id = #{member_id} AND book_no = #{book_no}
+    </select>
+
+    <!-- 이미 담겨있다면 수량만 증가 -->
+    <update id="bookCartUpdate" parameterType="com.sist.web.domain.book.vo.BookCartVO">
+        UPDATE book_cart 
+        SET quantity = quantity + #{quantity} 
+        WHERE member_id = #{member_id} AND book_no = #{book_no}
+    </update>
+
+    <!-- 장바구니에 없는 새로운 책이면 추가 -->
+    <insert id="bookCartInsert" parameterType="com.sist.web.domain.book.vo.BookCartVO">
+        INSERT INTO book_cart (no, member_id, book_no, quantity) 
+        VALUES (
+            bcart_no_seq.nextval, 
+            #{member_id}, 
+            #{book_no}, 
+            #{quantity}
+        )
+    </insert>
+    <!-- 장바구니 데이터 조회 -->
+    <select id="bookCartListData" resultType="com.sist.web.domain.book.vo.BookCartVO" parameterType="int">
+	    SELECT bc.no, bc.member_id, bc.book_no, bc.quantity, 
+	           b.title, b.poster, b.price
+	    FROM book_cart bc
+	    JOIN book b ON bc.book_no = b.no
+	    WHERE bc.member_id = #{member_id}
+	    ORDER BY bc.no DESC
+	</select>
+    
 </mapper>

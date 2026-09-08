@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sist.web.domain.book.mapper.BookMapper;
+import com.sist.web.domain.book.vo.BookCartVO;
 import com.sist.web.domain.book.vo.BookLikeVO;
 import com.sist.web.domain.book.vo.BookVO;
 
@@ -100,5 +101,25 @@ public class BookServiceImpl implements BookService{
 	 public void bookLikeDecrement(int book_no) {
 		// TODO Auto-generated method stub
 		bMapper.bookLikeDecrement(book_no);
+	 }
+	 @Override
+	 public int bookCartCheck(BookCartVO vo) {
+		// TODO Auto-generated method stub
+		return bMapper.bookCartCheck(vo);
+	 }
+	 @Override
+	 public void bookCartUpdate(BookCartVO vo) {
+		// TODO Auto-generated method stub
+		bMapper.bookCartUpdate(vo);
+	 }
+	 @Override
+	 public void bookCartInsert(BookCartVO vo) {
+		// TODO Auto-generated method stub
+		bMapper.bookCartInsert(vo);
+	 }
+	 @Override
+	 public List<BookCartVO> bookCartListData(int member_id) {
+		// TODO Auto-generated method stub
+		return bMapper.bookCartListData(member_id);
 	 }
 }

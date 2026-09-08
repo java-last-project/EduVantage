@@ -1,4 +1,4 @@
-package com.sist.web.domain.book.commons; // 1. 패키지 경로 수정
+package com.sist.web.domain.book.commons; 
 
 import java.util.ArrayList;
 import java.util.HashMap;

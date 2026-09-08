@@ -3,6 +3,7 @@ package com.sist.web.domain.book.service;
 import java.util.List;
 import java.util.Map;
 
+import com.sist.web.domain.book.vo.BookCartVO;
 import com.sist.web.domain.book.vo.BookLikeVO;
 import com.sist.web.domain.book.vo.BookVO;
 
@@ -31,4 +32,11 @@ public interface BookService {
 	
 	public void bookLikeDecrement(int book_no);
 	
+	public int bookCartCheck(BookCartVO vo);
+
+	public void bookCartUpdate(BookCartVO vo);
+
+	public void bookCartInsert(BookCartVO vo);
+	
+	public List<BookCartVO> bookCartListData(int member_id);
 }

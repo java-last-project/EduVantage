@@ -5,10 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sist.web.domain.book.service.BookService;
+import com.sist.web.domain.book.vo.BookCartVO;
 import com.sist.web.domain.book.vo.BookLikeVO;
 import com.sist.web.domain.book.vo.BookVO;
 import com.sist.web.domain.book.commons.PaginationUtil; 
@@ -61,7 +63,7 @@ public class BookRestController {
         return new ResponseEntity<>(vo, HttpStatus.OK);
     }
     
-    @GetMapping("/book/api/find")
+    @GetMapping("/book/find")
     public Map<String, Object> bookFindData(
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             @RequestParam(value = "page", defaultValue = "1") int page,
@@ -97,7 +99,7 @@ public class BookRestController {
     }
     
     // 책 상세페이지 진입 시 상태 확인
-    @GetMapping("/book/api/like/status")
+    @GetMapping("/book/like/status")
     public Map<String, Object> bookLikeStatus(
             @RequestParam("book_no") int bookNo,
             HttpSession session) {
@@ -120,7 +122,7 @@ public class BookRestController {
     }
 
     // 좋아요 버튼 클릭 시 토글 처리
-    @PostMapping("/book/api/like/toggle")
+    @PostMapping("/book/like/toggle")
     public Map<String, Object> bookLikeToggle(
             @RequestParam("book_no") int bookNo,
             HttpSession session) {
@@ -148,4 +150,33 @@ public class BookRestController {
 
         return response;
     }
+    @PostMapping("/cart/add")
+    public Map<String, String> addCart(@RequestBody BookCartVO vo) {
+        Map<String, String> response = new HashMap<>();
+        
+        try {
+            // 이미 장바구니에 담겨있는지 확인
+            int count = bService.bookCartCheck(vo);
+            
+            if (count > 0) {
+                // 이미 있으면 수량 증가 업데이트
+                bService.bookCartUpdate(vo);
+            } else {
+                // 없으면 새로 추가
+                bService.bookCartInsert(vo);
+            }
+            
+            response.put("status", "success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("status", "error");
+        }
+        
+        return response;
+    }
+    @GetMapping("/cart/list")
+    public List<BookCartVO> bookCartList(@RequestParam("member_id") int memberId) {
+        return bService.bookCartListData(memberId);
+    }
+
 }
