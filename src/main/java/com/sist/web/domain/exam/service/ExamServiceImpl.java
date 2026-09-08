@@ -1,5 +1,6 @@
 package com.sist.web.domain.exam.service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import com.sist.web.domain.exam.vo.ExamEnrollmentVO;
 import com.sist.web.domain.exam.vo.ExamQuestionVO;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +29,11 @@ public class ExamServiceImpl implements ExamService{
 	}
 
 	@Override
-	public void insertEnrollment(ExamEnrollmentVO vo) {
+	@Transactional
+	public Integer insertEnrollment(ExamEnrollmentVO vo) {
+		vo.setStarttime(LocalDateTime.now());
 		eMapper.insertEnrollment(vo);
+		return vo.getNo();
 	}
 
 }

@@ -7,5 +7,5 @@ import com.sist.web.domain.exam.vo.ExamQuestionVO;
 
 public interface ExamService {
 	public List<ExamQuestionVO> examDetailData(Integer theme,int count);
-	public void insertEnrollment(ExamEnrollmentVO vo);
+	public Integer insertEnrollment(ExamEnrollmentVO vo);
 }
