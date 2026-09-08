@@ -117,4 +117,9 @@ public class BookServiceImpl implements BookService{
 		// TODO Auto-generated method stub
 		bMapper.bookCartInsert(vo);
 	 }
+	 @Override
+	 public List<BookCartVO> bookCartListData(int member_id) {
+		// TODO Auto-generated method stub
+		return bMapper.bookCartListData(member_id);
+	 }
 }

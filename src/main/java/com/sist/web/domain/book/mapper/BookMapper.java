@@ -38,4 +38,6 @@ public interface BookMapper {
 	public void bookCartUpdate(BookCartVO vo);
 
 	public void bookCartInsert(BookCartVO vo);
+	
+	public List<BookCartVO> bookCartListData(int member_id);
 }

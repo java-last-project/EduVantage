@@ -63,7 +63,7 @@ public class BookRestController {
         return new ResponseEntity<>(vo, HttpStatus.OK);
     }
     
-    @GetMapping("/book/api/find")
+    @GetMapping("/book/find")
     public Map<String, Object> bookFindData(
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             @RequestParam(value = "page", defaultValue = "1") int page,
@@ -99,7 +99,7 @@ public class BookRestController {
     }
     
     // 책 상세페이지 진입 시 상태 확인
-    @GetMapping("/book/api/like/status")
+    @GetMapping("/book/like/status")
     public Map<String, Object> bookLikeStatus(
             @RequestParam("book_no") int bookNo,
             HttpSession session) {
@@ -122,7 +122,7 @@ public class BookRestController {
     }
 
     // 좋아요 버튼 클릭 시 토글 처리
-    @PostMapping("/book/api/like/toggle")
+    @PostMapping("/book/like/toggle")
     public Map<String, Object> bookLikeToggle(
             @RequestParam("book_no") int bookNo,
             HttpSession session) {
@@ -150,7 +150,7 @@ public class BookRestController {
 
         return response;
     }
-    @PostMapping("/cart/api/add")
+    @PostMapping("/cart/add")
     public Map<String, String> addCart(@RequestBody BookCartVO vo) {
         Map<String, String> response = new HashMap<>();
         
@@ -173,6 +173,10 @@ public class BookRestController {
         }
         
         return response;
+    }
+    @GetMapping("/cart/list")
+    public List<BookCartVO> bookCartList(@RequestParam("member_id") int memberId) {
+        return bService.bookCartListData(memberId);
     }
 
 }

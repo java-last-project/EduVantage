@@ -37,4 +37,6 @@ public interface BookService {
 	public void bookCartUpdate(BookCartVO vo);
 
 	public void bookCartInsert(BookCartVO vo);
+	
+	public List<BookCartVO> bookCartListData(int member_id);
 }

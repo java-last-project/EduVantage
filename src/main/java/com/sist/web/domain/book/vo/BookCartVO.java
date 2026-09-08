@@ -11,6 +11,10 @@ import lombok.Data;
  */
 @Data
 public class BookCartVO {
-	private int no, member_id, book_bo, quantity;
+	private int no, member_id, book_no, quantity;
 	private Date regdate;
+	// JOIN용 변수
+	private String title;
+    private String poster;
+    private int price;
 }
