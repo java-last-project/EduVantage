@@ -1,10 +1,313 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
+<style>
+    .exam-card {
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .exam-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.06) !important;
+    }
+    .badge-regular { background-color: #e0f2fe; color: #0284c7; }
+    .badge-always  { background-color: #fef3c7; color: #d97706; }
+</style>
+<div class="app-wrapper">
+<th:block th:replace="~{exam/sidebar::sidebar('examList')}"></th:block>
 
-</body>
-</html>
+    <main class="main-content py-4 px-4 flex-grow-1" style="min-width: 0; padding-bottom: 80px;">
+        <div style="max-width: 1100px; margin: 0 auto;">
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                <div>
+                    <h3 class="fw-bold text-dark mb-1" style="font-size: 24px; letter-spacing: -0.5px;">온라인 시험</h3>
+                    <p class="text-secondary small mb-0">상시 모의고사 및 정규 자격 검정 일정을 확인하고 응시할 수 있습니다.</p>
+                </div>
+            </div>
+
+            <!-- 상시시험 -->
+            <section class="mb-5">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-primary px-2 py-1" style="font-size: 11px;">PRACTICE</span>
+                        <h5 class="fw-bold mb-0 text-dark">상시시험 바로가기</h5>
+                        <span class="text-muted small ps-2 border-start d-none d-md-inline">원하는 과목과 문항 수를 선택해 즉시 응시할 수 있습니다.</span>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+
+                    <div class="col-md-6">
+                        <div class="card-vertical exam-card shadow-sm border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
+                            <div class="exam-front">
+                                <div class="mb-3">
+                                    <i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
+                                </div>
+                                <h5 class="fw-bold mb-1">정보처리기사</h5>
+                                <p class="text-muted small mb-3">상시시험</p>
+                                <button type="button" class="btn btn-primary w-100 fw-bold py-2 rounded-3" onclick="toggleExamOptions(this)">
+                                    응시하기
+                                </button>
+                            </div>
+
+                            <div class="exam-options d-none flex-column h-100 justify-content-center">
+                                <h6 class="fw-bold mb-3 text-dark">문제 수를 선택하세요</h6>
+                                <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사', 1, 20)">20제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사', 1, 40)">40제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사', 1, 60)">60제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사', 1, 80)">80제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사', 1, 100)">100제</button>
+                                </div>
+                                <button type="button" class="btn btn-light btn-sm text-muted mt-auto w-100" onclick="toggleExamOptions(this)">
+                                    <i class="fa-solid fa-arrow-left"></i> 뒤로
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="card-vertical exam-card shadow-sm border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
+                            <div class="exam-front">
+                                <div class="mb-3">
+                                    <i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
+                                </div>
+                                <h5 class="fw-bold mb-1">정보보안기사</h5>
+                                <p class="text-muted small mb-3">상시시험</p>
+                                <button type="button" class="btn btn-primary w-100 fw-bold py-2 rounded-3" onclick="toggleExamOptions(this)">
+                                    응시하기
+                                </button>
+                            </div>
+
+                            <div class="exam-options d-none flex-column h-100 justify-content-center">
+                                <h6 class="fw-bold mb-3 text-dark">문제 수를 선택하세요</h6>
+                                <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사', 2, 20)">20제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사', 2, 40)">40제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사', 2, 60)">60제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사', 2, 80)">80제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사', 2, 100)">100제</button>
+                                </div>
+                                <button type="button" class="btn btn-light btn-sm text-muted mt-auto w-100" onclick="toggleExamOptions(this)">
+                                    <i class="fa-solid fa-arrow-left"></i> 뒤로
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card-vertical exam-card shadow-sm border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
+                            <div class="exam-front">
+                                <div class="mb-3">
+                                    <i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
+                                </div>
+                                <h5 class="fw-bold mb-1">SQLD</h5>
+                                <p class="text-muted small mb-3">상시시험</p>
+                                <button type="button" class="btn btn-primary w-100 fw-bold py-2 rounded-3" onclick="toggleExamOptions(this)">
+                                    응시하기
+                                </button>
+                            </div>
+
+                            <div class="exam-options d-none flex-column h-100 justify-content-center">
+                                <h6 class="fw-bold mb-3 text-dark">문제 수를 선택하세요</h6>
+                                <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('SQLD', 3, 20)">20제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('SQLD', 3, 40)">40제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('SQLD', 3, 60)">60제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('SQLD', 3, 80)">80제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('SQLD', 3, 100)">100제</button>
+                                </div>
+                                <button type="button" class="btn btn-light btn-sm text-muted mt-auto w-100" onclick="toggleExamOptions(this)">
+                                    <i class="fa-solid fa-arrow-left"></i> 뒤로
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card-vertical exam-card shadow-sm border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
+                            <div class="exam-front">
+                                <div class="mb-3">
+                                    <i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
+                                </div>
+                                <h5 class="fw-bold mb-1">리눅스 마스터</h5>
+                                <p class="text-muted small mb-3">상시시험</p>
+                                <button type="button" class="btn btn-primary w-100 fw-bold py-2 rounded-3" onclick="toggleExamOptions(this)">
+                                    응시하기
+                                </button>
+                            </div>
+
+                            <div class="exam-options d-none flex-column h-100 justify-content-center">
+                                <h6 class="fw-bold mb-3 text-dark">문제 수를 선택하세요</h6>
+                                <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('리눅스 마스터', 4, 20)">20제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('리눅스 마스터', 4, 40)">40제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('리눅스 마스터', 4, 60)">60제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('리눅스 마스터', 4, 80)">80제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('리눅스 마스터', 4, 100)">100제</button>
+                                </div>
+                                <button type="button" class="btn btn-light btn-sm text-muted mt-auto w-100" onclick="toggleExamOptions(this)">
+                                    <i class="fa-solid fa-arrow-left"></i> 뒤로
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card-vertical exam-card shadow-sm border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
+                            <div class="exam-front">
+                                <div class="mb-3">
+                                    <i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
+                                </div>
+                                <h5 class="fw-bold mb-1">빅데이터 분석기사</h5>
+                                <p class="text-muted small mb-3">상시시험</p>
+                                <button type="button" class="btn btn-primary w-100 fw-bold py-2 rounded-3" onclick="toggleExamOptions(this)">
+                                    응시하기
+                                </button>
+                            </div>
+
+                            <div class="exam-options d-none flex-column h-100 justify-content-center">
+                                <h6 class="fw-bold mb-3 text-dark">문제 수를 선택하세요</h6>
+                                <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('빅데이터 분석기사', 5, 20)">20제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('빅데이터 분석기사', 5, 40)">40제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('빅데이터 분석기사', 5, 60)">60제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('빅데이터 분석기사', 5, 80)">80제</button>
+                                    <button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('빅데이터 분석기사', 5, 100)">100제</button>
+                                </div>
+                                <button type="button" class="btn btn-light btn-sm text-muted mt-auto w-100" onclick="toggleExamOptions(this)">
+                                    <i class="fa-solid fa-arrow-left"></i> 뒤로
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- 정기시험 -->
+            <section id="scheduled-exam-list">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-dark px-2 py-1" style="font-size: 11px;">OFFICIAL</span>
+                        <h5 class="fw-bold mb-0 text-dark">정규 시험 일정 및 접수</h5>
+                        <span class="text-muted small ps-2 border-start d-none d-md-inline">정해진 접수 및 응시 기간에만 참여 가능한 정기 평가입니다.</span>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 bg-white px-3 py-1 border rounded-pill shadow-sm">
+                        <button type="button" class="btn btn-sm btn-light rounded-circle p-0 d-flex align-items-center justify-content-center"
+                                style="width: 24px; height: 24px;" @click="prevMonth()">
+                            <i class="fa-solid fa-chevron-left small" style="font-size: 11px;"></i>
+                        </button>
+                        <span class="fw-bold text-dark px-2" style="font-size: 15px;">{{ year }}년 {{ month }}월</span>
+                        <button type="button" class="btn btn-sm btn-light rounded-circle p-0 d-flex align-items-center justify-content-center"
+                                style="width: 24px; height: 24px;" @click="nextMonth()">
+                            <i class="fa-solid fa-chevron-right small" style="font-size: 11px;"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card border shadow-sm rounded-4 overflow-hidden bg-white">
+                    <table class="table table-hover align-middle mb-0 text-center">
+                        <thead class="table-light border-bottom">
+                        <tr class="text-secondary small">
+                            <th style="width: 100px;">구분</th>
+                            <th class="text-start ps-4">시험명 / 일정</th>
+                            <th style="width: 220px;">응시 기간</th>
+                            <th style="width: 100px;">알림</th>
+                            <th style="width: 130px;">응시 / 접수</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="exam in sList" :key="exam.no">
+                            <td>
+                                <span class="badge rounded-pill fw-semibold px-2 py-1 badge-regular">정규</span>
+                            </td>
+                            <td class="text-start ps-4 py-3">
+                                <div class="fw-bold text-dark fs-6">{{ exam.title }}</div>
+                                <div class="text-muted small">제한시간 {{ exam.time_limit || 120 }}분 | 100문항</div>
+                            </td>
+                            <td class="small text-muted">
+                                <div>{{ exam.open_date.split('T')[0] }}</div>
+                                <div>~ {{ exam.close_date.split('T')[0] }}</div>
+                            </td>
+                            <td>
+                                <a class="text-decoration-none" style="cursor:pointer; font-size: 16px;" @click="examNotiRegister(exam)">
+                                    <i class="fa-solid fa-bell text-primary" v-if="exam.subscribed"></i>
+                                    <i class="fa-regular fa-bell text-muted" v-else></i>
+                                </a>
+                            </td>
+                            <td>
+                                <button v-if="exam.status==='OPEN'"
+                                        class="btn btn-sm btn-primary fw-bold px-3 py-1 rounded-2"
+                                        @click="takeRegularExam(exam.no)">
+                                    응시하기
+                                </button>
+                                <button v-else-if="exam.status==='READY'"
+                                        class="btn btn-sm btn-light border fw-bold px-3 py-1 rounded-2 text-muted" disabled>
+                                    접수대기
+                                </button>
+                                <button v-else
+                                        class="btn btn-sm btn-outline-secondary fw-bold px-3 py-1 rounded-2"
+                                        @click="viewResult(exam.no)">
+                                    결과확인
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr v-if="sList.length === 0">
+                            <td colspan="5" class="py-5 text-center text-muted">
+                                <i class="fa-regular fa-calendar-xmark fs-2 mb-2 d-block"></i>
+                                현재 등록된 정규 시험 일정이 없습니다.
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div v-if="totalpage > 1" class="d-flex justify-content-center align-items-center gap-3 py-3 border-top bg-light">
+                        <button type="button" class="btn btn-sm btn-light rounded-circle border d-flex align-items-center justify-content-center"
+                                style="width: 28px; height: 28px;" @click="prevPage()" :disabled="page <= 0">
+                            <i class="fa-solid fa-chevron-left" style="font-size: 10px;"></i>
+                        </button>
+                        <span class="small fw-semibold text-secondary">{{ page + 1 }} / {{ totalpage }}</span>
+                        <button type="button" class="btn btn-sm btn-light rounded-circle border d-flex align-items-center justify-content-center"
+                                style="width: 28px; height: 28px;" @click="nextPage()" :disabled="page >= totalpage - 1">
+                            <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+
+<script>
+    function toggleExamOptions(button) {
+        const card = button.closest('.card-vertical');
+        const front = card.querySelector('.exam-front');
+        const options = card.querySelector('.exam-options');
+        front.classList.toggle('d-none');
+        options.classList.toggle('d-none');
+
+        if (!options.classList.contains('d-none')) {
+            options.style.display = 'flex';
+        } else {
+            options.style.display = '';
+        }
+    }
+
+    function startExam(subjectName, theme, count) {
+        if (confirm(`${subjectName} ${count}문제를 시작하시겠습니까?`)) {
+            location.href = `/exam/detail?theme=${theme}&count=${count}`;
+        }
+    }
+
+    function takeRegularExam(button) {
+        const examNo = button.getAttribute('data-no');
+        if (confirm('정기 시험에 응시하시겠습니까? 바로 시험이 시작됩니다.')) {
+            location.href = `/exam/take?examNo=${examNo}`;
+        }
+    }
+
+    function viewResult(button) {
+        const examNo = button.getAttribute('data-no');
+        location.href = `/exam/result?examNo=${examNo}`;
+    }
+</script>
+<script src="/vue/exam/scheduledExamList.js"></script>

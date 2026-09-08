@@ -749,3 +749,37 @@ body {
     color: #12b886;
     border: 1px solid #c3fae8;
 }
+ .main-banner {
+     height: 350px;
+     width: 100%;
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: center;
+     text-align: center;
+     position: relative;
+     text-decoration: none !important;
+     overflow: hidden;
+     user-select: none;
+ }
+.main-banner:hover {
+    filter: brightness(0.98);
+}
+
+.banner-dark {
+    background: radial-gradient(circle at center, #1e293b 0%, #0b0f17 100%);
+}
+
+.banner-mint {
+    background: linear-gradient(135deg, #dcfce7 0%, #a7f3d0 50%, #6ee7b7 100%);
+}
+
+.banner-blue {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%);
+}
+
+.deco-icon {
+    position: absolute;
+    opacity: 0.18;
+    filter: blur(0.5px);
+}
