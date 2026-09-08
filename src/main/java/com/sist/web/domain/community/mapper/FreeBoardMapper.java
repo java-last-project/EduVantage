@@ -35,7 +35,7 @@ public interface FreeBoardMapper {
 
 	//댓글 알림용 게시판 정보
 	@Select("""
-			SELECT member_id, subject
+			SELECT no, member_id, subject
 			FROM FREE_BOARD
 			WHERE no=#{freeBoardNo}
 			""")

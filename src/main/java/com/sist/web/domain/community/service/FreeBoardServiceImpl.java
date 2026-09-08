@@ -121,7 +121,7 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 		cMapper.freeBoardCommentInsert(vo);
 		FreeBoardVO parentFreeBoard = fMapper.freeBoardInfo(vo.getBoard_no());
 		//이벤트 발행
-		notificationProducer.publishPostCommented(parentFreeBoard.getMember_id(), vo.getNo(), parentFreeBoard.getSubject());
+		notificationProducer.publishPostCommented(parentFreeBoard.getMember_id(), vo.getBoard_no(), parentFreeBoard.getSubject());
 	}
 
 	@Override

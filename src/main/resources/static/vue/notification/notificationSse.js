@@ -7,12 +7,16 @@ if(badge){
     const es = new EventSource("/sse", {withCredentials: true})
 
     // 서버에서 데이터를 보낼 때(emitter.send())마다 실행
-    es.onmessage = (e) => {
+    es.onmessage = async (e) => {
         const data = JSON.parse(e.data)
-        const store = useNotificationStore()
+        // 인자 없이 호출하면 그 시점의 전역 active pinia(다른 페이지 앱이 마지막에 설정한 것)를
+        // 잘못 참조할 수 있어 notificationPinia를 명시적으로 지정함
+        const store = useNotificationStore(notificationPinia)
         store.addNotification(data)
 
-        showToast(data.type, data.title, data.content)
+        //알림목록 새로고침
+        showToast(data.type, data.title, data.content, data.related_id)
+        await store.fetchNotifications()
     }
 
     es.onerror = () => {
@@ -20,7 +24,7 @@ if(badge){
     }
 }
 
-function showToast(type, title, content) {
+function showToast(type, title, content, related_id) {
     const toast = document.createElement("div")
     toast.className = "sse-toast"
 
@@ -38,6 +42,13 @@ function showToast(type, title, content) {
     if (type === "EXAM_SUBSCRIBED") {
         badgeEl.classList.add("text-info", "bg-info-subtle")
         iconEl.className = "fa-solid fa-calendar-check"
+    }
+    if (type === "POST_COMMENTED") {
+        toast.addEventListener("click",()=>{
+            window.location.href="/freeboard/detail?no="+related_id
+        })
+        badgeEl.classList.add("text-primary", "bg-primary-subtle")
+        iconEl.className = "fa-solid fa-bell"
     }
 
 

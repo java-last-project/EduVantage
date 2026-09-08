@@ -4,7 +4,8 @@
     const badge = document.getElementById("notification-badge")
 
     if(badge){
-        const store = useNotificationStore()
+        // notificationPinia를 명시적으로 지정해 다른 페이지의 pinia와 충돌하지 않도록 함
+        const store = useNotificationStore(notificationPinia)
 
         const syncBadge = () => {
             badge.style.display = store.hasUnread ? "" : "none"
