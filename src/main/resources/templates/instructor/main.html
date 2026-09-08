@@ -2,13 +2,14 @@
 <html>
 <meta charset="UTF-8">
 
+<link rel="stylesheet" href="/css/instructor/instructor.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 	<div class="layout">
 		<aside class="exam-sidebar">
 		<nav class="exam-nav">
-			<a href="/instructor/profile" class="exam-nav-item active"><i class="fa-solid fa-user"></i> 프로필</a>
-			<a href="/instructor/course" class="exam-nav-item"><i class="fa-solid fa-book-open"></i> 담당 강의 목록</a>
-			<a href="/instructor/qna" class="exam-nav-item"><i class="fa-solid fa-comment"></i> 수강생 QnA</a>
+			<a href="/instructor/profile" class="exam-nav-item" th:classappend="${instructor_html == 'instructor/profile'} ? 'active':''"><i class="fa-solid fa-user"></i> 프로필</a>
+			<a href="/instructor/course" class="exam-nav-item" th:classappend="${instructor_html == 'instructor/course'} ? 'active':''"><i class="fa-solid fa-book-open"></i> 담당 강의 목록</a>
+			<a href="/instructor/qna" class="exam-nav-item" th:classappend="${instructor_html == 'instructor/qna'} ? 'active':''"><i class="fa-solid fa-comment"></i> 수강생 QnA</a>
 		</nav>
 
 		<!-- 접속자 프로필 -->
