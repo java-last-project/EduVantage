@@ -124,7 +124,5 @@ public class NotificationConsumer {
                         emitterRepository.deleteByMemberId(event.getMemberId());
                     }
                 });
-
     }
-
 }

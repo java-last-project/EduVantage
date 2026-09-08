@@ -73,13 +73,17 @@ const scheduledExamApp = createApp({
         //알림등록 및 취소
         const examNotiRegister = async (exam) => {
             try{
+
                 if(exam.subscribed){
                     //구독중 -> 알림취소
                     await api.delete(`/exam/subscribe/${exam.no}`)
                     showToast("EXAM_SUBSCRIBED", "정기 시험 알림 구독 취소", exam.title+" 알림 신청이 취소되었습니다")
                     //DOM 실시간 반영
                     exam.subscribed = false
-
+                    console.log("원본: "+exam.open_date)
+                    console.log("시험일: "+new Date(exam.open_date))
+                    console.log("오늘: "+new Date())
+                    console.log("결과:"+(new Date(exam.open_date) <= new Date()))
                     //알림목록 새로고침
                     const store = useNotificationStore()
                     await store.fetchNotifications()
