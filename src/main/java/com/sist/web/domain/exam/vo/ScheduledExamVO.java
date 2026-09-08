@@ -15,4 +15,18 @@ public class ScheduledExamVO {
 	private LocalDateTime open_date,close_date;
 	//시험 알림 구독 여부 판단용
 	private boolean subscribed;
+
+	public String getStatus() {
+		if (open_date == null || close_date == null) {
+			return "CLOSED";
+		}
+		LocalDateTime now = LocalDateTime.now();
+		if (now.isBefore(open_date)) {
+			return "READY";
+		} else if (now.isAfter(close_date)) {
+			return "CLOSED";
+		} else {
+			return "OPEN";
+		}
+	}
 }
