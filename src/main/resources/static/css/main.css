@@ -762,9 +762,6 @@ body {
      overflow: hidden;
      user-select: none;
  }
-.main-banner:hover {
-    filter: brightness(0.98);
-}
 
 .banner-dark {
     background: radial-gradient(circle at center, #1e293b 0%, #0b0f17 100%);
