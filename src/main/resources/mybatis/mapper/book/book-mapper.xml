@@ -145,6 +145,7 @@
             #{quantity}
         )
     </insert>
+    
     <!-- 장바구니 데이터 조회 -->
     <select id="bookCartListData" resultType="com.sist.web.domain.book.vo.BookCartVO" parameterType="int">
 	    SELECT bc.no, bc.member_id, bc.book_no, bc.quantity, 
@@ -155,4 +156,43 @@
 	    ORDER BY bc.no DESC
 	</select>
     
+    <!-- 
+    	private int no, member_id, total_price;
+		private String order_status, dbday;
+		private Date regdate;
+		
+		private int no, book_order_no, book_no, quantity, price;
+     -->
+    <!-- 바로구매 주문 데이터 조회 -->
+    <select id="bookOrderListData" resultType="com.sist.web.domain.book.vo.BookOrderVO" parameterType="int">
+	    SELECT bo.no, bo.member_id, bo.total_price, bo.order_status, 
+	           TO_CHAR(bo.regdate, 'yyyy-MM-dd') as dbday, 
+	           bod.book_no, bod.quantity, bod.price
+	    FROM book_order bo
+	    JOIN book_order_detail bod ON bo.no = bod.book_order_no
+	    WHERE bo.member_id = #{member_id}
+	</select>
+
+	<insert id="bookOrderInsert" parameterType="com.sist.web.domain.book.vo.BookOrderVO">
+	    <selectKey keyProperty="no" resultType="int" order="BEFORE">
+	        SELECT border_no_seq.nextval FROM DUAL
+	    </selectKey>
+	    INSERT INTO book_order (no, member_id, total_price)
+	    VALUES (
+	    	#{no}, 
+	    	#{member_id}, 
+	    	#{total_price}
+	    )
+	</insert>
+
+	<insert id="bookOrderDetailInsert" parameterType="com.sist.web.domain.book.vo.BookOrderDetailVO">
+	    INSERT INTO book_order_detail (no, book_order_no, book_no, quantity, price)
+	    VALUES (
+	    	bod_no_seq.nextval, 
+	    	#{book_order_no}, 
+	    	#{book_no}, 
+	    	#{quantity},
+	    	#{price}
+	    )
+	</insert>
 </mapper>

@@ -18,7 +18,7 @@ const useBookDetailStore = defineStore('bookDetail', {
                 console.error(error);
             }
         },
-        // 추가: 좋아요 상태 조회
+        // 좋아요 상태 조회
         async fetchLikeStatus(no) {
             try {
                 const response = await axios.get('/book/like/status', {
@@ -31,7 +31,7 @@ const useBookDetailStore = defineStore('bookDetail', {
             }
         },
 
-        // 추가: 좋아요 토글
+        // 좋아요 토글
         async toggleLike() {
             try {
                 const response = await axios.post('/book/like/toggle', null, {
@@ -78,8 +78,18 @@ const useBookDetailStore = defineStore('bookDetail', {
 		        alert('서버 오류가 발생했습니다.');
 		    }
 		},
-        goToOrder() {
-            location.href = '/mypage/orders?tab=book';
-        }
+		goToOrder() {
+		    // 로그인 여부 체크 
+		    if (typeof SESSION_ID === 'undefined' || SESSION_ID === null || SESSION_ID === 0) {
+		        alert('로그인이 필요한 서비스입니다.');
+		        return;
+		    }
+
+		    // 2. 구매할 도서 번호와 수량 가져오기
+		    const bookNo = this.vo.no;
+		    const quantity = 1; 
+
+		    location.href = `/mypage/orders?type=buy_now&bookNo=${bookNo}&quantity=${quantity}`;
+		}
     }
 });

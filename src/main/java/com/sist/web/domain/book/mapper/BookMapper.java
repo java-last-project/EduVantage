@@ -8,8 +8,6 @@ import com.sist.web.domain.book.vo.*;
 public interface BookMapper {
 
 	public List<BookVO> bookListData(Map map);
-
-	// public int bookTotalPage(String category);
 	
 	public int bookTotalCount(String category);
 	
@@ -40,4 +38,10 @@ public interface BookMapper {
 	public void bookCartInsert(BookCartVO vo);
 	
 	public List<BookCartVO> bookCartListData(int member_id);
+	
+    public List<BookOrderVO> bookOrderListData(int member_id);
+
+    public void bookOrderInsert(BookOrderVO vo);
+
+    public void bookOrderDetailInsert(BookOrderDetailVO vo);
 }

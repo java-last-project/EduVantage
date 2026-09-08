@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sist.web.domain.book.service.BookService;
 import com.sist.web.domain.book.vo.BookCartVO;
 import com.sist.web.domain.book.vo.BookLikeVO;
+import com.sist.web.domain.book.vo.BookOrderDetailVO;
+import com.sist.web.domain.book.vo.BookOrderVO;
 import com.sist.web.domain.book.vo.BookVO;
 import com.sist.web.domain.book.commons.PaginationUtil; 
 
@@ -120,7 +122,7 @@ public class BookRestController {
 
         return response;
     }
-
+    
     // 좋아요 버튼 클릭 시 토글 처리
     @PostMapping("/book/like/toggle")
     public Map<String, Object> bookLikeToggle(
@@ -150,6 +152,7 @@ public class BookRestController {
 
         return response;
     }
+    
     @PostMapping("/cart/add")
     public Map<String, String> addCart(@RequestBody BookCartVO vo) {
         Map<String, String> response = new HashMap<>();
@@ -174,9 +177,26 @@ public class BookRestController {
         
         return response;
     }
+    
     @GetMapping("/cart/list")
     public List<BookCartVO> bookCartList(@RequestParam("member_id") int memberId) {
         return bService.bookCartListData(memberId);
     }
-
+    
+    @PostMapping("/order/save")
+    public Map<String, String> saveOrder(@RequestBody BookOrderVO orderVO) {
+        Map<String, String> response = new HashMap<>();
+        
+        try {
+            bService.bookOrderComplete(orderVO, orderVO.getDetailList());
+            
+            response.put("status", "success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("status", "error");
+        }
+        
+        return response;
+    }
+    
 }
