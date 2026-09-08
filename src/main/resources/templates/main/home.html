@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <style>
 .hide-scrollbar::-webkit-scrollbar { 
 	display: none; 
@@ -196,12 +196,31 @@
 									</h6>
 									<p class="card-text text-muted small mb-0">{{ exam.open_date.split('T')[0] }} ~ {{ exam.close_date.split('T')[0] }}</p>
 								</div>
-								<a class="position-relative text-decoration-none"
+								<!--로그인 유저-->
+								<a sec:authorize="hasAnyRole('USER', 'INSTRUCTOR')"
+										class="position-relative text-decoration-none"
+								   style="font-size: 15px;"
+								   title="알림"
+								>
+									<span v-if="exam.subscribed" style="cursor:not-allowed">
+										<i class="fa-solid fa-bell" @click="examNotiRegister(exam)" style="color:var(--text-muted)"></i>
+									</span>
+									<!--기간 지난 시험 구독 비활성화-->
+									<span v-else-if=" new Date(exam.open_date) < new Date()" style="cursor:not-allowed">
+										<i class="fa-solid fa-bell-slash" style="color:var(--text-muted);pointer-events:none;cursor:not-allowed"></i>
+									</span>
+									<i class="fa-regular fa-bell" @click="examNotiRegister(exam)" style="cursor:pointer" v-else></i>
+								</a>
+								<!-- 비로그인 유저-->
+								<a sec:authorize="!isAuthenticated()"
+								   class="position-relative text-decoration-none"
 								   style="font-size: 15px;cursor:pointer"
 								   title="알림"
 								   @click="examNotiRegister(exam)">
-									<i class="fa-solid fa-bell" v-if="exam.subscribed" style="color:var(--text-muted)"></i>
-									<i class="fa-regular fa-bell" v-else></i>
+									<span v-if="new Date(exam.open_date) < new Date()" style="cursor:not-allowed">
+										<i class="fa-solid fa-bell-slash" style="color:var(--text-muted);pointer-events:none;cursor:not-allowed"></i>
+									</span>
+									<i class="fa-solid fa-bell" v-else onclick="window.location.href='/member/login'"></i>
 								</a>
 							</div>
 						</div>

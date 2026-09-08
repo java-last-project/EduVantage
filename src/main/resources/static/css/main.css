@@ -749,6 +749,7 @@ body {
     color: #12b886;
     border: 1px solid #c3fae8;
 }
+
  .main-banner {
      height: 350px;
      width: 100%;
@@ -780,3 +781,4 @@ body {
     opacity: 0.18;
     filter: blur(0.5px);
 }
+

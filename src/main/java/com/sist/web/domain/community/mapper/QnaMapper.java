@@ -1,6 +1,7 @@
 package com.sist.web.domain.community.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 import com.sist.web.domain.community.vo.QnaBoardVO;
@@ -18,4 +19,11 @@ public interface QnaMapper {
 	public void qnaUpdate(QnaBoardVO vo);
 	public String qnaDeleteValidate(int no);
 	public void qnaDelete(int no);
+
+	@Select("""
+			SELECT no, subject
+			FROM qnaboard
+			WHERE no= #{qnaNo}
+			""")
+	public void qnaInfo(int qnaNo);
 }

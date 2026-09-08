@@ -38,7 +38,7 @@ public class ScheduledExamDdayScheduler {
             List<Integer> memberIds = scheduledExamMapper.findUnnotifiedSubscribers(exam.getExamNo(), column);
 
             for(Integer memberId: memberIds) {
-                String title = targetDate == 0 ? "시험 당일입니다!":"시험이 "+targetDate+"일 남았습니다!";
+                String title = targetDate == 0 ? " 당일입니다!":"이 "+targetDate+"일 남았습니다!";
                 String content = exam.getExamTitle()+ " 시험을 확인하세요";
 
                 Notifications noti = Notifications.builder()

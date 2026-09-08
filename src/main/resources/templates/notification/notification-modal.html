@@ -22,7 +22,8 @@
                         :key="notification.no"
                         :class="notification.read === 'false' ?
                             'notification-unread'
-                            : 'notification-read'">
+                            : 'notification-read'"
+                    @click="move(notification)">
                         <!-- 아이콘 -->
                         <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
                              style="width: 40px; height: 40px;"
