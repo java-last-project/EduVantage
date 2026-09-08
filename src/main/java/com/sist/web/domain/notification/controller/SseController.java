@@ -1,16 +1,12 @@
 package com.sist.web.domain.notification.controller;
 
 import com.sist.web.domain.member.mapper.MemberMapper;
-import com.sist.web.domain.notification.producer.CourseCompletedProducer;
 import com.sist.web.domain.notification.repository.EmitterRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * SSE는 실시간이므로 REST로 처리 불가
@@ -20,7 +16,6 @@ import java.util.Map;
 public class SseController {
     private final MemberMapper memberMapper;
     private final EmitterRepository emitterRepository;
-    private final CourseCompletedProducer  courseCompletedProducer;
 
     /**
      * [WHAT] 클라이언트가 EventSource로 연결할 포인트

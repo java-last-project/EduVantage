@@ -33,10 +33,10 @@
 		WHERE ROWNUM &lt;=#{count}
 	</select>
 	
-	<insert id="insertEnrollment" parameterType="com.sist.web.domain.exam.vo.ExamEnrollmentVO">
+	<insert id="insertEnrollment" parameterType="com.sist.web.domain.exam.vo.ExamEnrollmentVO"
+	        useGeneratedKeys="true" keyProperty="no">
 	    INSERT INTO exam_enrollment
 	    <trim prefix="(" suffix=")" suffixOverrides=",">
-	        no,
 	        member_id,
 	        regdate,
 	        starttime,
@@ -49,7 +49,6 @@
 	        </if>
 	    </trim>
 	    <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
-	        exam_enrollment_no_seq.NEXTVAL,
 	        #{member_id},
 	        SYSDATE,
 	        #{starttime},
