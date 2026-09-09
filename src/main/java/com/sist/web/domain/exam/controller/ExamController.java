@@ -9,7 +9,13 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class ExamController {
-	
+
+	@GetMapping("/exam/list")
+	public String examList(Model model){
+		model. addAttribute("main_html","exam/list");
+		return "main/main";
+	}
+
 	@GetMapping("/exam/detail")
 	public String exam_detail(@RequestParam(value="theme",required=false)Integer theme,@RequestParam(value="count",defaultValue="20")int count, HttpSession session, Model model) {
 		String mid=(String)session.getAttribute("member_id");

@@ -1,10 +1,10 @@
-const { createApp, ref, onMounted } = Vue
+(function(){
+const { createApp, ref, onMounted } = Vue;
 
-//ref의 역할
 
-createApp({
+const scheduledExamApp = createApp({
     setup(){
-        //정기시험 목록
+        //정기시험 목록, 반응형 선언 DOM바로 반영
         const sList = ref([])
 
         //params
@@ -70,10 +70,46 @@ createApp({
             scheduledExamListData()
         }
 
+        //알림등록 및 취소
+        const examNotiRegister = async (exam) => {
+            try{
+                if(exam.subscribed){
+                    //구독중 -> 알림취소
+                    await api.delete(`/exam/subscribe/${exam.no}`)
+                    showToast("EXAM_SUBSCRIBED", "정기 시험 알림 구독 취소", exam.title+" 알림 신청이 취소되었습니다")
+                    //DOM 실시간 반영
+                    exam.subscribed = false
+                    console.log("원본: "+exam.open_date)
+                    console.log("시험일: "+new Date(exam.open_date))
+                    console.log("오늘: "+new Date())
+                    console.log("결과:"+(new Date(exam.open_date) <= new Date()))
+                    //알림목록 새로고침
+                    const store = useNotificationStore()
+                    await store.fetchNotifications()
+                }else{
+                    //미구독 -> 알림신청
+                    await api.post("/exam/subscribe",{examNo: exam.no})
+                    showToast("EXAM_SUBSCRIBED", "정기 시험 알림 구독", exam.title+"이 다가오면 알려드릴게요")
+                    //DOM 실시간 반영
+                    exam.subscribed = true
+
+                    //알림목록 새로고침
+                    const store = useNotificationStore()
+                    await store.fetchNotifications()
+                }
+
+            }catch(error){
+                console.error(error)
+            }
+        }
+
         onMounted(()=>{
             scheduledExamListData()
         })
 
-        return {sList,year,month, page, totalpage, prevMonth, nextMonth, prevPage, nextPage}
+        return {sList,year,month, page, totalpage, prevMonth, nextMonth, prevPage, nextPage, examNotiRegister}
     }
-}).mount("#scheduled-exam-list")
+})
+
+scheduledExamApp.mount("#scheduled-exam-list")
+})()

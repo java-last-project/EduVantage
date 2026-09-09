@@ -1,4 +1,4 @@
-//header에 알림모듈(로그인 상태)이 있는 경우에만 연결
+//header에 알림모듈이 있는 상태(로그인된 상태)에만 연결
 const badge = document.getElementById("notification-badge")
 
 if(badge){
@@ -7,21 +7,24 @@ if(badge){
     const es = new EventSource("/sse", {withCredentials: true})
 
     // 서버에서 데이터를 보낼 때(emitter.send())마다 실행
-    es.onmessage = (e) => {
+    es.onmessage = async (e) => {
         const data = JSON.parse(e.data)
-        //알림 뱃지 노출
-        document.getElementById("notification-badge").style.display = "inline-block"
-        //토스트 알림
-        showToast(data.type, data.title, data.content)
+        // 인자 없이 호출하면 그 시점의 전역 active pinia(다른 페이지 앱이 마지막에 설정한 것)를
+        // 잘못 참조할 수 있어 notificationPinia를 명시적으로 지정함
+        const store = useNotificationStore(notificationPinia)
+        store.addNotification(data)
+
+        //알림목록 새로고침
+        showToast(data.type, data.title, data.content, data.related_id)
+        await store.fetchNotifications()
     }
 
-    //sse 연결끊겼을 경우
     es.onerror = () => {
         console.log("sse 연결 끊김")
     }
 }
 
-function showToast(type, title, content){
+function showToast(type, title, content, related_id) {
     const toast = document.createElement("div")
     toast.className = "sse-toast"
 
@@ -32,11 +35,21 @@ function showToast(type, title, content){
     badgeEl.style.width = "32px"
     badgeEl.style.height = "32px"
     const iconEl = document.createElement("i")
-    if(type === "COURSE_COMPLETED"){
-        badgeEl.classList.add("text-success","bg-success-subtle")
+    if (type === "COURSE_COMPLETED") {
+        badgeEl.classList.add("text-success", "bg-success-subtle")
         iconEl.className = "fa-solid fa-award"
     }
-
+    if (type === "EXAM_SUBSCRIBED") {
+        badgeEl.classList.add("text-info", "bg-info-subtle")
+        iconEl.className = "fa-solid fa-calendar-check"
+    }
+    if (type === "POST_COMMENTED") {
+        toast.addEventListener("click",()=>{
+            window.location.href="/freeboard/detail?no="+related_id
+        })
+        badgeEl.classList.add("text-primary", "bg-primary-subtle")
+        iconEl.className = "fa-solid fa-bell"
+    }
 
 
     const titleEl = document.createElement("strong")
@@ -46,15 +59,16 @@ function showToast(type, title, content){
     contentEl.textContent = content
 
     badgeEl.appendChild(iconEl)
-    titleSectionEl.append(badgeEl,titleEl)
+    titleSectionEl.append(badgeEl, titleEl)
 
     toast.appendChild(titleSectionEl)
     toast.appendChild(contentEl)
 
     document.body.appendChild(toast);
 
-    setTimeout(()=>{
+    setTimeout(() => {
+        //페이드 적용안됨 오류 [수정필요]
         toast.classList.add("fade-out")
-        setTimeout(()=> toast.remove(), 300)
+        setTimeout(() => toast.remove(), 300)
     }, 6000)
 }

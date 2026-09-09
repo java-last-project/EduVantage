@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sist.web.domain.book.mapper.BookMapper">
-    <!-- 목록 출력 : 페이징 및 카테고리/정렬 -->
+    <!-- 도서 목록 -->
     <select id="bookListData" resultType="com.sist.web.domain.book.vo.BookVO" parameterType="hashmap">
         SELECT no, title, author, poster, like_count, price, TO_CHAR(pubdate, 'yyyy-MM-dd') as dbday, hit
         FROM book
@@ -18,13 +18,13 @@
         OFFSET #{start} ROWS FETCH NEXT 12 ROWS ONLY
     </select>
 
-    <select id="bookTotalPage" resultType="int" parameterType="String">
+    <!-- <select id="bookTotalPage" resultType="int" parameterType="String">
         SELECT CEIL(COUNT(*)/12.0) 
         FROM book
         <if test="category != '전체'">
             WHERE category = #{category}
         </if>
-    </select>
+    </select> -->
     
     <select id="bookTotalCount" resultType="int" parameterType="string">
     	SELECT COUNT(*)
@@ -33,7 +33,8 @@
     	WHERE category=#{category}
     	</if>
     </select>
-   
+    
+   <!-- 도서 상세목록 -->
     <select id="bookDetailData" resultType="com.sist.web.domain.book.vo.BookVO" parameterType="int">
     	SELECT no, price, stock, hit, like_count, comment_count, title, poster, author, publisher,
     			pages, isbn, book_desc, desc_img, author_desc, toc, category, TO_CHAR(pubdate, 'yyyy-MM-dd') as dbday
@@ -41,34 +42,117 @@
     	WHERE  no = #{no}
     </select>
     
+    <!-- 조회수 -->
     <update id="bookHitIncrement" parameterType="int">
     	UPDATE book
     	SET hit = hit +1
     	WHERE no = #{no}
     </update>
+    
+    <!-- 도서 검색 -->
 	<select id="bookFindCount" resultType="int" parameterType="hashmap">
-    SELECT COUNT(*)
-    FROM book
-    WHERE (title LIKE '%' || #{keyword} || '%' OR author LIKE '%' || #{keyword} || '%')
-    <if test="category != null and category != '전체'">
-        AND category = #{category}
-    </if>
-</select>
+	    SELECT COUNT(*)
+	    FROM book
+	    WHERE (title LIKE '%' || #{keyword} || '%' OR author LIKE '%' || #{keyword} || '%')
+	    <if test="category != null and category != '전체'">
+	        AND category = #{category}
+	    </if>
+	</select>
+	
+	<!-- 도서 검색 목록 -->
+	<select id="bookFindData" resultType="com.sist.web.domain.book.vo.BookVO" parameterType="hashmap">
+	    SELECT no, title, author, poster, like_count, price, TO_CHAR(pubdate, 'yyyy-MM-dd') as dbday, hit
+	    FROM book
+	    WHERE (title LIKE '%' || #{keyword} || '%' OR author LIKE '%' || #{keyword} || '%')
+	    <if test="category != null and category != '전체'">
+	        AND category = #{category}
+	    </if>
+	    <choose>
+	        <when test="sort == '출간일 순'">ORDER BY pubdate DESC</when>
+	        <when test="sort == '낮은 가격순'">ORDER BY price ASC</when>
+	        <when test="sort == '높은 가격순'">ORDER BY price DESC</when>
+	        <when test="sort == '조회 수 순'">ORDER BY hit DESC</when>
+	        <otherwise>ORDER BY no DESC</otherwise>
+	    </choose>
+	    OFFSET #{start} ROWS FETCH NEXT 12 ROWS ONLY
+	</select>
+	
+	<!-- 도서 좋아요 -->
+	<insert id="bookLikeOn" parameterType="com.sist.web.domain.book.vo.BookLikeVO">
+		INSERT INTO book_like(no, book_no, member_id) 
+		VALUES (
+			BL_NO_SEQ.nextval,
+			#{book_no},
+			#{member_id}
+		)
+	</insert>
+	
+	<!-- 좋아요 재차 눌렀을 시 -->
+	<delete id="bookLikeOff" parameterType="com.sist.web.domain.book.vo.BookLikeVO">
+		DELETE FROM book_like
+		WHERE member_id=#{member_id} AND book_no=#{book_no}
+	</delete>
+	
+	<!-- 좋아요 수 -->
+	<select id="bookLikeCount" resultType="int" parameterType="int">
+		SELECT COUNT(*)
+		FROM book_like
+		WHERE book_no=#{book_no}
+	</select>
+	
+	<!-- 좋아요 체크 -->
+	<select id="bookLikeCheck" resultType="int" parameterType="com.sist.web.domain.book.vo.BookLikeVO">
+		SELECT COUNT(*)
+		FROM book_like
+		WHERE book_no=#{book_no} AND member_id=#{member_id}
+	</select>
+	
+	<!-- 좋아요 증가 -->
+	<update id="bookLikeIncrement" parameterType="int">
+		UPDATE book 
+		SET like_count = like_count + 1
+		WHERE no = #{book_no}
+	</update>
+	
+	<!-- 좋아요 감소 -->
+	<update id="bookLikeDecrement" parameterType="int">
+		UPDATE book 
+		SET like_count = like_count - 1
+		WHERE no = #{book_no}
+	</update>
+	
+    <!-- 장바구니에 담았는지 확인 -->
+    <select id="bookCartCheck" resultType="int" parameterType="com.sist.web.domain.book.vo.BookCartVO">
+        SELECT COUNT(*) 
+        FROM book_cart 
+        WHERE member_id = #{member_id} AND book_no = #{book_no}
+    </select>
 
-<select id="bookFindData" resultType="com.sist.web.domain.book.vo.BookVO" parameterType="hashmap">
-    SELECT no, title, author, poster, like_count, price, TO_CHAR(pubdate, 'yyyy-MM-dd') as dbday, hit
-    FROM book
-    WHERE (title LIKE '%' || #{keyword} || '%' OR author LIKE '%' || #{keyword} || '%')
-    <if test="category != null and category != '전체'">
-        AND category = #{category}
-    </if>
-    <choose>
-        <when test="sort == '출간일 순'">ORDER BY pubdate DESC</when>
-        <when test="sort == '낮은 가격순'">ORDER BY price ASC</when>
-        <when test="sort == '높은 가격순'">ORDER BY price DESC</when>
-        <when test="sort == '조회 수 순'">ORDER BY hit DESC</when>
-        <otherwise>ORDER BY no DESC</otherwise>
-    </choose>
-    OFFSET #{start} ROWS FETCH NEXT 12 ROWS ONLY
-</select>
+    <!-- 이미 담겨있다면 수량만 증가 -->
+    <update id="bookCartUpdate" parameterType="com.sist.web.domain.book.vo.BookCartVO">
+        UPDATE book_cart 
+        SET quantity = quantity + #{quantity} 
+        WHERE member_id = #{member_id} AND book_no = #{book_no}
+    </update>
+
+    <!-- 장바구니에 없는 새로운 책이면 추가 -->
+    <insert id="bookCartInsert" parameterType="com.sist.web.domain.book.vo.BookCartVO">
+        INSERT INTO book_cart (no, member_id, book_no, quantity) 
+        VALUES (
+            bcart_no_seq.nextval, 
+            #{member_id}, 
+            #{book_no}, 
+            #{quantity}
+        )
+    </insert>
+    <!-- 장바구니 데이터 조회 -->
+    <select id="bookCartListData" resultType="com.sist.web.domain.book.vo.BookCartVO" parameterType="int">
+	    SELECT bc.no, bc.member_id, bc.book_no, bc.quantity, 
+	           b.title, b.poster, b.price
+	    FROM book_cart bc
+	    JOIN book b ON bc.book_no = b.no
+	    WHERE bc.member_id = #{member_id}
+	    ORDER BY bc.no DESC
+	</select>
+    
 </mapper>

@@ -4,16 +4,13 @@ import com.sist.web.domain.notification.entity.Notifications;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Date;
 import java.util.List;
 
 public interface NotificationRepository extends JpaRepository<Notifications, Integer> {
-    //전체조회(읽음/안읽음 탭 고민필요)
-    //Page<Notifications> findByOrderByRegdateDesc();
-
-    //안읽음만(최근 10개)
-    //읽음만(최근 10개)
-    List<Notifications> findByIsReadOrderByRegdateDesc(String isRead);
+    //최근 3일치 알림 데이터 조회
+    List<Notifications> findByMemberIdAndRegdateAfterOrderByRegdateDesc(int memberId, Date regdate);
 
     //뱃지 (카운트)
-    List<Notifications> countByIsRead(String isRead);
+    List<Notifications> countByMemberIdAndRegdateAfter(int memberId, Date regdate);
 }

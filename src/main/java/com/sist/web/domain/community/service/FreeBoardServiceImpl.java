@@ -2,6 +2,7 @@ package com.sist.web.domain.community.service;
 
 import java.util.*;
 
+import com.sist.web.domain.notification.producer.NotificationProducer;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class FreeBoardServiceImpl implements FreeBoardService {
+	private final NotificationProducer notificationProducer;
 	private final FreeBoardMapper fMapper;
 	private final FreeBoardCommentMapper cMapper;
 	private final int ROW=20;
@@ -117,6 +119,9 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	@Override
 	public void freeBoardCommentInsert(FreeCommentVO vo) {
 		cMapper.freeBoardCommentInsert(vo);
+		FreeBoardVO parentFreeBoard = fMapper.freeBoardInfo(vo.getBoard_no());
+		//이벤트 발행
+		notificationProducer.publishPostCommented(parentFreeBoard.getMember_id(), vo.getBoard_no(), parentFreeBoard.getSubject());
 	}
 
 	@Override

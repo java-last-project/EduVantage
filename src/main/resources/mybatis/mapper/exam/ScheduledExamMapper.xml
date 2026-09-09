@@ -2,8 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sist.web.domain.notification.mapper.ScheduledExamMapper">
     <select id="getScheduledExamByMonth" resultType="ScheduledExamVO">
-        SELECT *
-        FROM scheduled_exam
+        SELECT
+        se.no,
+        se.title,
+        se.open_date,
+        se.close_date,
+        <if test="memberId != null">
+            CASE WHEN es.no IS NOT NULL THEN 1 ELSE 0 END AS subscribed
+        </if>
+        <if test="memberId == null">
+            0 AS subscribed
+        </if>
+        FROM scheduled_exam se
+        <if test="memberId != null">
+            LEFT JOIN exam_subscription es
+                ON se.no = es.exam_no AND es.member_id = #{memberId}
+        </if>
         WHERE open_date &gt;= TO_DATE(#{year}||'-'||#{month}||'-01','YYYY-MM-DD')
             AND open_date &lt; ADD_MONTHS(TO_DATE(#{year}||'-'||#{month}||'-01','YYYY-MM-DD'),1)
         ORDER BY open_date
@@ -15,4 +29,36 @@
         WHERE open_date &gt;= TO_DATE(#{year}||'-'||#{month}||'-01','YYYY-MM-DD')
         AND open_date &lt; ADD_MONTHS(TO_DATE(#{year}||'-'||#{month}||'-01','YYYY-MM-DD'),1)
     </select>
+    <insert id="subscribeExam">
+        INSERT INTO exam_subscription(member_id, exam_no, notified_d3, notified_dd)
+        VALUES(#{memberId}, #{examNo}, 'N', 'N')
+    </insert>
+    <select id="subscribeExamInfo" resultType="SubscribeExamVO">
+        SELECT no AS examNo, title AS examTitle
+        FROM scheduled_exam
+        WHERE no = #{examNo}
+    </select>
+    <!--d-3/dday인 시험 조회-->
+    <select id="findScheduledExamByDday" resultType="SubscribeExamVO">
+        SELECT no AS examNo, title AS examTitle
+        FROM scheduled_exam
+        WHERE TRUNC(open_date) = TRUNC(SYSDATE + #{targetDate})
+    </select>
+    <!--알림 못받은 유저 조회-->
+    <select id="findUnnotifiedSubscribers" resultType="int">
+        SELECT member_id
+        FROM exam_subscription
+        WHERE exam_no=#{examNo} AND ${column} = 'N'
+    </select>
+    <!--스케줄러 > 알림 수신 후 > 수신여부 업데이트-->
+    <update id="markNotified">
+        UPDATE exam_subscription
+        SET ${column} = 'Y'
+        WHERE member_id=#{memberId} AND exam_no=#{examNo}
+    </update>
+    <!--알림 삭제-->
+    <delete id="unsubscribeExam">
+        DELETE FROM exam_subscription
+        WHERE member_id=#{memberId} AND exam_no=#{examNo}
+    </delete>
 </mapper>
