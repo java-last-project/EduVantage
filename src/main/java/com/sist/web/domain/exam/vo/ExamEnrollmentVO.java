@@ -16,7 +16,7 @@ import lombok.Data;
 public class ExamEnrollmentVO {
 	private Integer no,member_id,exam_no,totalscore,theme;
 	private LocalDateTime starttime,endtime,regdate;
-	private String dbday;
+	private String dbday,status;
 	private ExamOptionVO ovo;
 	private ExamQuestionVO qvo;
 	private ScheduledExamVO svo;

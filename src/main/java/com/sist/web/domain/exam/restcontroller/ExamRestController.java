@@ -11,9 +11,7 @@ import java.util.*;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,11 +35,9 @@ public class ExamRestController {
             }
             int mid=Integer.parseInt(String.valueOf(sessionMid));
 
-            ExamEnrollmentVO vo=new ExamEnrollmentVO();
-            vo.setMember_id(mid);
-            vo.setTheme(theme!=0?theme:null);
-            vo.setExam_no(examNo);
-            eService.insertEnrollment(vo);
+            ExamEnrollmentVO vo=eService.getOrCreateEnrollment(mid,examNo,theme);
+            map.put("enrollmentNo",vo.getNo());
+            map.put("startTime",vo.getStarttime());
 
             String title=null;
             if(examNo!=null && examNo>0){
@@ -57,5 +53,35 @@ public class ExamRestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
         return ResponseEntity.ok(map);
+    }
+
+    @PostMapping("/exam/submit_vue")
+    public ResponseEntity<?> examSubmit(@RequestBody Map<String, Object> params, HttpSession session){
+        try{
+            Object sessionMid=session.getAttribute("member_id");
+            if(sessionMid==null){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            Map<String,Object> map=eService.submitExam(params);
+            return ResponseEntity.ok(map);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/exam/result_vue")
+    public ResponseEntity<?> exam_result_vue(@RequestParam("no") int enrollmentNo, HttpSession session) {
+        try {
+            Object sessionMid=session.getAttribute("member_id");
+            if (sessionMid==null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            Map<String, Object> resultData=eService.getExamResultData(enrollmentNo);
+            return ResponseEntity.ok(resultData);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

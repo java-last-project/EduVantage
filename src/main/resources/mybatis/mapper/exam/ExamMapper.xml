@@ -64,6 +64,25 @@
 			ORDER BY q.no
 	</select>
 	
+	<select id="findActiveEnrollment" parameterType="hashmap" resultType="com.sist.web.domain.exam.vo.ExamEnrollmentVO">
+		SELECT no, member_id, exam_no, theme, starttime
+		FROM EXAM_ENROLLMENT
+		WHERE member_id=#{member_id}
+		AND endtime IS NULL
+		<choose>
+			<when test="exam_no!=null and exam_no!=0">
+				AND exam_no=#{exam_no}
+			</when>
+			<otherwise>
+				AND theme=#{theme}
+				AND exam_no IS NULL
+			</otherwise>
+		</choose>
+		AND starttime&gt;=SYSDATE-(120/(24*60))
+		AND ROWNUM=1
+		ORDER BY starttime DESC
+	</select>
+	
 	<insert id="insertEnrollment" parameterType="com.sist.web.domain.exam.vo.ExamEnrollmentVO"
 	        useGeneratedKeys="true" keyProperty="no" keyColumn="no">
 	    INSERT INTO exam_enrollment
@@ -95,22 +114,149 @@
 		WHERE no=#{examNo}
 	</select>
 
-	<update id="setExamEndTime" parameterType="int">
-		UPDATE EXAM_ENROLLMENT
-		SET endtime=SYSTIMESTAMP
+<!-- 채점 -->
+	<select id="getQuestionForGrading" parameterType="list" resultType="com.sist.web.domain.exam.vo.ExamQuestionVO">
+		SELECT no, title, answer, score, type
+		FROM exam_question
+		WHERE no IN
+		<foreach item="qNo" collection="list" open="(" separator="," close=")">
+			#{qNo}
+		</foreach>
+	</select>
+
+	<insert id="insertUserAnswers" parameterType="list">
+		INSERT ALL
+		<foreach item="ans" collection="list">
+			INTO exam_user_answer (
+			enrollment_no,
+			question_no,
+			user_answer,
+			is_correct,
+			score,
+			grader_id,
+			graded_at
+			) VALUES (
+			#{ans.enrollment_no},
+			#{ans.question_no},
+			#{ans.user_answer, jdbcType=VARCHAR},
+			#{ans.is_correct},
+			#{ans.score},
+			NULL,
+			NULL
+			)
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
+
+	<update id="updateEnrollmentFinish" parameterType="com.sist.web.domain.exam.vo.ExamEnrollmentVO">
+		UPDATE exam_enrollment
+		SET endtime=#{endtime},
+		    totalscore=#{totalscore},
+		    status=#{status}
 		WHERE no=#{no}
 	</update>
 
-	<insert id="userAnswerInput" parameterType="com.sist.web.domain.exam.vo.ExamUserAnswerVO">
-		INSERT INTO EXAM_USER_ANSWER (ENROLLMENT_NO, QUESTION_NO, USER_ANSWER)
-		VALUES(#{enrollment_no},#{question_no},#{user_answer})
-	</insert>
-
-	<select id="getQuestionAnswer" parameterType="int" resultType="string">
-		SELECT answer
-		FROM EXAM_QUESTION
-		WHERE no=#{question_no}
+	<!--  -->
+	<select id="selectPendingSubjectiveList" parameterType="int" resultType="hashmap">
+		SELECT a.no AS "answer_no",
+		       a.enrollment_no AS "enrollment_no",
+		       a.question_no AS "question_no",
+		       a.user_answer AS "user_answer",
+		       a.grader_id AS "grader_id",
+		       q.title AS "title",
+		       q.answer AS "standard_answer",
+		       q.score AS "score",
+		       e.theme AS "theme",
+		       e.exam_no AS "exam_no"
+		FROM exam_user_answer a
+			JOIN exam_question q ON a.question_no=q.no
+			JOIN exam_enrollment e ON a.enrollment_no=e.no
+		WHERE a.is_correct='W'
+		  AND (a.grader_id IS NULL OR a.grader_id=#{graderId})
+		ORDER BY a.no
 	</select>
 
+	<update id="claimGradingTask" parameterType="hashmap">
+		UPDATE exam_user_answer
+		SET grader_id=#{graderId}
+		WHERE no=#{answerNo}
+		  AND is_correct='W'
+		  AND grader_id IS NULL
+	</update>
+
+	<update id="releaseGradingClaim" parameterType="hashmap">
+		UPDATE exam_user_answer
+		SET grader_id=NULL
+		WHERE no=#{answerNo}
+			AND grader_id=#{graderId}
+			AND is_correct='W'
+	</update>
+
+	<update id="gradeSubjectiveAnswer" parameterType="hashmap">
+		UPDATE exam_user_answer
+		SET score=#{score},
+		    is_correct=CASE WHEN #{score} &gt; 0 THEN 'Y' ELSE 'N' END,
+		    graded_at=SYSDATE
+		WHERE no=#{answerNo}
+		  AND grader_id=#{graderId}
+	</update>
+
+	<select id="countRemainingPending" parameterType="int" resultType="int">
+		SELECT COUNT(*)
+		FROM exam_user_answer
+		WHERE enrollment_no=#{enrollmentNo}
+		  AND is_correct='W'
+	</select>
+
+	<update id="finalizeEnrollmentScore" parameterType="int">
+		UPDATE exam_enrollment
+		SET totalscore=(
+			SELECT NVL(SUM(score), 0)
+			FROM exam_user_answer
+			WHERE enrollment_no=#{enrollmentNo}
+		),
+		    status='COMPLETE'
+		WHERE no=#{enrollmentNo}
+	</update>
+
+	<select id="selectExamResultMaster" parameterType="int" resultType="hashmap">
+		SELECT e.no AS enrollment_no,
+		       e.member_id AS member_id,
+		       e.exam_no AS exam_no,
+		       e.theme AS theme,
+		       e.totalscore AS total_score,
+		       e.status AS status,
+		       TO_CHAR(e.starttime, 'YYYY-MM-DD HH24:MI:SS') AS start_time,
+		       TO_CHAR(e.endtime, 'YYYY-MM-DD HH24:MI:SS') AS end_time,
+		       ROUND((CAST(e.endtime AS DATE)-CAST(e.starttime AS DATE))*24*60*60) AS spent_seconds,
+		       (SELECT COUNT(*) FROM exam_user_answer WHERE enrollment_no=e.no) AS total_count,
+		       (SELECT COUNT(*)
+		        FROM exam_user_answer a
+						 JOIN exam_question q ON a.question_no=q.no
+		        WHERE a.enrollment_no=e.no AND q.type!=1) AS subjective_total,
+		       (SELECT COUNT(*)
+		        FROM exam_user_answer a
+						 JOIN exam_question q ON a.question_no=q.no
+		        WHERE a.enrollment_no=e.no AND q.type!=1 AND a.is_correct!='W') AS subjective_graded
+		FROM exam_enrollment e
+		WHERE e.no=#{enrollmentNo}
+	</select>
+
+	<select id="selectExamResultDetails" parameterType="int" resultType="hashmap">
+		SELECT a.no AS answer_no,
+		       a.question_no AS question_no,
+		       a.user_answer AS user_answer,
+		       a.is_correct AS is_correct,
+		       a.score AS score,
+		       q.title AS title,
+		       q.image AS image,
+		       q.answer AS standard_answer,
+		       q.description AS description,
+		       q.type AS question_type
+		FROM exam_user_answer a
+				 JOIN exam_question q ON a.question_no = q.no
+		WHERE a.enrollment_no = #{enrollmentNo}
+		ORDER BY a.question_no ASC
+	</select>
 
 </mapper>

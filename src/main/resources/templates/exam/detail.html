@@ -8,7 +8,7 @@ const EXAM_COUNT = /*[[${count}]]*/ 20
 const EXAM_NO = /*[[${examNo}]]*/ null
 </script>
 	<div class="exam-layout">
-		<th:block th:include="exam/sidebar"></th:block>
+		<th:block th:replace="~{exam/sidebar::sidebar('examing')}"></th:block>
 	
 		<main class="exam-main">
 			<header class="exam-header">
@@ -37,22 +37,28 @@ const EXAM_NO = /*[[${examNo}]]*/ null
 							<span class="fw-bold" style="color: var(--main-color);">문제 {{index+1}} / {{store.list.length}}</span>
 						</div>
 						<h5 class="fw-bold mb-4" style="line-height: 1.5;">{{ q.title }}</h5>
-     
+						<div v-if="q.image" class="text-center my-3 p-2 bg-white rounded border">
+							<img :src="q.image"
+							     :alt="'문제 '+(index+1)+' 이미지'"
+							     class="img-fluid rounded"
+							     referrerpolicy="no-referrer"
+							     style="max-height: 360px; object-fit: contain;">
+						</div>
 						<div v-if="q.type === 1" class="d-flex flex-column gap-2">
 							<label class="option-box" :class="{selected: userAnswers[q.no]==='1'}">
-			                    <input type="radio" :name="'q_' + q.no" value="1" v-model="userAnswers[q.no]">
+			                    <input type="radio" :name="'q_'+q.no" value="1" v-model="userAnswers[q.no]">
 			                    <span>① {{q.ovo?.option1}}</span>
 			                </label>
 			                <label class="option-box" :class="{selected: userAnswers[q.no]==='2'}">
-			                    <input type="radio" :name="'q_' + q.no" value="2" v-model="userAnswers[q.no]">
+			                    <input type="radio" :name="'q_'+q.no" value="2" v-model="userAnswers[q.no]">
 			                    <span>② {{q.ovo?.option2}}</span>
 			                </label>
 			                <label class="option-box" :class="{selected: userAnswers[q.no]==='3'}">
-			                    <input type="radio" :name="'q_' + q.no" value="3" v-model="userAnswers[q.no]">
+			                    <input type="radio" :name="'q_'+q.no" value="3" v-model="userAnswers[q.no]">
 			                    <span>③ {{q.ovo?.option3}}</span>
 			                </label>
 			                <label class="option-box" :class="{selected: userAnswers[q.no]==='4'}">
-			                    <input type="radio" :name="'q_' + q.no" value="4" v-model="userAnswers[q.no]">
+			                    <input type="radio" :name="'q_'+q.no" value="4" v-model="userAnswers[q.no]">
 			                    <span>④ {{q.ovo?.option4}}</span>
 			                </label>
 						</div>
@@ -109,7 +115,7 @@ const EXAM_NO = /*[[${examNo}]]*/ null
 	</div>
 <script src="/vue/exam/examStore.js"></script>
 <script>
-const {onMounted,onUnmounted,ref,computed,createApp}=Vue
+const {onMounted,onUnmounted,ref,computed,createApp,watch}=Vue
 const {createPinia}=Pinia
 const examApp=createApp({
     setup(){
@@ -168,23 +174,43 @@ const examApp=createApp({
 				}
 			}, 1000)
 		}
-		const submitExam=()=>{
-			if (!confirm('시험을 최종 제출하시겠습니까?')) return
-			console.log('제출 데이터:', {
-				enrollment_no: store.enrollment_no,
+		const submitExam=async (isAuto=false)=>{
+			if (!isAuto && !confirm('시험을 최종 제출하시겠습니까?')) return
+			if (timerInterval) clearInterval(timerInterval)
+			const payload={
+				enrollment_no: store.enrollmentNo,
 				answers: userAnswers.value,
 				spentTime: elapsedSeconds.value
-			})
-			// 답안 제출 API
+			}
+			try{
+				// 답안 제출 API
+				localStorage.removeItem(`exam_ans_${store.enrollmentNo}`)
+				alert('성공적으로 제출되었습니다.')
+				location.href='/exam/result?no='+store.enrollmentNo
+			}catch(err){
+				console.error(err)
+				alert('제출처리에 실패했습니다. 다시 시도해주세요.')
+			}
 		}
-        onMounted(()=>{
+		watch(userAnswers,(newVal)=>{
+			if(store.enrollmentNo){
+				localStorage.setItem(`exam_ans_${store.enrollmentNo}`,JSON.stringify(newVal))
+			}
+		},{deep:true})
+        onMounted(async ()=>{
             store.username=SESSION_NAME
             const requestParams={
 				theme:EXAM_THEME,
 				count:EXAM_COUNT,
 				examNo:EXAM_NO
 			}
-            store.examDetailData(requestParams)
+            await store.examDetailData(requestParams)
+			if(store.enrollmentNo){
+				const savedAnswers=localStorage.getItem(`exam_ans_${store.enrollmentNo}`)
+				if(savedAnswers){
+					userAnswers.value=JSON.parse(savedAnswers)
+				}
+			}
 
 			startTimer()
         })

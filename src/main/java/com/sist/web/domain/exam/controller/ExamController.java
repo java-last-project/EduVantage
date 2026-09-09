@@ -28,4 +28,11 @@ public class ExamController {
 		model.addAttribute("main_html", "exam/detail");
 		return "main/main";
 	}
+
+	@GetMapping("/exam/result")
+	public String exam_result(@RequestParam("no")Integer enrollmentNo,Model model){
+		model.addAttribute("enrollmentNo",enrollmentNo);
+		model.addAttribute("main_html","exam/result");
+		return "main/main";
+	}
 }
