@@ -10,14 +10,33 @@
     const useNotificationStore = defineStore('notification', {
         //[state]: 기존 ref()로 선언한 것, 전달해야하는 데이터 묶음
         state: ()=> ({
-            nnList: []
+            nnList: [],
+            // 탭 관련 state 추가
+            activeTab: null,
+            tabs: ['커뮤니티', '도서', '공지사항', '강의', '시험'],
+            tabTypeMap: {
+                '커뮤니티': ['POST_COMMENTED', 'COMMENT_REPLIED'],
+                '도서': [],
+                '공지사항': [],
+                '강의': ['COURSE_COMPLETED'],
+                '시험': ['EXAM_SUBSCRIBED']
+            }
         }),
         //[getters]: ...
         getters: {
-            hasUnread: (state)=>state.nnList.some(n=>n.read === false)
+            hasUnread: (state)=>state.nnList.some(n=>n.read === false),
+            filteredList: (state) => {
+                if (!state.activeTab) return state.nnList
+                const types = state.tabTypeMap[state.activeTab] || []
+                return state.nnList.filter(n => types.includes(n.type))
+            }
         },
         //[actions]: 기존 함수들
         actions: {
+            //알림모듈 탭
+            setActiveTab(tab) {
+                this.activeTab = this.activeTab === tab ? null : tab
+            },
             async fetchNotifications() {
                 try {
                     const res = await api.get("/notification")

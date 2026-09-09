@@ -14,7 +14,12 @@
                 markAllRead: store.markAllRead,
                 markRead: store.markRead,
                 move: store.move,
-                handleClick: store.handleClick
+                handleClick: store.handleClick,
+                //탭
+                activeTab: computed(()=>store.activeTab),
+                tabs: computed(()=>store.tabs),
+                filteredList: computed(()=>store.filteredList),
+                setActiveTab: store.setActiveTab,
             }
         }
     })
