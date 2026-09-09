@@ -44,4 +44,6 @@ public interface BookMapper {
     public void bookOrderInsert(BookOrderVO vo);
 
     public void bookOrderDetailInsert(BookOrderDetailVO vo);
+    
+    public List<BookVO> bookBestData();
 }

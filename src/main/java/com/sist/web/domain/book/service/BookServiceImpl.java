@@ -147,5 +147,11 @@ public class BookServiceImpl implements BookService {
 		}
 	}
 
+	@Override
+	public List<BookVO> bookBestData() {
+		// TODO Auto-generated method stub
+		return bMapper.bookBestData();
+	}
+
 	
 }

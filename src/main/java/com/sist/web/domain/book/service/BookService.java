@@ -47,4 +47,6 @@ public interface BookService {
     public void bookOrderDetailInsert(BookOrderDetailVO vo);
     
     public void bookOrderComplete(BookOrderVO orderVO, List<BookOrderDetailVO> detailList);
+    
+    public List<BookVO> bookBestData();
 }

@@ -18,7 +18,7 @@ const useCheckoutStore = defineStore('checkoutStore', {
                 console.error("도서 로드 실패", error);
             }
         },
-        // 회원(주소) 정보 조회
+        // 회원 정보 조회
         async fetchMemberInfo() {
             try {
                 const res = await axios.get('/member/info_vue');
