@@ -27,7 +27,20 @@
                     console.error(error)
                 }
             },
-
+            //클릭 알림 읽음 처리
+            async markRead(notification){
+                if(notification.read == false){
+                    try{
+                        await api.patch("/notification/read",{
+                            no: notification.no
+                        })
+                        await this.fetchNotifications()
+                    }catch(err){
+                        console.error(err)
+                    }
+                }
+            },
+            //전체 알림 읽음 처리
             async markAllRead() {
                 if(this.nnList.length === 0) return
                 const nos = this.nnList.map(n => n.no)
@@ -47,12 +60,17 @@
             //관련 url 이동
             move(notification){
                 if(notification.related_id != null){
-                    if(notification.type === "POST_COMMENTED"){
+                    if(notification.type === "POST_COMMENTED" || notification.type === "COMMENT_REPLIED"){
                         console.log(notification)
                         console.log(notification.related_id)
                         window.location.href="/freeboard/detail?no="+notification.related_id
                     }
                 }
+            },
+            //알림행 클릭했을경우
+            async handleClick(notification){
+                await this.markRead(notification)
+                this.move(notification)
             }
         }
     })

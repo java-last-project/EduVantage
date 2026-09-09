@@ -12,7 +12,9 @@
             return {
                 nnList: computed(()=>store.nnList),
                 markAllRead: store.markAllRead,
-                move: store.move
+                markRead: store.markRead,
+                move: store.move,
+                handleClick: store.handleClick
             }
         }
     })

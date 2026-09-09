@@ -1,6 +1,7 @@
 package com.sist.web.domain.notification.controller;
 
 import com.sist.web.domain.member.mapper.MemberMapper;
+import com.sist.web.domain.notification.dto.MarkAllReadRequest;
 import com.sist.web.domain.notification.dto.MarkReadRequest;
 import com.sist.web.domain.notification.service.NotificationService;
 import com.sist.web.domain.notification.vo.NotificationVO;
@@ -41,8 +42,15 @@ public class NotificationController {
      * @return -> read = true로 처리
      */
     @PatchMapping("/read-all")
-    public ResponseEntity<Void> markAllAsRead(@RequestBody MarkReadRequest request){
+    public ResponseEntity<Void> markAllAsRead(@RequestBody MarkAllReadRequest request){
         notificationService.markAllAsRead(request.getNos());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/read")
+    public ResponseEntity<Void> markAsRead(@RequestBody MarkReadRequest request){
+        notificationService.markAsRead(request.getNo());
 
         return ResponseEntity.ok().build();
     }

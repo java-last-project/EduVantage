@@ -9,4 +9,5 @@ import java.util.List;
 public interface NotificationService {
     List<NotificationVO> findRecentNotifications(int memberId);
     void markAllAsRead(List<Integer> nos);
+    void markAsRead(int no);
 }

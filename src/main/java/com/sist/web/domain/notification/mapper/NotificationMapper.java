@@ -14,4 +14,9 @@ import java.util.List;
 public interface NotificationMapper {
     List<NotificationVO> findRecentNotifications(@Param("memberId") int memberId, @Param("targetDate") Date targetDate);
     void markAllAsRead(@Param("nos") List<Integer> nos);
+    @Update("""
+    UPDATE notifications SET is_read = 'Y'
+    WHERE no = #{no}
+    """)
+    void markAsRead(@Param("no")int no);
 }
