@@ -66,4 +66,45 @@
 		ON m.member_id=a.member_id
 		WHERE m.member_id=#{member_id}
 	</select>
+	
+	<!-- 전체 강의 목록 조회 -->
+	<select id="adminCourseListData" resultType="hashmap" parameterType="int">
+		SELECT c.no,c.title,m.name,TO_CHAR(c.pay_price, 'FM999,999,999') as payprice,c.thumbnail,c.student_count,c.star
+		FROM course c
+		JOIN member m
+		ON c.instructor_no=m.member_id
+		ORDER BY c.no desc
+		OFFSET #{start} ROWS FETCH NEXT 10 ROWS ONLY
+	</select>
+	
+	<!-- 전체 강의 목록에서 강의명으로 검색 -->
+	<select id="adminFindCourseListData" resultType="hashmap" parameterType="hashmap">
+		SELECT c.no,c.title,m.name,TO_CHAR(c.pay_price, 'FM999,999,999') as payprice,c.thumbnail,c.student_count,c.star
+		FROM course c
+		JOIN member m
+		ON c.instructor_no=m.member_id
+		WHERE c.title LIKE '%'||#{title}||'%'
+		ORDER BY c.no desc
+		OFFSET #{start} ROWS FETCH NEXT 10 ROWS ONLY
+	</select>
+	
+	<!-- 대시보드 출력용 -->
+	<!-- 총 강사 수 -->
+	<select id="adminGetTotalInstCount" resultType="int">
+		SELECT COUNT(*)
+		FROM member m
+		JOIN authority a
+		ON m.member_id=a.member_id
+		WHERE a.authority='ROLE_INSTRUCTOR'
+	</select>
+	
+	<!-- 수강생 수 Best5 강의 -->
+	<select id="adminGetBest5Course" resultType="com.sist.web.domain.course.vo.CourseVO">
+		SELECT rownum as no,title, student_count
+		FROM (SELECT title, student_count
+		        FROM course
+		        ORDER BY student_count DESC)
+		WHERE rownum &lt;= 5
+	</select>
+	
 </mapper>
