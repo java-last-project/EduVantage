@@ -89,7 +89,8 @@ const useBookDetailStore = defineStore('bookDetail', {
 		    const bookNo = this.vo.no;
 		    const quantity = 1; 
 
-		    location.href = `/mypage/orders?type=buy_now&bookNo=${bookNo}&quantity=${quantity}`;
+		    /*location.href = `/mypage/orders?type=buy_now&bookNo=${bookNo}&quantity=${quantity}`;*/
+			location.href = `/book/checkout?bookNo=${bookNo}&quantity=${quantity}`;
 		}
     }
 });

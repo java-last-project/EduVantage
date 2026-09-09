@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+<script th:inline="javascript">
+    const CHECKOUT_SESSION_ID = /*[[${session.member_id}]]*/ 1; 
+</script>
+</head>
+<body>
+	<div id="checkoutApp" class="container-fluid p-4"
+		style="max-width: 800px; margin: 0 auto; font-family: 'Pretendard', sans-serif;">
+		<h2 class="fw-bold mb-4"
+			style="border-bottom: 2px solid #333; padding-bottom: 15px;">주문/결제</h2>
+
+		<!-- 주문 상품 정보 -->
+		<h5 class="fw-bold mb-3 mt-4">주문 상품 정보</h5>
+		<div class="card mb-4">
+			<div class="card-body d-flex align-items-center gap-3">
+				<img :src="store.book.poster" alt="도서"
+					style="width: 80px; height: 110px; object-fit: cover; border-radius: 4px; background: #f5f5f5;">
+				<div class="flex-grow-1">
+					<div class="fw-bold fs-5 mb-1">{{ store.book.title }}</div>
+					<div class="text-secondary small mb-2">{{ store.book.author
+						}} 저 · {{ store.book.publisher }}</div>
+					<div class="text-muted small">수량: {{ store.quantity }}개</div>
+				</div>
+				<div class="fw-bold fs-4">{{ (store.book.price *
+					store.quantity).toLocaleString() || 0 }}원</div>
+			</div>
+		</div>
+
+		<!-- 배송지 정보 -->
+		<h5 class="fw-bold mb-3">배송지 정보</h5>
+		<div class="card mb-4">
+			<div class="card-body">
+				<label class="fw-bold mb-3" style="cursor: pointer;"> <input
+					type="checkbox" v-model="store.useDefaultAddress"
+					@change="store.handleAddressToggle" class="form-check-input me-2">
+					기본 배송지 사용
+				</label>
+				<div v-if="store.useDefaultAddress && store.member.name"
+					class="bg-light p-3 rounded text-dark">
+					<div class="row mb-2">
+						<div class="col-2 text-muted">받는 사람</div>
+						<div class="col-10 fw-bold">{{ store.member.name }}</div>
+					</div>
+					<div class="row mb-2">
+						<div class="col-2 text-muted">연락처</div>
+						<div class="col-10">{{ store.member.phone }}</div>
+					</div>
+					<div class="row">
+						<div class="col-2 text-muted">주소</div>
+						<div class="col-10">[{{ store.member.post }}] {{
+							store.member.addr1 }} {{ store.member.addr2 }}</div>
+					</div>
+				</div>
+				<div v-else class="text-muted p-3">기본 배송지를 선택해주세요.</div>
+			</div>
+		</div>
+
+		<!-- 최종 결제 금액 -->
+		<h5 class="fw-bold mb-3">최종 결제 금액</h5>
+		<div class="card mb-4 border-dark">
+			<div class="card-body">
+				<div class="d-flex justify-content-between mb-2">
+					<span class="text-muted">총 주문금액</span> <span class="fw-bold">{{
+						(store.book.price * store.quantity).toLocaleString() || 0 }}원</span>
+				</div>
+				<div class="d-flex justify-content-between mb-3 border-bottom pb-3">
+					<span class="text-muted">배송비</span> <span>무료</span>
+				</div>
+				<div class="d-flex justify-content-between align-items-center">
+					<span class="fw-bold fs-5">최종 결제금액</span> <span
+						class="fw-bold text-danger" style="font-size: 32px;">{{
+						(store.book.price * store.quantity).toLocaleString() || 0 }}<span
+						class="fs-5 text-dark">원</span>
+					</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="d-flex gap-3 mt-2">
+			<button class="btn btn-dark w-50 py-3 fs-5 fw-bold"
+				@click="store.requestPay">결제하기</button>
+			<button class="btn btn-outline-dark w-50 py-3 fs-5 fw-bold"
+				onclick="history.back()">취소</button>
+		</div>
+	</div>
+	<script src="/vue/book/bookCheckoutStore.js"></script>
+
+	<script>
+    const { createApp, onMounted } = Vue;
+    const { createPinia } = Pinia;
+
+    const checkoutApp = createApp({
+        setup() {
+            const store = useCheckoutStore();
+
+            onMounted(() => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const bookNo = urlParams.get('bookNo') || 1;
+                
+                store.sessionId = CHECKOUT_SESSION_ID;
+                store.quantity = urlParams.get('quantity') || 1;
+
+                // 페이지 진입 시 도서 정보와 회원 정보 동시 로드
+                store.fetchBookInfo(bookNo);
+                store.fetchMemberInfo();
+            });
+
+            return { store };
+        }
+    });
+    
+    checkoutApp.use(createPinia());
+    checkoutApp.mount('#checkoutApp');
+</script>
+</body>
+</html>
