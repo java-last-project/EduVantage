@@ -7,8 +7,6 @@ import java.util.Date;
 import java.util.List;
 
 public interface NotificationService {
-    //List<NotificationVO> getIsNotReadNotification(int memberId);
-
     List<NotificationVO> findRecentNotifications(int memberId);
     void markAllAsRead(List<Integer> nos);
 }

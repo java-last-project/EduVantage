@@ -1,7 +1,6 @@
 package com.sist.web.domain.notification.controller;
 
 import com.sist.web.domain.member.mapper.MemberMapper;
-import com.sist.web.domain.notification.dto.ExamSubscribeRequest;
 import com.sist.web.domain.notification.dto.MarkReadRequest;
 import com.sist.web.domain.notification.service.NotificationService;
 import com.sist.web.domain.notification.vo.NotificationVO;
@@ -20,6 +19,11 @@ public class NotificationController {
     private final NotificationService notificationService;
     private final MemberMapper memberMapper;
 
+    /**
+     * 최근 3일 이내 알림 조회
+     * @param authentication
+     * @return
+     */
     @GetMapping
     public ResponseEntity<List<NotificationVO>> getRecentNotifications(Authentication authentication){
         String username = authentication.getName();

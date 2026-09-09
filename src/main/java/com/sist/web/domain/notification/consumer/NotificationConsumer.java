@@ -125,4 +125,36 @@ public class NotificationConsumer {
                     }
                 });
     }
+
+    //대댓글 알림 리스너
+    @KafkaListener(topics = NotificationTopics.COMMENT_REPLIED, groupId = "notification-group")
+    public void handleCommentReplied(NotificationEventVO event){
+        String title = "내 댓글에 답변이 달렸어요!";
+        String content = "눌러서 바로 ["+event.getTarget()+"] 게시글로 이동해보세요.";
+
+        //db저장
+        Notifications notification = Notifications.builder()
+                .memberId(event.getMemberId())
+                .type(NotificationType.COMMENT_REPLIED)
+                .title(title)
+                .content(content)
+                .relatedId(event.getTargetNo())
+                .eventKey(event.getEventKey())
+                .build();
+        notificationRepository.save(notification);
+        int no = notification.getNo();
+        int related_id = notification.getRelatedId();
+
+        //유저 접속 여부 확인(emitter)
+        emitterRepository.findByMemberId(event.getMemberId())
+                //온라인
+                .ifPresent(emitter -> {
+                    try{
+                        emitter.send(SseEmitter.event()
+                                .data(Map.of("no", no,"type",NotificationType.COMMENT_REPLIED.toString(),"title",title,"content",content,"related_id", related_id)));
+                    }catch(IOException e){
+                        emitterRepository.deleteByMemberId(event.getMemberId());
+                    }
+                });
+    }
 }

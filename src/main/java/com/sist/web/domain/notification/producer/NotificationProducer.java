@@ -26,7 +26,6 @@ public class NotificationProducer {
 
     /**
      * [WHAT] 대댓글 알림, 카프카 토픽에 넣는 역할
-     * [WHY] 프로듀서: 전달 / 컨슈머: 로직 -> 결합력 감소
      */
     public void publishReplied(int memberId,  int replyNo) {
         kafkaTemplate.send(NotificationTopics.COMMENT_REPLIED, new NotificationEventVO(
@@ -36,14 +35,19 @@ public class NotificationProducer {
 
     /**
      * [WHAT] 내 글에 댓글 알림, 카프카 토픽에 넣는 역할
-     * [WHY] 프로듀서: 전달 / 컨슈머: 로직 -> 결합력 감소
      */
     public void publishPostCommented(int memberId,  int qnaNo, String qnaTitle) {
         kafkaTemplate.send(NotificationTopics.POST_COMMENTED, new NotificationEventVO(
                 memberId, qnaNo, qnaTitle, UUID.randomUUID().toString()
         ));
-
-        System.out.println("==============producer");
     }
 
+    /**
+     * [WHAT] 내 댓글에 대댓글 알림, 카프카 토픽에 넣는 역할
+     */
+    public void publishCommentReplied(int memberId, int qnaNo, String qnaTitle){
+        kafkaTemplate.send(NotificationTopics.COMMENT_REPLIED, new NotificationEventVO(
+                memberId, qnaNo, qnaTitle, UUID.randomUUID().toString()
+        ));
+    }
 }

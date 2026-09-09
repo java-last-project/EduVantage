@@ -11,6 +11,10 @@
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important; 
 }
+.exam-slide-item {
+	flex: 0 0 calc((100% - 48px) / 4);
+	min-width: 250px;
+}
 </style>
     <main class="container" style="max-width: 1200px; padding-bottom: 100px;">
     
@@ -251,64 +255,166 @@
 			<h3 class="section-heading">상시시험 바로가기</h3>
 	        <p class="section-subheading">원하는 과목과 문제 수를 선택하여 즉시 모의고사를 시작하세요.</p>
 		</div>
-	
-		<div class="row g-4">
-			<div class="col-md-4">
-				<div class="card-vertical shadow-sm border rounded-3 p-4 text-center h-100 d-flex flex-column justify-content-center" style="background-color: #fff;">
-					<div class="exam-front">
-						<div class="mb-3">
-							<i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
+
+		<div class="position-relative px-3">
+			<button type="button"
+			        class="btn btn-light rounded-circle border position-absolute top-50 start-0 translate-middle-y z-3 d-flex align-items-center justify-content-center"
+			        onclick="slideExam(-1)"
+			        style="width: 40px; height: 40px; left: -15px !important;">
+				<i class="fa-solid fa-chevron-left text-secondary"></i>
+			</button>
+
+			<div class="d-flex flex-nowrap overflow-x-auto gap-3 py-2 hide-scrollbar"
+			     id="examCardSlider"
+			     style="scroll-behavior: smooth;">
+
+					<div class="exam-slide-item">
+						<div class="card-vertical exam-card border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
+							<div class="exam-front">
+								<div class="mb-3">
+									<i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
+								</div>
+								<h5 class="fw-bold mb-1">정보처리기사</h5>
+								<p class="text-muted small mb-3">상시시험</p>
+								<button type="button" class="btn btn-primary w-100 fw-bold py-2 rounded-3" onclick="toggleExamOptions(this)">
+									응시하기
+								</button>
+							</div>
+
+							<div class="exam-options d-none flex-column h-100 justify-content-center">
+								<h6 class="fw-bold mb-3 text-dark">문제 수를 선택하세요</h6>
+								<div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사', 1, 20)">20제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사', 1, 40)">40제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사', 1, 60)">60제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사', 1, 80)">80제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사', 1, 100)">100제</button>
+								</div>
+								<button type="button" class="btn btn-light btn-sm text-muted mt-auto w-100" onclick="toggleExamOptions(this)">
+									<i class="fa-solid fa-arrow-left"></i> 뒤로
+								</button>
+							</div>
 						</div>
-						<h5 class="fw-bold mb-1">정보처리기사</h5>
-						<p class="text-muted small mb-4">상시시험</p>
-						<button type="button" class="btn text-white w-100 mt-auto fw-bold" style="background-color: var(--main-color, #0d6efd);" onclick="toggleExamOptions(this)">
-							응시하기
-						</button>
 					</div>
-	
-					<div class="exam-options d-none flex-column h-100 justify-content-center">
-						<h6 class="fw-bold mb-3 text-dark">문제 수를 선택하세요</h6>
-						<div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
-							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사',1, 20)">20제</button>
-							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사',1, 40)">40제</button>
-							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사',1, 60)">60제</button>
-							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사',1, 80)">80제</button>
-							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보처리기사',1, 100)">100제</button>
+					<div class="exam-slide-item">
+						<div class="card-vertical exam-card border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
+							<div class="exam-front">
+								<div class="mb-3">
+									<i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
+								</div>
+								<h5 class="fw-bold mb-1">정보보안기사</h5>
+								<p class="text-muted small mb-3">상시시험</p>
+								<button type="button" class="btn btn-primary w-100 fw-bold py-2 rounded-3" onclick="toggleExamOptions(this)">
+									응시하기
+								</button>
+							</div>
+
+							<div class="exam-options d-none flex-column h-100 justify-content-center">
+								<h6 class="fw-bold mb-3 text-dark">문제 수를 선택하세요</h6>
+								<div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사', 2, 20)">20제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사', 2, 40)">40제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사', 2, 60)">60제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사', 2, 80)">80제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사', 2, 100)">100제</button>
+								</div>
+								<button type="button" class="btn btn-light btn-sm text-muted mt-auto w-100" onclick="toggleExamOptions(this)">
+									<i class="fa-solid fa-arrow-left"></i> 뒤로
+								</button>
+							</div>
 						</div>
-						<button type="button" class="btn btn-light btn-sm text-muted mt-auto w-100" onclick="toggleExamOptions(this)">
-							<i class="fa-solid fa-arrow-left"></i> 뒤로
-						</button>
+					</div>
+					<div class="exam-slide-item">
+						<div class="card-vertical exam-card border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
+							<div class="exam-front">
+								<div class="mb-3">
+									<i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
+								</div>
+								<h5 class="fw-bold mb-1">SQLD</h5>
+								<p class="text-muted small mb-3">상시시험</p>
+								<button type="button" class="btn btn-primary w-100 fw-bold py-2 rounded-3" onclick="toggleExamOptions(this)">
+									응시하기
+								</button>
+							</div>
+
+							<div class="exam-options d-none flex-column h-100 justify-content-center">
+								<h6 class="fw-bold mb-3 text-dark">문제 수를 선택하세요</h6>
+								<div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('SQLD', 3, 20)">20제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('SQLD', 3, 40)">40제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('SQLD', 3, 60)">60제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('SQLD', 3, 80)">80제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('SQLD', 3, 100)">100제</button>
+								</div>
+								<button type="button" class="btn btn-light btn-sm text-muted mt-auto w-100" onclick="toggleExamOptions(this)">
+									<i class="fa-solid fa-arrow-left"></i> 뒤로
+								</button>
+							</div>
+						</div>
+					</div>
+					<div class="exam-slide-item">
+						<div class="card-vertical exam-card border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
+							<div class="exam-front">
+								<div class="mb-3">
+									<i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
+								</div>
+								<h5 class="fw-bold mb-1">리눅스 마스터</h5>
+								<p class="text-muted small mb-3">상시시험</p>
+								<button type="button" class="btn btn-primary w-100 fw-bold py-2 rounded-3" onclick="toggleExamOptions(this)">
+									응시하기
+								</button>
+							</div>
+
+							<div class="exam-options d-none flex-column h-100 justify-content-center">
+								<h6 class="fw-bold mb-3 text-dark">문제 수를 선택하세요</h6>
+								<div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('리눅스 마스터', 4, 20)">20제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('리눅스 마스터', 4, 40)">40제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('리눅스 마스터', 4, 60)">60제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('리눅스 마스터', 4, 80)">80제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('리눅스 마스터', 4, 100)">100제</button>
+								</div>
+								<button type="button" class="btn btn-light btn-sm text-muted mt-auto w-100" onclick="toggleExamOptions(this)">
+									<i class="fa-solid fa-arrow-left"></i> 뒤로
+								</button>
+							</div>
+						</div>
+					</div>
+					<div class="exam-slide-item">
+						<div class="card-vertical exam-card border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
+							<div class="exam-front">
+								<div class="mb-3">
+									<i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
+								</div>
+								<h5 class="fw-bold mb-1">빅데이터 분석기사</h5>
+								<p class="text-muted small mb-3">상시시험</p>
+								<button type="button" class="btn btn-primary w-100 fw-bold py-2 rounded-3" onclick="toggleExamOptions(this)">
+									응시하기
+								</button>
+							</div>
+
+							<div class="exam-options d-none flex-column h-100 justify-content-center">
+								<h6 class="fw-bold mb-3 text-dark">문제 수를 선택하세요</h6>
+								<div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('빅데이터 분석기사', 5, 20)">20제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('빅데이터 분석기사', 5, 40)">40제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('빅데이터 분석기사', 5, 60)">60제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('빅데이터 분석기사', 5, 80)">80제</button>
+									<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('빅데이터 분석기사', 5, 100)">100제</button>
+								</div>
+								<button type="button" class="btn btn-light btn-sm text-muted mt-auto w-100" onclick="toggleExamOptions(this)">
+									<i class="fa-solid fa-arrow-left"></i> 뒤로
+								</button>
+							</div>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div class="col-md-4">
-				<div class="card-vertical shadow-sm border rounded-3 p-4 text-center h-100 d-flex flex-column justify-content-center" style="background-color: #fff;">
-					<div class="exam-front">
-						<div class="mb-3">
-							<i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
-						</div>
-						<h5 class="fw-bold mb-1">정보보안기사</h5>
-						<p class="text-muted small mb-4">상시시험</p>
-						<button type="button" class="btn text-white w-100 mt-auto fw-bold" style="background-color: var(--main-color, #0d6efd);" onclick="toggleExamOptions(this)">
-							응시하기
-						</button>
-					</div>
-	
-					<div class="exam-options d-none flex-column h-100 justify-content-center">
-						<h6 class="fw-bold mb-3 text-dark">문제 수를 선택하세요</h6>
-						<div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
-							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사',2, 20)">20제</button>
-							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사',2, 40)">40제</button>
-							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사',2, 60)">60제</button>
-							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사',2, 80)">80제</button>
-							<button class="btn btn-outline-primary btn-sm px-3" onclick="startExam('정보보안기사',2, 100)">100제</button>
-						</div>
-						<button type="button" class="btn btn-light btn-sm text-muted mt-auto w-100" onclick="toggleExamOptions(this)">
-							<i class="fa-solid fa-arrow-left"></i> 뒤로
-						</button>
-					</div>
-				</div>
-			</div>
+				<button type="button"
+						class="btn btn-light rounded-circle border position-absolute top-50 end-0 translate-middle-y z-3 d-flex align-items-center justify-content-center"
+						onclick="slideExam(1)"
+						style="width: 40px; height: 40px; right: -15px !important;">
+					<i class="fa-solid fa-chevron-right text-secondary"></i>
+				</button>
 		</div>
 	</section>
 
@@ -352,6 +458,18 @@ function slideCourse(direction) {
             slider.scrollLeft-=slideAmount
         }
     }
+}
+function slideExam(direction) {
+	const slider=document.getElementById('examCardSlider')
+	if (!slider) return
+
+	const firstCard=slider.querySelector('.exam-slide-item')
+	const scrollAmount=firstCard?(firstCard.clientWidth + 16):260
+
+	slider.scrollBy({
+		left: direction * scrollAmount,
+		behavior: 'smooth'
+	})
 }
 </script>
 <script src="/vue/exam/scheduledExamList.js"></script>
