@@ -17,13 +17,14 @@ public class ExamController {
 	}
 
 	@GetMapping("/exam/detail")
-	public String exam_detail(@RequestParam(value="theme",required=false)Integer theme,@RequestParam(value="count",defaultValue="20")int count, HttpSession session, Model model) {
-		String mid=(String)session.getAttribute("member_id");
+	public String exam_detail(@RequestParam(value="theme",required=false)Integer theme,@RequestParam(value="count",defaultValue="20")int count, @RequestParam(value="examNo",required=false)Integer examNo, HttpSession session, Model model) {
+		Integer mid=(Integer)session.getAttribute("member_id");
 		String name=(String)session.getAttribute("name");
 		model.addAttribute("mid", mid);
 		model.addAttribute("name", name);
 		model.addAttribute("theme", theme);
         model.addAttribute("count", count);
+		model.addAttribute("examNo", examNo);
 		model.addAttribute("main_html", "exam/detail");
 		return "main/main";
 	}

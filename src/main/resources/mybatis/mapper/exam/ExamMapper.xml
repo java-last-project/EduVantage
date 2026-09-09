@@ -4,12 +4,17 @@
 	<resultMap id="questionMap" type="com.sist.web.domain.exam.vo.ExamQuestionVO">
 		<id property="no" column="NO"/>
 		<result property="title" column="TITLE"/>
+		<result property="image" column="IMAGE"/>
+		<result property="answer" column="ANSWER"/>
+		<result property="score" column="SCORE"/>
+		<result property="description" column="DESCRIPTION"/>
 		<result property="type" column="TYPE"/>
 		<result property="theme" column="THEME"/>
-		<result property="score" column="SCORE"/>
+		<result property="difficulty" column="DIFFICULTY"/>
 
 		<association property="ovo" javaType="com.sist.web.domain.exam.vo.ExamOptionVO">
 			<id property="no" column="OPTION_NO"/>
+			<result property="question_no" column="QUESTION_NO"/>
 			<result property="option1" column="OPTION1"/>
 			<result property="option2" column="OPTION2"/>
 			<result property="option3" column="OPTION3"/>
@@ -17,30 +22,54 @@
 		</association>
 	</resultMap>
 
+<!--	<select id="examDetailData" resultMap="questionMap" parameterType="hashmap">-->
+<!--		SELECT *-->
+<!--		FROM (-->
+<!--		    SELECT q.no,q.title,q.image,q.answer,o.option1,o.option2,o.option3,o.option4,q.type,q.theme,q.score-->
+<!--		    FROM EXAM_QUESTION q-->
+<!--		    LEFT JOIN EXAM_OPTION o ON q.no=o.question_no-->
+<!--			<where>-->
+<!--				<if test="theme!=null and theme!=0">-->
+<!--					q.theme=#{theme}-->
+<!--				</if>-->
+<!--       		</where>-->
+<!--		    ORDER BY DBMS_RANDOM.VALUE-->
+<!--		)-->
+<!--		WHERE ROWNUM &lt;=#{count}-->
+<!--	</select>-->
+
 	<select id="examDetailData" resultMap="questionMap" parameterType="hashmap">
-		SELECT *
+		SELECT q.no,q.title,q.image,q.answer,o.option1,o.option2,o.option3,o.option4,q.type,q.theme,q.score
 		FROM (
-		    SELECT q.no,q.title,o.option1,o.option2,o.option3,o.option4,q.type,q.theme,q.score
-		    FROM EXAM_QUESTION q
-		    LEFT JOIN EXAM_OPTION o ON q.no=o.question_no
-			<where>
-				<if test="theme!=null and theme!=0">
-					q.theme=#{theme}
-				</if>
-       		</where>
-		    ORDER BY DBMS_RANDOM.VALUE
-		)
-		WHERE ROWNUM &lt;=#{count}
+			SELECT *
+			FROM EXAM_QUESTION
+			    <choose>
+					<when test="exam_no!=null and exam_no!=0">
+						WHERE no IN(
+						    SELECT question_no
+						    FROM SCHEDULED_EXAM_MAP
+						    WHERE exam_no=#{exam_no}
+						)
+					</when>
+					<otherwise>
+						WHERE theme=#{theme}
+						ORDER BY DBMS_RANDOM.VALUE
+					</otherwise>
+				</choose>
+			) q
+			LEFT JOIN EXAM_OPTION o ON q.no=o.question_no
+			<if test="exam_no==null or exam_no==0">
+				WHERE ROWNUM &lt;= #{count}
+			</if>
+			ORDER BY q.no
 	</select>
 	
 	<insert id="insertEnrollment" parameterType="com.sist.web.domain.exam.vo.ExamEnrollmentVO"
-	        useGeneratedKeys="true" keyProperty="no">
+	        useGeneratedKeys="true" keyProperty="no" keyColumn="no">
 	    INSERT INTO exam_enrollment
 	    <trim prefix="(" suffix=")" suffixOverrides=",">
 	        member_id,
-	        regdate,
 	        starttime,
-	        endtime,
 	        <if test="theme != null and theme != 0">
 	            theme,
 	        </if>
@@ -50,9 +79,7 @@
 	    </trim>
 	    <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
 	        #{member_id},
-	        SYSDATE,
 	        #{starttime},
-	        #{endtime},
 	        <if test="theme != null and theme != 0">
 	            #{theme},
 	        </if>
@@ -61,4 +88,29 @@
 	        </if>
 	    </trim>
 	</insert>
+
+	<select id="getScheduledExamTitle" parameterType="int" resultType="string">
+		SELECT title
+		FROM SCHEDULED_EXAM
+		WHERE no=#{examNo}
+	</select>
+
+	<update id="setExamEndTime" parameterType="int">
+		UPDATE EXAM_ENROLLMENT
+		SET endtime=SYSTIMESTAMP
+		WHERE no=#{no}
+	</update>
+
+	<insert id="userAnswerInput" parameterType="com.sist.web.domain.exam.vo.ExamUserAnswerVO">
+		INSERT INTO EXAM_USER_ANSWER (ENROLLMENT_NO, QUESTION_NO, USER_ANSWER)
+		VALUES(#{enrollment_no},#{question_no},#{user_answer})
+	</insert>
+
+	<select id="getQuestionAnswer" parameterType="int" resultType="string">
+		SELECT answer
+		FROM EXAM_QUESTION
+		WHERE no=#{question_no}
+	</select>
+
+
 </mapper>

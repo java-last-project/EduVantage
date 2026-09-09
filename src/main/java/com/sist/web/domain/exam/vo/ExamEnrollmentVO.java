@@ -14,7 +14,7 @@ import lombok.Data;
 //TOTALSCORE          NUMBER(3)   
 @Data
 public class ExamEnrollmentVO {
-	private int no,member_id,exam_no,totalscore;
+	private Integer no,member_id,exam_no,totalscore,theme;
 	private LocalDateTime starttime,endtime,regdate;
 	private String dbday;
 	private ExamOptionVO ovo;

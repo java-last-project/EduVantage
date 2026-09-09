@@ -15,4 +15,5 @@ public interface ExamMapper {
 	
 	public List<ExamQuestionVO> examDetailData(Map<String,Object> map);
 	public void insertEnrollment(ExamEnrollmentVO vo);
+	public String getScheduledExamTitle(Integer examNo);
 }
