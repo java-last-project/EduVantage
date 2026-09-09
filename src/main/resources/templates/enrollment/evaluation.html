@@ -1,78 +1,191 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+  <meta charset="UTF-8">
+  <title>Insert title here</title>
+  <script th:inline="javascript">
+    const SESSION_ID = /*[[${session.member_id}]]*/ 0
+    const COURSE_NO = /*[[${course_no}]]*/ 0
+  </script>
 </head>
 <body>
-<div class="flex-grow-1 p-4">
-  <div class="card border mb-3">
-    <div class="card-body d-flex align-items-center gap-3">
-      <img th:src="${vo.thumbnail}" style="height: 100px">
-      <div class="flex-grow-1" style="min-width: 0;">
-        <div class="fw-bold text-truncate">[[${vo.title}]]</div>
-        <div class="text-secondary small">[[${vo.instructor}]]</div>
-      </div>
-      <div class="text-center flex-shrink-0" style="width: 130px;">
-        <div class="fs-3 fw-bold">[[${vo.star}]]</div>
-        <div style="color: #f5a623; letter-spacing: 1px;">★★★★☆</div>
-        <div class="d-flex justify-content-center gap-1 mt-1">
-          <span class="badge rounded-pill text-bg-light border small">리뷰 [[${eCount}]]개</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 리뷰 작성 -->
-  <div class="card border mb-3">
-    <div class="card-body">
-      <h6 class="fw-bold mb-3">리뷰 작성</h6>
-
-      <div class="mb-3">
-        <div class="text-secondary small mb-1">별점 선택</div>
-        <div style="font-size: 22px; letter-spacing: 2px; color: #dee2e6; cursor: pointer;">
-          ★★★★★
-        </div>
-      </div>
-
-      <div class="mb-2">
-        <div class="text-secondary small mb-1">강의평 입력</div>
-        <textarea class="form-control" rows="4" maxlength="500" placeholder="수강하신 강의는 어떠셨나요? 솔직한 후기를 남겨주세요."></textarea>
-        <div class="text-secondary small text-end mt-1">0 / 500자</div>
-      </div>
-
-      <div class="d-flex justify-content-end gap-2">
-        <button class="btn btn-dark btn-sm px-3">등록</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="card border">
-    <div class="card-body p-0">
-
-      <div th:each="evo:${eList}"
-           class="d-flex align-items-start gap-3 p-3" style="border-bottom: 1px solid #f1f3f5;">
-        <div class="bg-light rounded-circle flex-shrink-0" style="width: 44px; height: 44px;"></div>
+  <div class="flex-grow-1 p-4" id="evaluation">
+    <div class="card border mb-3">
+      <div class="card-body d-flex align-items-center gap-3">
+        <img :src="store.cvo.thumbnail" style="height: 100px">
         <div class="flex-grow-1" style="min-width: 0;">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <div class="d-flex align-items-center gap-2">
-              <span class="fw-semibold small">[[${evo.name}]]</span>
-              <span style="color: #f5a623; font-size: 13px; letter-spacing: 1px;">
-			    <span th:each="i : ${#numbers.sequence(1,5)}" 
-			      th:text="${i <= evo.rating} ? '★' : '☆'"></span>
-			  </span>
-            </div>
-            <span class="text-secondary small flex-shrink-0">[[${evo.dbday}]]</span>
+          <div class="fw-bold text-truncate">{{store.cvo.title}}</div>
+          <div class="text-secondary small">{{store.cvo.instructor}}</div>
+        </div>
+        <div class="text-center flex-shrink-0" style="width: 130px;">
+          <div class="fs-3 fw-bold">{{store.star}}</div>
+          <div style="color: #f5a623; letter-spacing: 1px;">
+            <span v-for="i in 5" :key="i">
+              {{i&lt;=Math.round(store.star)?'★':'☆'}}
+            </span>
           </div>
-          <div class="text-secondary small mb-2">[[${evo.review}]]</div>
-          <button class="btn btn-outline-secondary btn-sm px-2 py-0" style="font-size: 12px;">
-            👍 좋아요 [[${evo.like_count}]]
-          </button>
+          <div class="d-flex justify-content-center gap-1 mt-1">
+            <span class="badge rounded-pill text-bg-light border small">리뷰 {{store.eCount}}개</span>
+          </div>
         </div>
       </div>
+    </div>
 
+    <div class="card border mb-3" v-if="store.evo===null">
+      <div class="card-body">
+        <h6 class="fw-bold mb-3">리뷰 작성</h6>
+
+        <div class="mb-3">
+          <div class="text-secondary small mb-1">별점 선택</div>
+          <div style="font-size: 22px; letter-spacing: 2px; color: #dee2e6; cursor: pointer;">
+            <span v-for="i in 5" :key="i"
+                  :style="{ color: i <= store.rating ? '#ffc107' : '#dee2e6' }"
+                  @click="store.setRating(i)">★</span>
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <div class="text-secondary small mb-1">강의평 입력</div>
+          <textarea v-model="store.review" class="form-control" rows="4" maxlength="500" placeholder="수강하신 강의는 어떠셨나요? 솔직한 후기를 남겨주세요."></textarea>
+          <div class="text-secondary small text-end mt-1">{{store.review.length}} / 500자</div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+          <button class="btn btn-dark btn-sm px-3" @click="store.evaluationInsert">등록</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border mb-3" v-else>
+      <div class="card-body">
+        <h6 class="fw-bold mb-3">내가 작성한 리뷰</h6>
+
+        <div class="d-flex align-items-start gap-3 p-3" style="border-bottom: 1px solid #f1f3f5;">
+          <div class="bg-light rounded-circle flex-shrink-0" style="width: 50px; height: 50px;">
+            <img src="/icon/profile.png" style="width: 100%">
+          </div>
+          <div class="flex-grow-1" style="min-width: 0;">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <div class="d-flex align-items-center gap-2">
+                <span class="fw-semibold small">{{store.evo.name}}</span>
+                <span class="text-secondary small flex-shrink-0">{{store.evo.dbday}}</span>
+              </div>
+              <div class="d-flex gap-2">
+                <button @click.prevent="store.toggleUpdateForm" class="btn btn-outline-info btn-lg px-2 py-0" style="font-size: 14px;">
+                  <div v-if="!store.showUpdateForm">수정</div>
+                  <div v-if="store.showUpdateForm">닫기</div>
+                </button>
+                <button @click="store.evaluationDelete(store.evo.no)" class="btn btn-outline-danger btn-lg px-2 py-0" style="font-size: 14px;">삭제</button>
+              </div>
+            </div>
+
+            <div class="mb-2" style="color: #f5a623; font-size: 13px; letter-spacing: 1px;">
+              <span v-for="i in 5" :key="i">{{ i <= store.evo.rating ? '★' : '☆' }}</span>
+            </div>
+
+            <div class="text-secondary small mb-2">{{store.evo.review}}</div>
+          </div>
+        </div>
+
+        <div class="mt-3 p-3" v-show="store.showUpdateForm">
+          <div class="mb-3">
+            <div class="text-secondary small mb-1">별점 선택</div>
+            <div style="font-size: 22px; letter-spacing: 2px; color: #dee2e6; cursor: pointer;">
+              <span v-for="i in 5" :key="i"
+                    :style="{ color: i <= store.rating ? '#ffc107' : '#dee2e6' }"
+                    @click="store.setRating(i)">★</span>
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <div class="text-secondary small mb-1">강의평 입력</div>
+            <textarea v-model="store.review" class="form-control" rows="4" maxlength="500" placeholder="수강하신 강의는 어떠셨나요? 솔직한 후기를 남겨주세요."></textarea>
+            <div class="text-secondary small text-end mt-1">{{store.review.length}} / 500자</div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-dark btn-sm px-3" @click="store.evaluationUpdate">수정</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border">
+      <div class="card-body p-0" v-if="store.eList.length>0">
+        <div v-for="(envo,i) in store.eList" :key="i"
+             :style="store.member_id===envo.member_id?'background-color: #fffdf5':''"
+             class="d-flex align-items-start gap-3 p-3" style="border-bottom: 1px solid #f1f3f5;">
+          <div class="bg-light rounded-circle flex-shrink-0" style="width: 50px; height: 50px;">
+            <img src="/icon/profile.png" style="width: 100%">
+          </div>
+          <div class="flex-grow-1" style="min-width: 0;">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <div class="d-flex align-items-center gap-2">
+                <span class="fw-semibold small">{{envo.name}}</span>
+                <span class="text-secondary small flex-shrink-0">{{envo.dbday}}</span>
+              </div>
+            </div>
+
+            <div class="mb-2" style="color: #f5a623; font-size: 13px; letter-spacing: 1px;">
+              <span v-for="i in 5" :key="i">{{ i <= envo.rating ? '★' : '☆' }}</span>
+            </div>
+
+            <div class="text-secondary small mb-2">{{envo.review}}</div>
+
+            <button v-if="envo.liked===0" @click="store.evaluationLikeOn(envo.no)" class="btn btn-outline-secondary btn-sm px-2 py-0" style="font-size: 12px;">
+              👍 좋아요 {{envo.like_count}}
+            </button>
+            <button v-else @click="store.evaluationLikeOff(envo.no)" class="btn btn-success btn-sm px-2 py-0" style="font-size: 12px;">
+              👍 좋아요 {{envo.like_count}}
+            </button>
+          </div>
+        </div>
+        <ul class="pagination justify-content-center border-0 m-3">
+          <li class="page-item" v-if="store.startpage>1">
+            <a class="page-link border-0 text-muted" style="cursor: pointer;" @click="store.move(store.startpage-1)">
+              <i class="fa-solid fa-chevron-left"></i>
+            </a>
+          </li>
+          <li class="page-item" v-for="(i,index) in store.range" :key="index">
+            <a class="page-link border-0 rounded-circle mx-1 custom-page-btn" :class="{'active':store.curpage===i}" @click="store.move(i)">
+              {{i}}
+            </a>
+          </li>
+          <li class="page-item" v-if="store.endpage<store.totalpage">
+            <a class="page-link border-0 text-muted" style="cursor: pointer;" @click="store.move(store.endpage+1)">
+              <i class="fa-solid fa-chevron-right"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div v-else class="text-center text-secondary py-5">
+        <div style="font-size: 40px; margin-bottom: 12px;">📝</div>
+        <div class="fw-semibold mb-1">아직 작성된 리뷰가 없어요</div>
+        <div class="small">이 강의를 수강하고 첫 번째 리뷰를 남겨보세요!</div>
+      </div>
     </div>
   </div>
-</div>
+  <script src="/vue/enrollment/evaluation/evalStore.js"></script>
+  <script>
+    const {createApp,onMounted}=Vue
+    const {createPinia}=Pinia
+
+    const evalApp=createApp({
+      setup(){
+        const store=useEvalStore()
+        onMounted(()=>{
+          store.member_id=SESSION_ID
+          store.courseData(COURSE_NO)
+          store.myEvalData()
+          store.evaluationListData()
+        })
+        return {
+          store
+        }
+      }
+    })
+    evalApp.use(createPinia())
+    evalApp.mount('#evaluation')
+  </script>
 </body>
 </html>
