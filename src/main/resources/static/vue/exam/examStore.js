@@ -2,23 +2,30 @@
 const {defineStore}=Pinia
 const initialState=()=>({
     list:[],
-    type:0,
-    count:1
+    theme:0,
+    count:1,
+	enrollmentNo:null,
+	username:'',
+	examNo:null,
+	title:''
 })
 const useExamStore=defineStore('exam_store',{
     state:initialState,
     actions:{
         async examDetailData(params){
 			if (params) {
-				this.type = params.type;
-				this.count = params.count;
+				this.theme=params.theme ?? this.theme
+				this.count=params.count ?? this.count
+				this.examNo=params.examNo ?? this.examNo
 			}
 			try{
 	            const res=await api.post('/exam/detail_vue', {
-	                type: this.type,
-	                count: this.count
+	                theme: this.theme,
+	                count: this.count,
+					examNo: this.examNo
 	            })
-	            console.log(res.data)
+	            this.enrollmentNo=res.data.enrollmentNo
+				this.title=res.data.title
 	            this.list=res.data.list
 			}catch(error){
 			console.error(error)
