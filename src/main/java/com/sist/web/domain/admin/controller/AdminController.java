@@ -1,11 +1,13 @@
 package com.sist.web.domain.admin.controller;
 
+import org.apache.naming.StringManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.sist.web.domain.admin.service.AdminService;
+import com.sist.web.domain.course.vo.CourseVO;
 import com.sist.web.domain.member.vo.MemberVO;
 
 import lombok.RequiredArgsConstructor;
@@ -118,8 +120,52 @@ public class AdminController
 	}
 	
 	@GetMapping("/admin/course")
-	public String admin_course(Model model)
+	public String admin_course(@RequestParam(value="page", required = false) String page,
+								@RequestParam(value="title", required = false) String title,
+								Model model)
 	{
+		if(page==null) page = "1";
+		List<Map<String, Object>> list = null;
+		
+		int pageNum = Integer.parseInt(page);
+		int count = 0;
+		
+		// 강의명 값이 들어오면 검색모드
+		if(title != null && !title.isEmpty())
+		{
+			list = aService.adminFindCourseListData(title, pageNum);
+			count = aService.adminGetCountFindCourse(title);
+			model.addAttribute("title", title);
+		}
+		else
+		{
+			list = aService.adminCourseListData(pageNum);			
+			count = aService.adminGetCountCourse();
+		}
+		
+		int totalpage = (int)(Math.ceil(count/10.0));
+		final int BLOCK = 10;
+		int startPage = ((pageNum-1)/BLOCK*BLOCK)+1;
+		int endPage = ((pageNum-1)/BLOCK*BLOCK)+BLOCK;
+		
+		if(endPage>totalpage)
+			endPage = totalpage;
+		
+		
+		int startNum = (pageNum-1) * 10 + 1;
+		int endNum = pageNum * 10 > count ? count : pageNum * 10;
+		
+		model.addAttribute("startNum", startNum);
+		model.addAttribute("endNum", endNum);
+		
+		model.addAttribute("list", list);
+		model.addAttribute("curpage", pageNum);
+		model.addAttribute("totalpage", totalpage);
+		model.addAttribute("startPage", startPage);
+		model.addAttribute("endPage", endPage);
+		
+		model.addAttribute("count", count);
+		
 		model.addAttribute("admin_html", "admin/course");
 		model.addAttribute("main_html", "admin/main");
 		return "main/main";
@@ -152,6 +198,34 @@ public class AdminController
 	@GetMapping("/admin/dashboard")
 	public String admin_dashboard(Model model)
 	{
+		int memberCount = aService.getTotalMember();
+		int courseCount = aService.adminGetCountCourse();
+		int instCount = aService.adminGetTotalInstCount();
+		List<CourseVO> list = aService.adminGetBest5Course();
+		
+		// 화면 프로그래스 바 출력용 데이터 구하기 
+		int maxCount = list.get(0).getStudent_count();
+		
+		List<Map<String, Object>> bestCounts = new ArrayList<>();
+		for(CourseVO vo : list)
+		{
+			int percent = Math.round((vo.getStudent_count() * 100f) / maxCount);
+			
+			Map<String, Object> map = new HashMap<>();
+			map.put("no", vo.getNo());
+			map.put("title", vo.getTitle());
+			map.put("student_count", vo.getStudent_count());
+			map.put("percent", percent);
+			
+			bestCounts.add(map);
+		}
+		
+		
+		model.addAttribute("memberCount", memberCount);
+		model.addAttribute("courseCount", courseCount);
+		model.addAttribute("instCount", instCount);
+		model.addAttribute("list", bestCounts);
+		
 		model.addAttribute("admin_html", "admin/dashboard");
 		model.addAttribute("main_html", "admin/main");
 		return "main/main";

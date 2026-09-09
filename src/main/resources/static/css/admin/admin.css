@@ -189,9 +189,6 @@
 	}
 	.page-btn.nav{ color:var(--text-muted); }
 
-	@media (max-width:900px){
-		.main{ padding:20px; }
-	}
 	
 	.page-btn a{
 	display:flex;
@@ -339,5 +336,139 @@
 		font-size:14px;
 		color:var(--text-main);
 		line-height:1.6;
+	}
+	
+	.course-name{ display:flex; align-items:center; gap:12px; }
+	.course-thumb-sm{
+		width:44px; height:44px;
+		border-radius:6px;
+		background:#e2e8f0;
+		color:#94a3b8;
+		display:flex;
+		align-items:center;
+		justify-content:center;
+		font-size:16px;
+		flex-shrink:0;
+	}
+	.course-title-text{ font-weight:500; color:var(--text-main); }
+	.course-category-text{ font-size:12px; color:var(--text-muted); margin-top:2px; }
+
+	.price-text{ color:var(--text-main); font-weight:500; }
+	
+	.img-placeholder img{
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.plain-link {
+    color: inherit;
+    text-decoration: none;
+}
+.plain-link:hover {
+    text-decoration: underline; /* 선택사항: 마우스 올렸을 때만 밑줄 */
+}
+
+.stat-grid{
+		display:grid;
+		grid-template-columns:repeat(3, 1fr);
+		gap:16px;
+		margin-bottom:24px;
+	}
+	.stat-card{
+		background:#ffffff;
+		border:1px solid var(--border-color);
+		border-radius:10px;
+		padding:20px 24px;
+		display:flex;
+		align-items:center;
+		gap:16px;
+	}
+	.stat-icon{
+		width:48px; height:48px;
+		border-radius:10px;
+		display:flex;
+		align-items:center;
+		justify-content:center;
+		font-size:18px;
+		flex-shrink:0;
+		color:#ffffff;
+	}
+	.stat-icon.member{ background:var(--main-color, #2563eb); }
+	.stat-icon.revenue{ background:#16a34a; }
+	.stat-icon.student{ background:#f59e0b; }
+
+	.stat-label{ font-size:13px; color:var(--text-muted); margin-bottom:4px; }
+	.stat-value{ font-size:22px; font-weight:700; color:var(--text-main); }
+	
+	.table-card-header{
+		padding:20px 24px;
+		border-bottom:1px solid var(--border-color);
+	}
+	.table-card-title{
+		font-size:16px;
+		font-weight:700;
+		color:var(--text-main);
+		margin:0 0 2px;
+	}
+	.table-card-desc{
+		font-size:13px;
+		color:var(--text-muted);
+		margin:0;
+	}
+
+	.rank-list{ padding:8px 24px 20px; }
+	.rank-row{
+		display:flex;
+		align-items:center;
+		gap:16px;
+		padding:14px 0;
+		border-bottom:1px solid var(--border-color);
+	}
+	.rank-row:last-child{ border-bottom:none; }
+	.rank-num{
+		width:26px; height:26px;
+		border-radius:50%;
+		background:#f1f5f9;
+		color:var(--text-muted);
+		font-size:13px;
+		font-weight:700;
+		display:flex;
+		align-items:center;
+		justify-content:center;
+		flex-shrink:0;
+	}
+	.rank-row:nth-child(1) .rank-num{ background:var(--main-color, #2563eb); color:#fff; }
+	.rank-info{ flex:1; min-width:0; }
+	.rank-title{
+		font-size:14px;
+		font-weight:500;
+		color:var(--text-main);
+		margin-bottom:6px;
+		white-space:nowrap;
+		overflow:hidden;
+		text-overflow:ellipsis;
+	}
+	.rank-bar-track{
+		height:6px;
+		border-radius:3px;
+		background:#f1f5f9;
+		overflow:hidden;
+	}
+	.rank-bar-fill{
+		height:100%;
+		background:var(--main-color, #2563eb);
+		border-radius:3px;
+	}
+	.rank-count{
+		font-size:14px;
+		font-weight:600;
+		color:var(--text-main);
+		flex-shrink:0;
+		white-space:nowrap;
+	}
+	
+	@media (max-width:900px){
+		.main{ padding:20px; }
 	}
 	
