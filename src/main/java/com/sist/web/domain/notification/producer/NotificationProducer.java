@@ -50,4 +50,13 @@ public class NotificationProducer {
                 memberId, qnaNo, qnaTitle, UUID.randomUUID().toString()
         ));
     }
+
+    /**
+     * [WHAT] 공지사항 업로드 시, 전역 알림
+     */
+    public void publishNoticeUpload(int noticeNo, String noticeTitle){
+        kafkaTemplate.send(NotificationTopics.NOTICE_UPLOAD, new NotificationEventVO(
+                null, noticeNo, noticeTitle, null
+        ));
+    }
 }

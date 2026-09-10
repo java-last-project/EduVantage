@@ -17,7 +17,7 @@
             tabTypeMap: {
                 '커뮤니티': ['POST_COMMENTED', 'COMMENT_REPLIED'],
                 '도서': [],
-                '공지사항': [],
+                '공지사항': ['NOTICE_UPLOAD'],
                 '강의': ['COURSE_COMPLETED'],
                 '시험': ['EXAM_SUBSCRIBED']
             }
@@ -83,6 +83,11 @@
                         console.log(notification)
                         console.log(notification.related_id)
                         window.location.href="/freeboard/detail?no="+notification.related_id
+                    }
+                    if(notification.type === "NOTICE_UPLOAD"){
+                        console.log(notification)
+                        console.log(notification.related_id)
+                        window.location.href="/notice/detail?no="+notification.related_id
                     }
                 }
             },

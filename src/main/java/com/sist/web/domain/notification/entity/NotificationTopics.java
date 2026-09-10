@@ -9,4 +9,5 @@ public class NotificationTopics {
     public static final String COURSE_COMPLETED = "course-completed";
     public static final String COMMENT_REPLIED = "comment-replied";
     public static final String POST_COMMENTED = "post-commented";
+    public static final String NOTICE_UPLOAD = "notice-upload";
 }
