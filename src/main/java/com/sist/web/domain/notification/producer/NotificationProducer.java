@@ -25,29 +25,20 @@ public class NotificationProducer {
     }
 
     /**
-     * [WHAT] 대댓글 알림, 카프카 토픽에 넣는 역할
-     */
-    public void publishReplied(int memberId,  int replyNo) {
-        kafkaTemplate.send(NotificationTopics.COMMENT_REPLIED, new NotificationEventVO(
-                memberId, replyNo, null, UUID.randomUUID().toString()
-        ));
-    }
-
-    /**
      * [WHAT] 내 글에 댓글 알림, 카프카 토픽에 넣는 역할
      */
-    public void publishPostCommented(int memberId,  int qnaNo, String qnaTitle) {
+    public void publishPostCommented(int memberId,  int postNo, String qnaTitle) {
         kafkaTemplate.send(NotificationTopics.POST_COMMENTED, new NotificationEventVO(
-                memberId, qnaNo, qnaTitle, UUID.randomUUID().toString()
+                memberId, postNo, qnaTitle, UUID.randomUUID().toString()
         ));
     }
 
     /**
      * [WHAT] 내 댓글에 대댓글 알림, 카프카 토픽에 넣는 역할
      */
-    public void publishCommentReplied(int memberId, int qnaNo, String qnaTitle){
+    public void publishCommentReplied(int memberId, int postNo, String qnaTitle){
         kafkaTemplate.send(NotificationTopics.COMMENT_REPLIED, new NotificationEventVO(
-                memberId, qnaNo, qnaTitle, UUID.randomUUID().toString()
+                memberId, postNo, qnaTitle, UUID.randomUUID().toString()
         ));
     }
 
@@ -57,6 +48,15 @@ public class NotificationProducer {
     public void publishNoticeUpload(int noticeNo, String noticeTitle){
         kafkaTemplate.send(NotificationTopics.NOTICE_UPLOAD, new NotificationEventVO(
                 null, noticeNo, noticeTitle, null
+        ));
+    }
+
+    /**
+     * [WHAT] QnA 답변 시, 알림
+     */
+    public void publishQnAReplied(int memberId, int qnaNo, String qnaTitle){
+        kafkaTemplate.send(NotificationTopics.QNA_REPLIED, new NotificationEventVO(
+                memberId, qnaNo, qnaTitle, UUID.randomUUID().toString()
         ));
     }
 }

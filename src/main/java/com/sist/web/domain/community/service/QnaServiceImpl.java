@@ -106,6 +106,10 @@ public class QnaServiceImpl implements QnaService {
 		map.put("status", "Y");
 		rMapper.qnaStatusUpdate(map);
 		rMapper.qnaReplyInsert(vo);
+
+		QnaBoardVO qvo = rMapper.qnaInfo(qnaNo);
+		//이벤트 연결
+		notificationProducer.publishQnAReplied(qvo.getMember_id(), qnaNo, qvo.getSubject());
 	}
 
 	@Override

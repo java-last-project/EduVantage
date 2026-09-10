@@ -200,4 +200,36 @@ public class NotificationConsumer {
                     });
         }
     }
+
+    //QnA 답변 알림 리스너
+    @KafkaListener(topics = NotificationTopics.QNA_REPLIED, groupId = "notification-group")
+    public void handleQnAReplied(NotificationEventVO event) {
+        String title = "내 [" + event.getTarget() + "] 글에 관리자가 답변했어요!";
+        String content = "눌러서 바로 게시글로 이동해보세요.";
+
+        //db저장
+        Notifications notification = Notifications.builder()
+                .memberId(event.getMemberId())
+                .type(NotificationType.QNA_REPLIED)
+                .title(title)
+                .content(content)
+                .relatedId(event.getTargetNo())
+                .eventKey(event.getEventKey())
+                .build();
+        notificationRepository.save(notification);
+        int no = notification.getNo();
+        int related_id = notification.getRelatedId();
+
+        //유저 접속 여부 확인(emitter)
+        emitterRepository.findByMemberId(event.getMemberId())
+                //온라인
+                .ifPresent(emitter -> {
+                    try {
+                        emitter.send(SseEmitter.event()
+                                .data(Map.of("no", no, "type", NotificationType.QNA_REPLIED.toString(), "title", title, "content", content, "related_id", related_id)));
+                    } catch (IOException e) {
+                        emitterRepository.deleteByMemberId(event.getMemberId());
+                    }
+                });
+    }
 }

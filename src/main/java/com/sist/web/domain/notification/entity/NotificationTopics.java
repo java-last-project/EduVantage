@@ -10,4 +10,5 @@ public class NotificationTopics {
     public static final String COMMENT_REPLIED = "comment-replied";
     public static final String POST_COMMENTED = "post-commented";
     public static final String NOTICE_UPLOAD = "notice-upload";
+    public static final String QNA_REPLIED = "qna-replied";
 }

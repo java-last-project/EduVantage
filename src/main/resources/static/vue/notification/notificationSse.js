@@ -57,6 +57,14 @@ function showToast(type, title, content, related_id) {
         badgeEl.classList.add("text-danger", "bg-danger-subtle")
         iconEl.className = "fa-solid fa-bullhorn";
     }
+    if (type === "QNA_REPLIED"){
+        toast.addEventListener("click", ()=>{
+            window.location.href="/qna/detail?no="+related_id
+        })
+        badgeEl.classList.add("text-primary", "bg-primary-subtle")
+        iconEl.className = "fa-solid fa-bullhorn";
+    }
+
 
 
     const titleEl = document.createElement("strong")

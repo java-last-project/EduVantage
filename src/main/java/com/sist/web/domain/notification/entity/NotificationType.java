@@ -6,4 +6,5 @@ public enum NotificationType {
     COMMENT_REPLIED,
     POST_COMMENTED,
     NOTICE_UPLOAD,
+    QNA_REPLIED,
 }
