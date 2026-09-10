@@ -4,6 +4,7 @@ import com.sist.web.domain.community.entity.NoticeBoard;
 import com.sist.web.domain.community.mapper.NoticeBoardMapper;
 import com.sist.web.domain.community.repository.NoticeBoardRepository;
 import com.sist.web.domain.community.vo.NoticeBoardVO;
+import com.sist.web.domain.notification.producer.NotificationProducer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +17,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class NoticeBoardServiceImpl implements NoticeBoardService{
+    private final NotificationProducer notificationProducer;
     private final NoticeBoardMapper nMapper;
     private final NoticeBoardRepository nRepo;
     private final int ROW=20;
@@ -71,6 +73,9 @@ public class NoticeBoardServiceImpl implements NoticeBoardService{
     public Integer noticeInsert(Integer memberId, NoticeBoard vo) {
         NoticeBoard notice=new NoticeBoard(memberId,vo.getCategoryNo(),vo.getSubject(),vo.getContent());
         NoticeBoard save=nRepo.save(notice);
+
+        //이벤트 발행
+        notificationProducer.publishNoticeUpload(notice.getNo(), notice.getSubject());
         return save.getNo();
     }
 
