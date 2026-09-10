@@ -23,6 +23,7 @@ public interface MemberMapper {
 
 	public int memberAuthInsert(String username);
 
+	//전역 알림용
 	@Select("""
 			SELECT m.member_id FROM member m
 			LEFT JOIN authority a
@@ -30,5 +31,6 @@ public interface MemberMapper {
 			WHERE a.authority IN ('ROLE_INSTRUCTOR', 'ROLE_USER')
 			""")
 	public List<Integer> getAllMemberIdsExcludeAdmin();
+	public MemberVO memberDetailData(int member_id);
 }
 

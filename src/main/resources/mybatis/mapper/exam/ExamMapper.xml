@@ -4,12 +4,17 @@
 	<resultMap id="questionMap" type="com.sist.web.domain.exam.vo.ExamQuestionVO">
 		<id property="no" column="NO"/>
 		<result property="title" column="TITLE"/>
+		<result property="image" column="IMAGE"/>
+		<result property="answer" column="ANSWER"/>
+		<result property="score" column="SCORE"/>
+		<result property="description" column="DESCRIPTION"/>
 		<result property="type" column="TYPE"/>
 		<result property="theme" column="THEME"/>
-		<result property="score" column="SCORE"/>
+		<result property="difficulty" column="DIFFICULTY"/>
 
 		<association property="ovo" javaType="com.sist.web.domain.exam.vo.ExamOptionVO">
 			<id property="no" column="OPTION_NO"/>
+			<result property="question_no" column="QUESTION_NO"/>
 			<result property="option1" column="OPTION1"/>
 			<result property="option2" column="OPTION2"/>
 			<result property="option3" column="OPTION3"/>
@@ -17,30 +22,73 @@
 		</association>
 	</resultMap>
 
+<!--	<select id="examDetailData" resultMap="questionMap" parameterType="hashmap">-->
+<!--		SELECT *-->
+<!--		FROM (-->
+<!--		    SELECT q.no,q.title,q.image,q.answer,o.option1,o.option2,o.option3,o.option4,q.type,q.theme,q.score-->
+<!--		    FROM EXAM_QUESTION q-->
+<!--		    LEFT JOIN EXAM_OPTION o ON q.no=o.question_no-->
+<!--			<where>-->
+<!--				<if test="theme!=null and theme!=0">-->
+<!--					q.theme=#{theme}-->
+<!--				</if>-->
+<!--       		</where>-->
+<!--		    ORDER BY DBMS_RANDOM.VALUE-->
+<!--		)-->
+<!--		WHERE ROWNUM &lt;=#{count}-->
+<!--	</select>-->
+
 	<select id="examDetailData" resultMap="questionMap" parameterType="hashmap">
-		SELECT *
+		SELECT q.no,q.title,q.image,q.answer,o.option1,o.option2,o.option3,o.option4,q.type,q.theme,q.score
 		FROM (
-		    SELECT q.no,q.title,o.option1,o.option2,o.option3,o.option4,q.type,q.theme,q.score
-		    FROM EXAM_QUESTION q
-		    LEFT JOIN EXAM_OPTION o ON q.no=o.question_no
-			<where>
-				<if test="theme!=null and theme!=0">
-					q.theme=#{theme}
-				</if>
-       		</where>
-		    ORDER BY DBMS_RANDOM.VALUE
-		)
-		WHERE ROWNUM &lt;=#{count}
+			SELECT *
+			FROM EXAM_QUESTION
+			    <choose>
+					<when test="exam_no!=null and exam_no!=0">
+						WHERE no IN(
+						    SELECT question_no
+						    FROM SCHEDULED_EXAM_MAP
+						    WHERE exam_no=#{exam_no}
+						)
+					</when>
+					<otherwise>
+						WHERE theme=#{theme}
+						ORDER BY DBMS_RANDOM.VALUE
+					</otherwise>
+				</choose>
+			) q
+			LEFT JOIN EXAM_OPTION o ON q.no=o.question_no
+			<if test="exam_no==null or exam_no==0">
+				WHERE ROWNUM &lt;= #{count}
+			</if>
+			ORDER BY q.no
+	</select>
+	
+	<select id="findActiveEnrollment" parameterType="hashmap" resultType="com.sist.web.domain.exam.vo.ExamEnrollmentVO">
+		SELECT no, member_id, exam_no, theme, starttime
+		FROM EXAM_ENROLLMENT
+		WHERE member_id=#{member_id}
+		AND endtime IS NULL
+		<choose>
+			<when test="exam_no!=null and exam_no!=0">
+				AND exam_no=#{exam_no}
+			</when>
+			<otherwise>
+				AND theme=#{theme}
+				AND exam_no IS NULL
+			</otherwise>
+		</choose>
+		AND starttime&gt;=SYSDATE-(120/(24*60))
+		AND ROWNUM=1
+		ORDER BY starttime DESC
 	</select>
 	
 	<insert id="insertEnrollment" parameterType="com.sist.web.domain.exam.vo.ExamEnrollmentVO"
-	        useGeneratedKeys="true" keyProperty="no">
+	        useGeneratedKeys="true" keyProperty="no" keyColumn="no">
 	    INSERT INTO exam_enrollment
 	    <trim prefix="(" suffix=")" suffixOverrides=",">
 	        member_id,
-	        regdate,
 	        starttime,
-	        endtime,
 	        <if test="theme != null and theme != 0">
 	            theme,
 	        </if>
@@ -50,9 +98,7 @@
 	    </trim>
 	    <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
 	        #{member_id},
-	        SYSDATE,
 	        #{starttime},
-	        #{endtime},
 	        <if test="theme != null and theme != 0">
 	            #{theme},
 	        </if>
@@ -61,4 +107,180 @@
 	        </if>
 	    </trim>
 	</insert>
+
+	<select id="getScheduledExamTitle" parameterType="int" resultType="string">
+		SELECT title
+		FROM SCHEDULED_EXAM
+		WHERE no=#{examNo}
+	</select>
+
+<!-- 채점 -->
+	<select id="getQuestionForGrading" parameterType="list" resultType="com.sist.web.domain.exam.vo.ExamQuestionVO">
+		SELECT no, title, answer, score, type
+		FROM exam_question
+		WHERE no IN
+		<foreach item="qNo" collection="list" open="(" separator="," close=")">
+			#{qNo}
+		</foreach>
+	</select>
+
+	<insert id="insertUserAnswers" parameterType="list">
+		INSERT INTO exam_user_answer (
+		enrollment_no,
+		question_no,
+		user_answer,
+		is_correct,
+		score,
+		grader_id,
+		graded_at
+		)
+		SELECT sub.* FROM (
+		<foreach collection="list" item="item" separator=" UNION ALL ">
+			SELECT
+			#{item.enrollment_no},
+			#{item.question_no},
+			#{item.user_answer, jdbcType=VARCHAR},
+			#{item.is_correct},
+			#{item.score},
+			NULL AS grader_id,
+			NULL AS graded_at
+			FROM DUAL
+		</foreach>
+		) sub
+	</insert>
+
+	<update id="updateEnrollmentFinish" parameterType="com.sist.web.domain.exam.vo.ExamEnrollmentVO">
+		UPDATE exam_enrollment
+		SET endtime=#{endtime},
+		    totalscore=#{totalscore},
+		    status=#{status}
+		WHERE no=#{no}
+	</update>
+
+	<!--  -->
+	<select id="selectPendingSubjectiveList" parameterType="int" resultType="hashmap">
+		SELECT a.no AS "answer_no",
+		       a.enrollment_no AS "enrollment_no",
+		       a.question_no AS "question_no",
+		       a.user_answer AS "user_answer",
+		       a.grader_id AS "grader_id",
+		       q.title AS "title",
+		       q.answer AS "standard_answer",
+		       q.score AS "score",
+		       e.theme AS "theme",
+		       e.exam_no AS "exam_no"
+		FROM exam_user_answer a
+			JOIN exam_question q ON a.question_no=q.no
+			JOIN exam_enrollment e ON a.enrollment_no=e.no
+		WHERE a.is_correct='W'
+		  AND (a.grader_id IS NULL OR a.grader_id=#{graderId})
+		ORDER BY a.no
+	</select>
+
+	<update id="claimGradingTask" parameterType="hashmap">
+		UPDATE exam_user_answer
+		SET grader_id=#{graderId}
+		WHERE no=#{answerNo}
+		  AND is_correct='W'
+		  AND grader_id IS NULL
+	</update>
+
+	<update id="releaseGradingClaim" parameterType="hashmap">
+		UPDATE exam_user_answer
+		SET grader_id=NULL
+		WHERE no=#{answerNo}
+			AND grader_id=#{graderId}
+			AND is_correct='W'
+	</update>
+
+	<update id="gradeSubjectiveAnswer" parameterType="hashmap">
+		UPDATE exam_user_answer
+		SET score=#{score},
+		    is_correct=CASE WHEN #{score} &gt; 0 THEN 'Y' ELSE 'N' END,
+		    graded_at=SYSDATE
+		WHERE no=#{answerNo}
+		  AND grader_id=#{graderId}
+	</update>
+
+	<select id="countRemainingPending" parameterType="int" resultType="int">
+		SELECT COUNT(*)
+		FROM exam_user_answer
+		WHERE enrollment_no=#{enrollmentNo}
+		  AND is_correct='W'
+	</select>
+
+	<update id="finalizeEnrollmentScore" parameterType="int">
+		UPDATE exam_enrollment
+		SET totalscore=(
+			SELECT NVL(SUM(score), 0)
+			FROM exam_user_answer
+			WHERE enrollment_no=#{enrollmentNo}
+		),
+		    status='COMPLETE'
+		WHERE no=#{enrollmentNo}
+	</update>
+
+	<select id="selectExamResultMaster" parameterType="int" resultType="hashmap">
+		SELECT e.no AS enrollment_no,
+		       e.member_id AS member_id,
+		       e.exam_no AS exam_no,
+		       e.theme AS theme,
+		       NVL(e.totalscore, 0) AS total_score,
+		       e.status AS status,
+		       TO_CHAR(e.starttime, 'YYYY-MM-DD HH24:MI:SS') AS start_time,
+		       TO_CHAR(e.endtime, 'YYYY-MM-DD HH24:MI:SS') AS end_time,
+		       ROUND((CAST(e.endtime AS DATE)-CAST(e.starttime AS DATE))*24*60*60) AS spent_seconds,
+		       (SELECT COUNT(*) FROM exam_user_answer WHERE enrollment_no=e.no) AS total_count,
+		       (SELECT COUNT(*)
+		        FROM exam_user_answer a
+						 JOIN exam_question q ON a.question_no=q.no
+		        WHERE a.enrollment_no=e.no AND q.type NOT IN (1)) AS subjective_total,
+		       (SELECT COUNT(*)
+		        FROM exam_user_answer a
+						 JOIN exam_question q ON a.question_no=q.no
+		        WHERE a.enrollment_no=e.no AND q.type NOT IN (1) AND a.is_correct!='W') AS subjective_graded
+		FROM exam_enrollment e
+		WHERE e.no=#{enrollmentNo}
+	</select>
+
+	<select id="selectExamResultDetails" parameterType="int" resultType="hashmap">
+		SELECT a.no AS answer_no,
+		       a.question_no AS question_no,
+		       a.user_answer AS user_answer,
+		       a.is_correct AS is_correct,
+		       NVL(a.score, 0) AS score,
+		       q.title AS title,
+		       q.image AS image,
+		       o.option1 AS option1,
+		       o.option2 AS option2,
+		       o.option3 AS option3,
+		       o.option4 AS option4,
+		       q.answer AS standard_answer,
+		       TO_CHAR(q.description) AS description,
+		       q.type AS question_type
+		FROM EXAM_USER_ANSWER a
+			JOIN EXAM_QUESTION q ON a.question_no=q.no
+			LEFT JOIN EXAM_OPTION o ON q.no=o.question_no
+		WHERE a.enrollment_no = #{enrollmentNo}
+		ORDER BY a.question_no ASC
+	</select>
+
+	<select id="selectMyExamList" parameterType="int" resultType="hashmap">
+		SELECT e.no AS enrollment_no,
+		       e.exam_no AS exam_no,
+		       e.theme AS theme,
+		       e.totalscore AS total_score,
+		       e.status AS status,
+		       TO_CHAR(e.starttime, 'YYYY-MM-DD HH24:MI') AS start_time,
+		       TO_CHAR(e.endtime, 'YYYY-MM-DD HH24:MI') AS end_time,
+		       CASE
+				   WHEN e.exam_no IS NOT NULL THEN (SELECT title FROM scheduled_exam WHERE no = e.exam_no)
+			       ELSE '상시 모의고사'
+				   END AS exam_title
+		FROM exam_enrollment e
+		WHERE e.member_id = #{memberId}
+		  AND e.endtime IS NOT NULL
+		ORDER BY e.no DESC
+	</select>
+
 </mapper>

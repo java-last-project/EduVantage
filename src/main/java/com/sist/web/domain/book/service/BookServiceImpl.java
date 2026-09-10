@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sist.web.domain.book.mapper.BookMapper;
 import com.sist.web.domain.book.vo.BookCartVO;
 import com.sist.web.domain.book.vo.BookLikeVO;
+import com.sist.web.domain.book.vo.BookOrderDetailVO;
+import com.sist.web.domain.book.vo.BookOrderVO;
 import com.sist.web.domain.book.vo.BookVO;
 
 import lombok.RequiredArgsConstructor;
@@ -16,110 +18,140 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class BookServiceImpl implements BookService{
+public class BookServiceImpl implements BookService {
 	private final BookMapper bMapper;
+
 	@Override
 	public List<BookVO> bookListData(Map map) {
 		// TODO Auto-generated method stub
 		return bMapper.bookListData(map);
 	}
-	/*
-	 @Override
-	    public int[] bookTotalPage(int page, String category) {
-	        int totalpage = bMapper.bookTotalPage(category);
-	        int BLOCK = 10; // 화면에 보여줄 페이지 번호 개수
-	        int startPage = ((page - 1) / BLOCK) * BLOCK + 1;
-	        int endPage = startPage + BLOCK - 1;
-	        if (endPage > totalpage) {
-	            endPage = totalpage;
-	        }
-	        // 배열 반환
-	        return new int[]{page, totalpage, startPage, endPage};
-	    }
-	*/
-	 @Override
-	 public int bookTotalCount(String category) {
+
+	@Override
+	public int bookTotalCount(String category) {
 		// TODO Auto-generated method stub
 		return bMapper.bookTotalCount(category);
-	 }
+	}
 
-	 @Override
-	 public BookVO bookDetailData(int no) {
+	@Override
+	public BookVO bookDetailData(int no) {
 		// TODO Auto-generated method stub
 		bMapper.bookHitIncrement(no);
-		 return bMapper.bookDetailData(no);
-	 }
+		return bMapper.bookDetailData(no);
+	}
 
-	 @Override
-	 public int bookFindCount(Map<String, Object> map) {
+	@Override
+	public int bookFindCount(Map<String, Object> map) {
 		// TODO Auto-generated method stub
 		return bMapper.bookFindCount(map);
-	 }
+	}
 
-	 @Override
-	 public List<BookVO> bookFindData(Map<String, Object> map) {
+	@Override
+	public List<BookVO> bookFindData(Map<String, Object> map) {
 		// TODO Auto-generated method stub
 		return bMapper.bookFindData(map);
-	 }
+	}
 
-	 @Override
-	 public int bookLikeOn(BookLikeVO vo) {
+	@Override
+	public int bookLikeOn(BookLikeVO vo) {
 		// TODO Auto-generated method stub
-	     int result = bMapper.bookLikeOn(vo); 
-	     
-	     bMapper.bookLikeIncrement(vo.getBook_no()); 
-	     
-	     return result;
-	 }
+		int result = bMapper.bookLikeOn(vo);
 
-	 @Override
-	 public int bookLikeOff(BookLikeVO vo) {
+		bMapper.bookLikeIncrement(vo.getBook_no());
+
+		return result;
+	}
+
+	@Override
+	public int bookLikeOff(BookLikeVO vo) {
 		// TODO Auto-generated method stub
-	     int result = bMapper.bookLikeOff(vo); 
-	     
-	     bMapper.bookLikeDecrement(vo.getBook_no()); 
-	     
-	     return result;
-	 }
-	 @Override
-	 public int bookLikeCount(int book_no) {
+		int result = bMapper.bookLikeOff(vo);
+
+		bMapper.bookLikeDecrement(vo.getBook_no());
+
+		return result;
+	}
+
+	@Override
+	public int bookLikeCount(int book_no) {
 		// TODO Auto-generated method stub
 		return bMapper.bookLikeCount(book_no);
-	 }
+	}
 
-	 @Override
-	 public int bookLikeCheck(BookLikeVO vo) {
+	@Override
+	public int bookLikeCheck(BookLikeVO vo) {
 		// TODO Auto-generated method stub
 		return bMapper.bookLikeCheck(vo);
-	 }
-	 @Override
-	 public void bookLikeIncrement(int book_no) {
+	}
+
+	@Override
+	public void bookLikeIncrement(int book_no) {
 		// TODO Auto-generated method stub
 		bMapper.bookLikeIncrement(book_no);
-	 }
-	 @Override
-	 public void bookLikeDecrement(int book_no) {
+	}
+
+	@Override
+	public void bookLikeDecrement(int book_no) {
 		// TODO Auto-generated method stub
 		bMapper.bookLikeDecrement(book_no);
-	 }
-	 @Override
-	 public int bookCartCheck(BookCartVO vo) {
+	}
+
+	@Override
+	public int bookCartCheck(BookCartVO vo) {
 		// TODO Auto-generated method stub
 		return bMapper.bookCartCheck(vo);
-	 }
-	 @Override
-	 public void bookCartUpdate(BookCartVO vo) {
+	}
+
+	@Override
+	public void bookCartUpdate(BookCartVO vo) {
 		// TODO Auto-generated method stub
 		bMapper.bookCartUpdate(vo);
-	 }
-	 @Override
-	 public void bookCartInsert(BookCartVO vo) {
+	}
+
+	@Override
+	public void bookCartInsert(BookCartVO vo) {
 		// TODO Auto-generated method stub
 		bMapper.bookCartInsert(vo);
-	 }
-	 @Override
-	 public List<BookCartVO> bookCartListData(int member_id) {
+	}
+
+	@Override
+	public List<BookCartVO> bookCartListData(int member_id) {
 		// TODO Auto-generated method stub
 		return bMapper.bookCartListData(member_id);
-	 }
+	}
+
+	@Override
+	public List<BookOrderVO> bookOrderListData(int member_id) {
+		// TODO Auto-generated method stub
+		return bMapper.bookOrderListData(member_id);
+	}
+
+	@Override
+	public void bookOrderInsert(BookOrderVO vo) {
+		// TODO Auto-generated method stub
+		bMapper.bookOrderInsert(vo);
+	}
+
+	@Override
+	public void bookOrderDetailInsert(BookOrderDetailVO vo) {
+		// TODO Auto-generated method stub
+		bMapper.bookOrderDetailInsert(vo);
+	}
+	
+	@Override
+	public void bookOrderComplete(BookOrderVO vo, List<BookOrderDetailVO> detailList) {
+		bMapper.bookOrderInsert(vo);
+		for(BookOrderDetailVO detail : detailList) {
+			detail.setBook_order_no(vo.getNo()); 
+			bMapper.bookOrderDetailInsert(detail);
+		}
+	}
+
+	@Override
+	public List<BookVO> bookBestData() {
+		// TODO Auto-generated method stub
+		return bMapper.bookBestData();
+	}
+
+	
 }

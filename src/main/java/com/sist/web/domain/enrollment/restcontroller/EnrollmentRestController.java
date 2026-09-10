@@ -17,6 +17,8 @@ import com.sist.web.domain.course.vo.CourseVO;
 import com.sist.web.domain.enrollment.service.EnrollmentService;
 import com.sist.web.domain.enrollment.vo.CourseEvaluationLikeVO;
 import com.sist.web.domain.enrollment.vo.CourseEvaluationVO;
+import com.sist.web.domain.enrollment.vo.CourseQnaReplyVO;
+import com.sist.web.domain.enrollment.vo.CourseQnaVO;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -183,5 +185,124 @@ public class EnrollmentRestController {
 		return ResponseEntity.ok(map);
 	}
 	
+	// Qna 목록 출력
+	public Map commonsQnaListData(int page, int course_no) {
+		Map map=new HashMap();
+		List<CourseQnaVO> qList=eService.courseQnaListData(course_no, page); 
+		int[] pages=eService.qnaPages(page, course_no);
+		map.put("qList", qList);
+		
+		map.put("page", pages[0]);
+		map.put("totalpage", pages[1]);
+		map.put("startpage", pages[2]);
+		map.put("endpage", pages[3]);
+		map.put("qCount", pages[4]);
+		return map;
+	}	
 
+	// Qna
+	@GetMapping("/enrollment/qna_vue")
+	public ResponseEntity qna_vue(
+			@RequestParam("page") int page,
+			@RequestParam("course_no") int course_no,
+			HttpSession session
+			) {
+		Map map=new HashMap();
+		try {
+			map=commonsQnaListData(page, course_no);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().build();
+		}
+		return ResponseEntity.ok(map);
+	}
+	
+	@GetMapping("/enrollment/qna_detail_vue")
+	public ResponseEntity qna_detail_vue(
+			@RequestParam("no") int no,
+			HttpSession session
+			) {
+		Map map=new HashMap();
+		try {
+			CourseQnaVO curQvo=eService.courseQnaDetailData(no);
+			map.put("curQvo", curQvo);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().build();
+		}
+		return ResponseEntity.ok(map);
+	}
+	
+	@GetMapping("/enrollment/qna_reply_vue")
+	public ResponseEntity qna_reply_vue(
+			@RequestParam("course_qna_no") int course_qna_no,
+			HttpSession session
+			) {
+		Map map=new HashMap();
+		try {
+			CourseQnaReplyVO curRvo=eService.courseQnaReplyData(course_qna_no);
+			map.put("curRvo", curRvo);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().build();
+		}
+		return ResponseEntity.ok(map);
+	}
+	
+	@PostMapping("/enrollment/qna_insert_vue")
+	public ResponseEntity qna_insert_vue(
+			@RequestBody CourseQnaVO vo,
+			HttpSession session
+			) {
+		Map map=new HashMap();
+		try {
+			int member_id=(int)session.getAttribute("member_id");
+			vo.setMember_id(member_id);
+			eService.courseQnaInsert(vo);
+			map=commonsQnaListData(1, vo.getCourse_no());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().build();
+		}
+		return ResponseEntity.ok(map);
+	}
+	
+	@DeleteMapping("/enrollment/qna_delete_vue")
+	public ResponseEntity qna_delete_vue(
+			@RequestParam("no") int no,
+			@RequestParam("page") int page,
+			@RequestParam("course_no") int course_no,
+			HttpSession session
+			) {
+		Map map=new HashMap();
+		try {
+			int member_id=(int)session.getAttribute("member_id");
+			int deleted=eService.courseQnaDelete(no,member_id);
+			map=commonsQnaListData(page,course_no);
+			map.put("deleted", deleted);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().build();
+		}
+		return ResponseEntity.ok(map);
+	}
+	
+	@PutMapping("/enrollment/qna_update_vue")
+	public ResponseEntity qna_update_vue(
+			@RequestBody CourseQnaVO vo,
+			HttpSession session
+			) {
+		Map map=new HashMap();
+		try {
+			int member_id=(int)session.getAttribute("member_id");
+			vo.setMember_id(member_id);
+			int updated=eService.courseQnaUpdate(vo);
+			map=commonsQnaListData(vo.getCurpage(),vo.getCourse_no());
+			map.put("updated", updated);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().build();
+		}
+		return ResponseEntity.ok(map);
+	}
 }
