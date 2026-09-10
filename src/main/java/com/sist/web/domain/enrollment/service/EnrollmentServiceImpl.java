@@ -7,8 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sist.web.domain.course.vo.CourseVO;
 import com.sist.web.domain.enrollment.mapper.EnrollmentMapper;
+import com.sist.web.domain.enrollment.mapper.EnrollmentQnaMapper;
 import com.sist.web.domain.enrollment.vo.CourseEvaluationLikeVO;
 import com.sist.web.domain.enrollment.vo.CourseEvaluationVO;
+import com.sist.web.domain.enrollment.vo.CourseQnaReplyVO;
+import com.sist.web.domain.enrollment.vo.CourseQnaVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EnrollmentServiceImpl implements EnrollmentService {
 	private final EnrollmentMapper eMapper;
+	private final EnrollmentQnaMapper qMapper;
 	@Override
 	public CourseVO courseDetailData(int course_no) {
 		// TODO Auto-generated method stub
@@ -101,6 +105,55 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 		// TODO Auto-generated method stub
 		eMapper.evaluationUpdate(vo);
 		eMapper.courseStarUpdate(vo.getCourse_no());
+	}
+	
+	
+	// Qna
+	@Override
+	public List<CourseQnaVO> courseQnaListData(int course_no, int page) {
+		// TODO Auto-generated method stub
+		final int ROWSIZE=5;
+		int start=(page*ROWSIZE)-ROWSIZE;
+		return qMapper.courseQnaListData(course_no, start);
+	}
+	@Override
+	public CourseQnaVO courseQnaDetailData(int no) {
+		// TODO Auto-generated method stub
+		return qMapper.courseQnaDetailData(no);
+	}
+	@Override
+	public CourseQnaReplyVO courseQnaReplyData(int course_qna_no) {
+		// TODO Auto-generated method stub
+		return qMapper.courseQnaReplyData(course_qna_no);
+	}
+
+	@Override
+	public int[] qnaPages(int page, int course_no) {
+		// TODO Auto-generated method stub
+		int count=qMapper.courseQnaRowCount(course_no);
+		int totalpage=(int)Math.ceil(count/5.0);
+		final int BLOCK=10;
+		int startpage=((page-1)/BLOCK*BLOCK)+1;
+		int endpage=((page-1)/BLOCK*BLOCK)+BLOCK;
+		if(endpage>totalpage) endpage=totalpage;
+		
+		int[] pages= {page,totalpage,startpage,endpage,count};
+		return pages;
+	}
+	@Override
+	public void courseQnaInsert(CourseQnaVO vo) {
+		// TODO Auto-generated method stub
+		qMapper.courseQnaInsert(vo);
+	}
+	@Override
+	public int courseQnaDelete(int no,int member_id) {
+		// TODO Auto-generated method stub
+		return qMapper.courseQnaDelete(no,member_id);
+	}
+	@Override
+	public int courseQnaUpdate(CourseQnaVO vo) {
+		// TODO Auto-generated method stub
+		return qMapper.courseQnaUpdate(vo);
 	}
 
 }

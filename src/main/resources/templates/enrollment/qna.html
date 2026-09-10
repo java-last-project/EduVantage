@@ -3,42 +3,152 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+  <script th:inline="javascript">
+    const SESSION_ID = /*[[${session.member_id}]]*/ 0
+    const COURSE_NO = /*[[${course_no}]]*/ 0
+  </script>
 </head>
 <body>
-<div class="flex-grow-1 p-4">
+<div class="flex-grow-1 p-4" id="qna">
   
   <div class="card border">
     <div class="card-body">
 	  <h4 class="fw-bold mb-4">QnA</h4>
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <span class="text-secondary small">전체 8건</span>
+        <span class="text-secondary small">전체 {{store.qCount}}건</span>
         <div class="d-flex gap-2">
-          <a href="#" class="btn btn-dark btn-sm px-3">질문 등록</a>
+          <a href="#" @click.prevent="store.toggleInsertForm" class="btn btn-dark btn-sm px-3">{{!store.showInsertForm?'질문 등록':'취소'}}</a>
         </div>
       </div>
+<div class="mb-3 p-3" v-show="store.showInsertForm" style="background:#f8f9fa; border-radius:8px; border:1px solid #e9ecef;">
+  <h6 class="fw-bold mb-3">질문 등록</h6>
+
+  <div class="mb-2">
+    <div class="text-secondary small mb-1">제목</div>
+    <input v-model="store.newSubject" class="form-control" placeholder="질문 제목을 입력하세요">
+  </div>
+
+  <div class="mb-2">
+    <div class="text-secondary small mb-1">내용</div>
+    <textarea v-model="store.newContent" class="form-control" rows="4" placeholder="궁금한 내용을 자세히 적어주세요."></textarea>
+    <div class="text-secondary small text-end mt-1">{{store.newContent.length}} / 1000자</div>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2">
+    <button class="btn btn-dark btn-sm px-3" @click="store.courseQnaInsert">등록</button>
+  </div>
+</div>  
 
       <div class="d-flex align-items-center px-2 py-2 small fw-semibold text-secondary" style="border-bottom: 1px solid #dee2e6;">
         <div style="width: 5%" class="text-center">번호</div>
-        <div style="width: 70%" class="text-center">제목</div>
+        <div style="width: 65%" class="text-center">제목</div>
         <div style="width: 10%" class="text-center">작성자</div>
         <div style="width: 10%" class="text-center">등록일</div>
         <div style="width: 5%" class="text-center">상태</div>
+        <div style="width: 5%" class="text-center"></div>
       </div>
 
+	<div v-for="(qvo,i) in store.qList" :key="i" >
       <div class="d-flex align-items-center px-2 py-3" style="border-bottom: 1px solid #f1f3f5;">
-        <div style="width: 5%" class="text-center text-secondary">8</div>
-        <div style="width: 70%">
-          <a href="#" class="text-decoration-none" style="color: #212529;">useEffect 클린업 함수 관련 질문입니다</a>
+        <div style="width: 5%" class="text-center text-secondary">{{store.qCount-((store.curpage-1)*5+i)}}</div>
+        <div style="width: 65%">
+          <a href="#" @click.prevent="store.toggleDetail(qvo.no)" class="text-decoration-none" style="color: #212529;">{{qvo.subject}}</a>
         </div>
-        <div style="width: 10%" class="text-center text-secondary small">김민지</div>
-        <div style="width: 10%" class="text-center text-secondary small">2026.08.22</div>
+        <div style="width: 10%" class="text-center text-secondary small">{{qvo.name}}</div>
+        <div style="width: 10%" class="text-center text-secondary small">{{qvo.dbday}}</div>
       	<div style="width: 5%" class="text-center">
-          <span class="badge rounded-pill" style="background: #d3f9d8; color: #2b8a3e;">답변완료</span>
+          <span v-if="qvo.status==='Y'" 
+          	class="badge rounded-pill" style="background: #d3f9d8; color: #2b8a3e;">
+          		답변완료
+          </span>
+          <span v-else
+          	class="badge rounded-pill" style="background: #fef9c3; color: #a16207">
+          		답변대기
+          </span>
+        </div>
+        <div style="width: 5%" class="text-center">
+		  <div class="d-flex flex-column gap-1 align-items-center" v-if="qvo.status==='N' && qvo.member_id===store.member_id">
+		    <button @click="store.toggleUpdate(qvo.no)" class="btn btn-outline-info btn-sm px-2 py-0" style="font-size: 12px;">수정</button>
+		    <button @click="store.courseQnaDelete(qvo.no)" class="btn btn-outline-danger btn-sm px-2 py-0" style="font-size: 12px;">삭제</button>
+		  </div>
         </div>
       </div>
+		<div v-show="store.showDetail && store.curQvo.no===qvo.no"
+		     class="px-4 py-3"
+		     style="background:#eefaf1; border-bottom: 1px solid #f1f3f5;">
+		  <div class="mb-3" style="white-space: pre-line; font-size: 16px; color:#495057;">
+		    {{store.curQvo.content}}
+		  </div>
+		  <div v-if="qvo.status==='Y'" class="p-3 rounded" style="background:#fff; border:1px solid #e9ecef;">
+		    <div>
+		    	<span class="fw-semibold small mb-2" style="color:#2b8a3e;">👨‍🏫 {{store.curRvo.name}}</span>&nbsp;
+		    	<span class="small mb-2">({{store.curRvo.dbday}})</span>
+		    </div>
+		    <div style="white-space: pre-line; font-size: 16px; margin-top: 10px">{{store.curRvo.answer}}</div>
+		  </div>
+		  <div v-else class="p-3 rounded" style="background:#fff; border:1px solid #e9ecef;">
+		    아직 답변이 등록되지 않았습니다.
+		  </div>
+		</div>
+<div class="mb-3 p-3" v-show="store.showUpdateForm && store.updateNo===qvo.no" style="background:#f8f9fa; border-radius:8px; border:1px solid #e9ecef;">
+  <div class="mb-2">
+    <div class="text-secondary small mb-1">제목</div>
+    <input v-model="store.updateSubject" class="form-control" placeholder="질문 제목을 입력하세요">
+  </div>
 
+  <div class="mb-2">
+    <div class="text-secondary small mb-1">내용</div>
+    <textarea v-model="store.updateContent" class="form-control" rows="4" placeholder="궁금한 내용을 자세히 적어주세요."></textarea>
+    <div class="text-secondary small text-end mt-1">{{store.updateContent.length}} / 1000자</div>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2">
+    <button class="btn btn-dark btn-sm px-3" @click="store.courseQnaUpdate">수정</button>
+  </div>
+</div>  
+    </div>
+        <ul class="pagination justify-content-center border-0 m-3">
+          <li class="page-item" v-if="store.startpage>1">
+            <a class="page-link border-0 text-muted" style="cursor: pointer;" @click="store.move(store.startpage-1)">
+              <i class="fa-solid fa-chevron-left"></i>
+            </a>
+          </li>
+          <li class="page-item" v-for="(i,index) in store.range" :key="index">
+            <a class="page-link border-0 rounded-circle mx-1 custom-page-btn" :class="{'active':store.curpage===i}" @click="store.move(i)">
+              {{i}}
+            </a>
+          </li>
+          <li class="page-item" v-if="store.endpage<store.totalpage">
+            <a class="page-link border-0 text-muted" style="cursor: pointer;" @click="store.move(store.endpage+1)">
+              <i class="fa-solid fa-chevron-right"></i>
+            </a>
+          </li>
+        </ul>
     </div>
   </div>
 </div>
+  <script src="/vue/enrollment/qna/qnaStore.js"></script>
+  <script>
+    const {createApp,onMounted}=Vue
+    const {createPinia}=Pinia
+
+    const qnaApp=createApp({
+      setup(){
+        const store=useQnaStore()
+        onMounted(()=>{
+          store.member_id=SESSION_ID
+          //store.courseData(COURSE_NO)
+          //store.myEvalData()
+          //store.evaluationListData()
+          store.courseQnaListData(COURSE_NO)
+        })
+        return {
+          store
+        }
+      }
+    })
+    qnaApp.use(createPinia())
+    qnaApp.mount('#qna')
+  </script>
 </body>
 </html>
