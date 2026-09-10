@@ -7,6 +7,8 @@
 		JOIN member m ON c.instructor_no=m.member_id
 		WHERE no=#{course_no}
 	</select>
+	
+	<!-- Evaluation -->
 	<select id="evaluationListData" resultType="com.sist.web.domain.enrollment.vo.CourseEvaluationVO" parameterType="int">
 		SELECT no,e.member_id,name,rating,review,like_count,TO_CHAR(e.regdate,'yyyy-mm-dd') as dbday,
 			CASE WHEN EXISTS (
@@ -72,4 +74,7 @@
 		JOIN member m ON e.member_id=m.member_id
 		WHERE course_no=#{course_no} AND e.member_id=#{member_id}
 	</select>
+	
+	
+
 </mapper>
