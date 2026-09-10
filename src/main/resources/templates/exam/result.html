@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<script th:inline="javascript">
+    const ENROLLMENT_NO = /*[[${enrollmentNo}]]*/ null
+</script>
+
+<div class="exam-layout">
+    <th:block th:replace="~{exam/sidebar::sidebar('result')}"></th:block>
+
+    <main class="exam-main">
+        <header class="exam-header">
+            <h2 class="fs-4 fw-bold mb-0">시험 결과</h2>
+        </header>
+
+        <div class="exam-content d-flex justify-content-center">
+            <div style="max-width: 900px; width: 100%;">
+
+                <div v-if="master.STATUS==='WAITING'" class="exam-card text-center mb-4" style="background-color: #fffbeb; border-color: #fde68a;">
+                        <div class="mb-3">
+                    <span class="badge px-3 py-2 fs-6 border" style="background-color: #fef3c7; color: #d97706; border-color: #fde68a;">
+                        <i class="fa-solid fa-hourglass-half me-1"></i> 주관식 채점 진행 중
+                    </span>
+                        </div>
+                        <h4 class="fw-bold mb-2">{{ examTitle }}</h4>
+                        <p class="text-secondary mb-3">
+                            제출이 완료되었습니다. 강사님의 주관식 서술형 채점 완료 후 최종 성적이 확정됩니다.
+                        </p>
+                        <div class="d-inline-flex justify-content-center align-items-center gap-4 py-2 px-4 rounded bg-white border mx-auto">
+                            <div>객관식 가채점 점수: <strong class="text-primary">{{ master.TOTAL_SCORE }}점</strong></div>
+                            <div class="border-start ps-4">주관식 채점 현황: <strong>{{ master.SUBJECTIVE_GRADED }} / {{ master.SUBJECTIVE_TOTAL }} 문항</strong></div>
+                        </div>
+                    </div>
+
+                    <div v-else-if="master.STATUS==='COMPLETE'" class="exam-card text-center mb-4">
+                        <div class="mb-2">
+                            <span v-if="master.TOTAL_SCORE >= 60" class="badge bg-success px-3 py-2 fs-6">합격</span>
+                            <span v-else class="badge bg-danger px-3 py-2 fs-6">불합격 (FAIL)</span>
+                        </div>
+                        <h3 class="fw-bold mb-1">{{ examTitle }}</h3>
+                        <p class="text-muted mb-4">응시일시: {{ master.START_TIME }}</p>
+
+                        <div class="row g-3 justify-content-center">
+                            <div class="col-md-4">
+                                <div class="p-3 rounded" style="background-color: var(--bg-body);">
+                                    <div class="text-muted small">최종 득점</div>
+                                    <div class="fs-2 fw-bold text-primary">{{master.TOTAL_SCORE}}점</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 rounded" style="background-color: var(--bg-body);">
+                                    <div class="text-muted small">합격 기준</div>
+                                    <div class="fs-2 fw-bold text-secondary">60점 이상</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exam-card">
+                        <h5 class="fw-bold mb-4"><i class="fa-solid fa-list-check me-2"></i>문항별 채점 내역</h5>
+
+                        <div v-for="(q, idx) in details" :key="q.QUESTION_NO" class="border-bottom py-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold">문제 {{idx + 1}}.</span>
+                                <div>
+
+                                    <span v-if="q.QUESTION_TYPE===1" class="badge bg-light text-secondary border me-2">객관식</span>
+                                    <span v-else class="badge border me-2" style="background-color: #fffbeb; color: #d97706; border-color: #fde68a;">주관식</span>
+
+                                    <span v-if="q.IS_CORRECT==='Y'" class="badge bg-success">정답 (+{{ q.SCORE }}점)</span>
+                                    <span v-else-if="q.IS_CORRECT==='N'" class="badge bg-danger">오답 (0점)</span>
+                                    <span v-else-if="q.IS_CORRECT==='W'" class="badge bg-warning text-dark">채점 대기</span>
+                                </div>
+                            </div>
+
+                            <h6 class="mb-3" style="line-height: 1.5;">{{ q.TITLE }}</h6>
+
+                            <div class="p-3 rounded small mb-2" style="background-color: var(--bg-body);">
+                                <div>내 제출 답안: <strong>{{q.USER_ANSWER || '(미응답)'}}</strong></div>
+
+                                <div v-if="master.STATUS==='COMPLETE' || q.QUESTION_TYPE===1" class="text-success mt-1">
+                                    표준 정답: <strong>{{q.STANDARD_ANSWER}}</strong>
+                                </div>
+                            </div>
+
+                            <div v-if="(master.STATUS==='COMPLETE' || q.QUESTION_TYPE===1) && q.DESCRIPTION" class="small text-muted mt-2">
+                                <i class="fa-solid fa-circle-info me-1"></i> 해설: {{ q.DESCRIPTION }}
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <a href="/exam/list" class="btn btn-outline-secondary px-4 py-2">시험 목록으로 돌아가기</a>
+                        </div>
+                    </div>
+
+                </div>
+        </div>
+    </main>
+</div>
+
+<script>
+const {createApp,ref,onMounted }=Vue
+const resultApp=createApp({
+    setup() {
+        const master = ref({})
+        const details = ref([])
+        const examTitle = ref('')
+
+        const loadResultData=async()=>{
+            const enrollmentNo=ENROLLMENT_NO || new URLSearchParams(window.location.search).get('no')
+            if (!enrollmentNo) {
+                alert('잘못된 접근입니다.')
+                location.href='/exam/list'
+                return
+            }
+
+            try {
+                const res=await api.get('/exam/result_vue?no='+enrollmentNo)
+                master.value=res.data.master
+                details.value=res.data.details
+                examTitle.value=res.data.examTitle
+            } catch (err) {
+                console.error('결과 조회 실패:', err)
+                alert('시험 결과를 불러올 수 없습니다.')
+            }
+        }
+        onMounted(()=>{
+            loadResultData()
+        })
+        return {
+            master,
+            details,
+            examTitle
+        }
+    }
+})
+resultApp.mount('.exam-layout')
+</script>
+</html>

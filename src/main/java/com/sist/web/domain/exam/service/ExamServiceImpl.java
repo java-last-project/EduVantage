@@ -3,6 +3,8 @@ package com.sist.web.domain.exam.service;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import com.sist.web.domain.exam.vo.ExamUserAnswerVO;
+import com.sist.web.domain.notification.mapper.ScheduledExamMapper;
 import org.springframework.stereotype.Service;
 
 import com.sist.web.domain.exam.mapper.ExamMapper;
@@ -18,11 +20,10 @@ public class ExamServiceImpl implements ExamService{
 	private final ExamMapper eMapper;
 	
 	@Override
-	public List<ExamQuestionVO> examDetailData(Integer theme,int count) {
+	public List<ExamQuestionVO> examDetailData(Integer examNo,Integer theme,int count) {
 		Map<String, Object> map=new HashMap<>();
-		if(theme!=null&&theme!=0) {
-			map.put("theme", theme);
-		}
+		map.put("exam_no", examNo);
+		map.put("theme", theme);
 		map.put("count", count);
 		List<ExamQuestionVO> list=eMapper.examDetailData(map);
 		return list;
@@ -30,10 +31,156 @@ public class ExamServiceImpl implements ExamService{
 
 	@Override
 	@Transactional
-	public Integer insertEnrollment(ExamEnrollmentVO vo) {
+	public ExamEnrollmentVO getOrCreateEnrollment(int memberId, Integer examNo, Integer theme) {
+		Map<String,Object> map=new HashMap<>();
+		map.put("member_id",memberId);
+		map.put("exam_no",examNo);
+		map.put("theme",theme!=null&&theme!=0?theme:null);
+
+		ExamEnrollmentVO activeVo=eMapper.findActiveEnrollment(map);
+		if(activeVo!=null){
+			return activeVo;
+		}
+
+		ExamEnrollmentVO vo=new ExamEnrollmentVO();
+		vo.setMember_id(memberId);
+		vo.setExam_no(examNo);
+		vo.setTheme(theme!=null&&theme!=0?theme:null);
 		vo.setStarttime(LocalDateTime.now());
 		eMapper.insertEnrollment(vo);
-		return vo.getNo();
+		return vo;
+	}
+
+	@Override
+	public String getExamTitle(Integer examNo){
+		return eMapper.getScheduledExamTitle(examNo);
+	}
+
+	@Override
+	@Transactional
+	public Map<String, Object> submitExam(Map<String, Object> params) {
+		int enrollmentNo=(Integer)params.get("enrollmentNo");
+		Map<String,Object> raw=(Map<String,Object>)params.get("answers");
+		if(raw==null || raw.isEmpty()){
+			throw new IllegalArgumentException("제출된 답안이 없습니다");
+		}
+		List<Integer> qno=new ArrayList<>();
+		for(String key:raw.keySet()){
+			qno.add(Integer.parseInt(key));
+		}
+		List<ExamQuestionVO> questions=eMapper.getQuestionForGrading(qno);
+
+		int totalCount=questions.size();
+		double pointPerQuestion=100.0/totalCount;
+
+		// 채점
+		List<ExamUserAnswerVO> answers=new ArrayList<>();
+		double rawTotalScore=0.0;
+		boolean hasSubjective=false;
+
+		for(ExamQuestionVO qvo:questions){
+			ExamUserAnswerVO avo=new ExamUserAnswerVO();
+			avo.setEnrollment_no(enrollmentNo);
+			avo.setQuestion_no(qvo.getNo());
+
+			Object userAnsObj=raw.get(String.valueOf(qvo.getNo()));
+			String userAns=userAnsObj!=null?String.valueOf(userAnsObj).trim():"";
+			avo.setUser_answer(userAns);
+			if(qvo.getType()==1){ // 객관식
+				boolean isCorrect=qvo.getAnswer()!=null && qvo.getAnswer().trim().equals(userAns);
+				if(isCorrect){
+					avo.setIs_correct("Y");
+					avo.setScore((int)Math.round(pointPerQuestion));
+					rawTotalScore+=pointPerQuestion;
+				}else{
+					avo.setIs_correct("N");
+					avo.setScore(0);
+				}
+			}else{
+				avo.setIs_correct("W");
+				avo.setScore(0);
+				hasSubjective=true;
+			}
+			answers.add(avo);
+		}
+
+		if(!answers.isEmpty()){
+			eMapper.insertUserAnswers(answers);
+		}
+
+		int finalScore=(int)Math.round(rawTotalScore);
+
+		ExamEnrollmentVO evo=new ExamEnrollmentVO();
+		evo.setNo(enrollmentNo);
+		evo.setEndtime(LocalDateTime.now());
+		evo.setTotalscore(finalScore);
+		evo.setStatus(hasSubjective?"WAITING":"COMPLETE");
+
+		eMapper.updateEnrollmentFinish(evo);
+
+		Map<String,Object> result=new HashMap<>();
+		result.put("status",evo.getStatus());
+		result.put("enrollmentNo",enrollmentNo);
+		result.put("totalscore",finalScore);
+		return result;
+	}
+
+	@Override
+	public List<Map<String, Object>> getPendingSubjectiveList(int graderId) {
+		return eMapper.selectPendingSubjectiveList(graderId);
+	}
+
+	@Override
+	@Transactional
+	public boolean claimTask(int answerNo, int graderId) {
+		Map<String,Object> map=new HashMap<>();
+		map.put("answerNo",answerNo);
+		map.put("graderId",graderId);
+		return eMapper.claimGradingTask(map)>0;
+	}
+
+	@Override
+	@Transactional
+	public void releaseClaim(int answerNo, int graderId) {
+		Map<String,Object> map=new HashMap<>();
+		map.put("answerNo",answerNo);
+		map.put("graderId",graderId);
+		eMapper.releaseGradingClaim(map);
+	}
+
+	@Override
+	@Transactional
+	public void gradeSubjective(int enrollmentNo, int answerNo, int graderId, int score) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("answerNo", answerNo);
+		map.put("graderId", graderId);
+		map.put("score", score);
+		eMapper.gradeSubjectiveAnswer(map);
+
+		int remain=eMapper.countRemainingPending(enrollmentNo);
+		if(remain==0){
+			eMapper.finalizeEnrollmentScore(enrollmentNo);
+		}
+	}
+
+	@Override
+	public Map<String, Object> getExamResultData(int enrollmentNo) {
+		Map<String,Object> map=eMapper.selectExamResultMaster(enrollmentNo);
+		if(map==null){
+			throw new IllegalArgumentException("존재하지 않는 응시기록입니다.");
+		}
+		List<Map<String,Object>> details=eMapper.selectExamResultDetails(enrollmentNo);
+		Integer examNo=(Integer) map.get("EXAM_NO");
+		String examTitle="상시 모의고사";
+		if (examNo!=null && examNo>0) {
+			String sTitle=eMapper.getScheduledExamTitle(examNo);
+			if (sTitle!=null) examTitle=sTitle;
+		}
+		Map<String, Object> response = new HashMap<>();
+		response.put("master", map);
+		response.put("examTitle", examTitle);
+		response.put("details", details);
+		return response;
 	}
 
 }
