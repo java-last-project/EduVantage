@@ -216,7 +216,7 @@
 								   title="알림"
 								   @click="examNotiRegister(exam)">
 									<span v-if="new Date(exam.open_date) < new Date()" style="cursor:not-allowed">
-										<i class="fa-solid fa-bell-slash" style="color:var(--text-muted);pointer-events:none;cursor:not-allowed"></i>
+										<i class="fa-solid fa-bell" style="color:var(--text-muted);pointer-events:none;cursor:not-allowed"></i>
 									</span>
 									<i class="fa-solid fa-bell" v-else onclick="window.location.href='/member/login'"></i>
 								</a>
