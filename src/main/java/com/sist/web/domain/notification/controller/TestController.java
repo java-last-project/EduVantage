@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+[WHAT] : 임베딩 값 -> DB row insert 용 클래스
 @RestController
 @RequestMapping("/test")
 @RequiredArgsConstructor

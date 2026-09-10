@@ -37,7 +37,7 @@
 		</div>
 		<div class="summary-actions">
 			<button class="btn-outline"><i class="fa-solid fa-bullhorn"></i> 새소식</button>
-			<button class="btn-primary"><i class="fa-solid fa-pen"></i> 정보 수정</button>
+			<a class="btn btn-primary" th:href="@{/instructor/course_edit(course_no=${vo.no})}"><i class="fa-solid fa-pen"></i> 정보 수정</a>
 		</div>
 	</div>
 

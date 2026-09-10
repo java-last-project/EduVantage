@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<div class="exam-layout" id="resultListApp" v-cloak>
+    <th:block th:replace="~{exam/sidebar::sidebar('result')}"></th:block>
+
+    <main class="exam-main">
+        <header class="exam-header">
+            <h2 class="fs-4 fw-bold mb-0">내 시험 응시 내역</h2>
+        </header>
+
+        <div class="exam-content d-flex justify-content-center py-4">
+            <div style="max-width: 1000px; width: 100%;">
+
+                <div v-if="!loading && list.length===0" class="exam-card text-center d-flex flex-column justify-content-center align-items-center" style="min-height: 480px;">
+                    <div class="mb-4 d-inline-flex justify-content-center align-items-center rounded-circle" style="width: 80px; height: 80px; background-color: var(--bg-body);">
+                        <i class="fa-regular fa-folder-open fa-2x text-muted"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">응시한 시험 내역이 없습니다.</h5>
+                    <p class="text-muted mb-4" style="font-size: 14px;">
+                        아직 완료된 시험 기록이 없습니다.<br>
+                        모의고사를 풀고 나의 실력을 점검해 보세요!
+                    </p>
+                    <a href="/exam/list" class="btn text-white px-4 py-2 fw-medium shadow-sm" style="background-color: var(--main-color); border-radius: 8px;">
+                        <i class="fa-solid fa-pen-to-square me-1"></i> 시험 응시하러 가기
+                    </a>
+                </div>
+
+                <div v-else-if="!loading && list.length > 0" class="exam-card p-0 overflow-hidden shadow-sm" style="border-radius: 12px;">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle text-center mb-0" style="font-size: 14px;">
+                            <thead style="background-color: var(--bg-body); border-bottom: 2px solid #e9ecef;">
+                            <tr>
+                                <th style="width: 80px;" class="py-3">번호</th>
+                                <th class="text-start py-3 ps-4">시험명</th>
+                                <th style="width: 180px;" class="py-3">응시 일시</th>
+                                <th style="width: 140px;" class="py-3">채점 상태</th>
+                                <th style="width: 100px;" class="py-3">점수</th>
+                                <th style="width: 120px;" class="py-3">결과</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="(item, index) in list" :key="item.ENROLLMENT_NO">
+                                <td class="text-muted">{{ list.length - idx }}</td>
+                                <td class="text-start fw-bold ps-4">{{ item.EXAM_TITLE }}</td>
+                                <td class="text-muted">{{ item.START_TIME }}</td>
+                                <td>
+                                    <span v-if="item.STATUS==='COMPLETE'" class="badge bg-success px-2 py-1">채점 완료</span>
+                                    <span v-else class="badge px-2 py-1 border" style="background-color: #fffbeb; color: #d97706; border-color: #fde68a;">주관식 채점 대기</span>
+                                </td>
+                                <td>
+                              <span v-if="item.STATUS==='COMPLETE'" class="fw-bold" style="color: var(--main-color); font-size: 15px;">
+                                 {{ item.TOTAL_SCORE }}점
+                              </span>
+                                    <span v-else class="text-muted">-</span>
+                                </td>
+                                <td>
+                                    <a :href="'/exam/result?no='+item.ENROLLMENT_NO" class="btn btn-sm btn-outline-secondary px-3">
+                                        상세보기
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div v-if="loading" class="exam-card text-center d-flex justify-content-center align-items-center" style="min-height: 400px;">
+                    <div class="spinner-border text-primary" role="status"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script>
+    const {createApp,ref,onMounted}=Vue
+    createApp({
+        setup() {
+            const list=ref([])
+            const loading=ref(true)
+            onMounted(async()=>{
+                try {
+                    const res=await api.get('/exam/my_result_list_vue')
+                    list.value=res.data || []
+                } catch (err) {
+                    console.error('목록 로드 실패:', err)
+                } finally {
+                    loading.value=false
+                }
+            })
+            return {list,loading }
+        }
+    }).mount('#resultListApp')
+</script>
+</html>

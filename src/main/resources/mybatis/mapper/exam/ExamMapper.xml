@@ -125,27 +125,28 @@
 	</select>
 
 	<insert id="insertUserAnswers" parameterType="list">
-		INSERT ALL
-		<foreach item="ans" collection="list">
-			INTO exam_user_answer (
-			enrollment_no,
-			question_no,
-			user_answer,
-			is_correct,
-			score,
-			grader_id,
-			graded_at
-			) VALUES (
-			#{ans.enrollment_no},
-			#{ans.question_no},
-			#{ans.user_answer, jdbcType=VARCHAR},
-			#{ans.is_correct},
-			#{ans.score},
-			NULL,
-			NULL
-			)
+		INSERT INTO exam_user_answer (
+		enrollment_no,
+		question_no,
+		user_answer,
+		is_correct,
+		score,
+		grader_id,
+		graded_at
+		)
+		SELECT sub.* FROM (
+		<foreach collection="list" item="item" separator=" UNION ALL ">
+			SELECT
+			#{item.enrollment_no},
+			#{item.question_no},
+			#{item.user_answer, jdbcType=VARCHAR},
+			#{item.is_correct},
+			#{item.score},
+			NULL AS grader_id,
+			NULL AS graded_at
+			FROM DUAL
 		</foreach>
-		SELECT * FROM DUAL
+		) sub
 	</insert>
 
 	<update id="updateEnrollmentFinish" parameterType="com.sist.web.domain.exam.vo.ExamEnrollmentVO">
@@ -224,7 +225,7 @@
 		       e.member_id AS member_id,
 		       e.exam_no AS exam_no,
 		       e.theme AS theme,
-		       e.totalscore AS total_score,
+		       NVL(e.totalscore, 0) AS total_score,
 		       e.status AS status,
 		       TO_CHAR(e.starttime, 'YYYY-MM-DD HH24:MI:SS') AS start_time,
 		       TO_CHAR(e.endtime, 'YYYY-MM-DD HH24:MI:SS') AS end_time,
@@ -233,11 +234,11 @@
 		       (SELECT COUNT(*)
 		        FROM exam_user_answer a
 						 JOIN exam_question q ON a.question_no=q.no
-		        WHERE a.enrollment_no=e.no AND q.type!=1) AS subjective_total,
+		        WHERE a.enrollment_no=e.no AND q.type NOT IN (1)) AS subjective_total,
 		       (SELECT COUNT(*)
 		        FROM exam_user_answer a
 						 JOIN exam_question q ON a.question_no=q.no
-		        WHERE a.enrollment_no=e.no AND q.type!=1 AND a.is_correct!='W') AS subjective_graded
+		        WHERE a.enrollment_no=e.no AND q.type NOT IN (1) AND a.is_correct!='W') AS subjective_graded
 		FROM exam_enrollment e
 		WHERE e.no=#{enrollmentNo}
 	</select>
@@ -247,16 +248,39 @@
 		       a.question_no AS question_no,
 		       a.user_answer AS user_answer,
 		       a.is_correct AS is_correct,
-		       a.score AS score,
+		       NVL(a.score, 0) AS score,
 		       q.title AS title,
 		       q.image AS image,
+		       o.option1 AS option1,
+		       o.option2 AS option2,
+		       o.option3 AS option3,
+		       o.option4 AS option4,
 		       q.answer AS standard_answer,
-		       q.description AS description,
+		       TO_CHAR(q.description) AS description,
 		       q.type AS question_type
-		FROM exam_user_answer a
-				 JOIN exam_question q ON a.question_no = q.no
+		FROM EXAM_USER_ANSWER a
+			JOIN EXAM_QUESTION q ON a.question_no=q.no
+			LEFT JOIN EXAM_OPTION o ON q.no=o.question_no
 		WHERE a.enrollment_no = #{enrollmentNo}
 		ORDER BY a.question_no ASC
+	</select>
+
+	<select id="selectMyExamList" parameterType="int" resultType="hashmap">
+		SELECT e.no AS enrollment_no,
+		       e.exam_no AS exam_no,
+		       e.theme AS theme,
+		       e.totalscore AS total_score,
+		       e.status AS status,
+		       TO_CHAR(e.starttime, 'YYYY-MM-DD HH24:MI') AS start_time,
+		       TO_CHAR(e.endtime, 'YYYY-MM-DD HH24:MI') AS end_time,
+		       CASE
+				   WHEN e.exam_no IS NOT NULL THEN (SELECT title FROM scheduled_exam WHERE no = e.exam_no)
+			       ELSE '상시 모의고사'
+				   END AS exam_title
+		FROM exam_enrollment e
+		WHERE e.member_id = #{memberId}
+		  AND e.endtime IS NOT NULL
+		ORDER BY e.no DESC
 	</select>
 
 </mapper>

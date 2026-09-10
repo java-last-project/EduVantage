@@ -8,9 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-/**
- * SSE는 실시간이므로 REST로 처리 불가
- */
+
+//SSE는 실시간이므로 REST로 처리 불가
 @Controller
 @RequiredArgsConstructor
 public class SseController {
@@ -18,10 +17,9 @@ public class SseController {
     private final EmitterRepository emitterRepository;
 
     /**
-     * [WHAT] 클라이언트가 EventSource로 연결할 포인트
-     *
-     * @return SseEmitter
-     *          :연결을 끊지 않고 유지되는 데이터 통로 객체
+     * 유저가 회원가입 시, 클라이언트-서버 연결: EventSource로 연결할 포인트
+     * @param authentication
+     * @return SseEmitter(서버->클라이언트 연결을 끊지 않고 유지되는 데이터 통로 객체)
      */
     @GetMapping("/sse")
     public SseEmitter getSseEmitter(Authentication authentication){
@@ -31,10 +29,8 @@ public class SseController {
 
         //타임아웃 설정 -> 무제한: 무한 재연결 사이클 제거
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
-
         //emitter 저장
         emitterRepository.save(memberId, emitter);
-
         //연결이 끊기면 저장소에서 emitter 삭제 콜백 설정
         emitter.onCompletion(()->emitterRepository.deleteByMemberId(memberId));
         emitter.onTimeout(()->emitterRepository.deleteByMemberId(memberId));
@@ -50,7 +46,7 @@ public class SseController {
             emitterRepository.deleteByMemberId(memberId);
         }
         courseCompletedProducer.publishCompletion(memberId, 2, "JAVA 기초");
-*/
+        */
 
         return emitter;
     }

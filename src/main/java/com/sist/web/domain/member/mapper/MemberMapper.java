@@ -6,6 +6,8 @@ import org.springframework.stereotype.Repository;
 
 import com.sist.web.domain.member.vo.*;
 
+import java.util.List;
+
 @Mapper
 @Repository
 public interface MemberMapper {
@@ -20,7 +22,15 @@ public interface MemberMapper {
 	public int memberInsertData(MemberVO vo);
 
 	public int memberAuthInsert(String username);
-	
+
+	//전역 알림용
+	@Select("""
+			SELECT m.member_id FROM member m
+			LEFT JOIN authority a
+			ON m.member_id=a.member_id
+			WHERE a.authority IN ('ROLE_INSTRUCTOR', 'ROLE_USER')
+			""")
+	public List<Integer> getAllMemberIdsExcludeAdmin();
 	public MemberVO memberDetailData(int member_id);
 }
 
