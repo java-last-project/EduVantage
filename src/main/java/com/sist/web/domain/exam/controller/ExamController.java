@@ -35,4 +35,10 @@ public class ExamController {
 		model.addAttribute("main_html","exam/result");
 		return "main/main";
 	}
+
+	@GetMapping("/exam/result_list")
+	public String examResultList(Model model) {
+		model.addAttribute("main_html", "exam/result_list");
+		return "main/main";
+	}
 }

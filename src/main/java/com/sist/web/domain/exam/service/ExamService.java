@@ -15,5 +15,5 @@ public interface ExamService {
 	public void releaseClaim(int answerNo, int graderId);
 	public void gradeSubjective(int enrollmentNo, int answerNo, int graderId, int score);
 	public Map<String, Object> getExamResultData(int enrollmentNo);
-
+	public List<Map<String, Object>> getMyExamList(int memberId);
 }

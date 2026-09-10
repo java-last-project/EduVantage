@@ -29,4 +29,5 @@ public interface ExamMapper {
 	public void finalizeEnrollmentScore(int enrollmentNo);
 	public Map<String, Object> selectExamResultMaster(int enrollmentNo);
 	public List<Map<String, Object>> selectExamResultDetails(int enrollmentNo);
+	public List<Map<String, Object>> selectMyExamList(int memberId);
 }

@@ -170,7 +170,12 @@ public class ExamServiceImpl implements ExamService{
 			throw new IllegalArgumentException("존재하지 않는 응시기록입니다.");
 		}
 		List<Map<String,Object>> details=eMapper.selectExamResultDetails(enrollmentNo);
-		Integer examNo=(Integer) map.get("EXAM_NO");
+		Object rawExamNo = map.get("EXAM_NO") != null ? map.get("EXAM_NO") : map.get("exam_no");
+		Integer examNo = null;
+		if (rawExamNo != null && !String.valueOf(rawExamNo).isEmpty()) {
+			examNo = Integer.parseInt(String.valueOf(rawExamNo));
+		}
+
 		String examTitle="상시 모의고사";
 		if (examNo!=null && examNo>0) {
 			String sTitle=eMapper.getScheduledExamTitle(examNo);
@@ -181,6 +186,11 @@ public class ExamServiceImpl implements ExamService{
 		response.put("examTitle", examTitle);
 		response.put("details", details);
 		return response;
+	}
+
+	@Override
+	public List<Map<String, Object>> getMyExamList(int memberId) {
+		return eMapper.selectMyExamList(memberId);
 	}
 
 }
