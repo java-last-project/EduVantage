@@ -796,3 +796,268 @@ body {
     filter: blur(0.5px);
 }
 
+[v-cloak]{
+    display:none;
+}
+
+.grading-layout{
+    display:grid;
+    grid-template-columns:minmax(320px,0.9fr) minmax(480px,1.5fr);
+    gap:20px;
+    align-items:start;
+}
+
+.grading-summary{
+    display:flex;
+    gap:12px;
+    margin-bottom:20px;
+}
+
+.summary-card{
+    flex:1;
+    padding:18px 20px;
+    background:#fff;
+    border:1px solid var(--border-color);
+    border-radius:10px;
+}
+
+.summary-label{
+    margin-bottom:5px;
+    color:var(--text-muted);
+    font-size:13px;
+}
+
+.summary-value{
+    color:var(--text-main);
+    font-size:24px;
+    font-weight:700;
+}
+
+.grading-error{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin-bottom:16px;
+    padding:12px 15px;
+    background:#fef2f2;
+    border:1px solid #fecaca;
+    border-radius:8px;
+    color:#dc2626;
+    font-size:13px;
+}
+
+.grading-list-card,
+.grading-detail-card{
+    margin-bottom:0;
+}
+
+.grading-list{
+    max-height:680px;
+    overflow-y:auto;
+}
+
+.grading-item{
+    padding:17px 20px;
+    border-bottom:1px solid var(--border-color);
+    cursor:pointer;
+    transition:background-color 0.15s;
+}
+
+.grading-item:last-child{
+    border-bottom:none;
+}
+
+.grading-item:hover{
+    background:#f8fafc;
+}
+
+.grading-item.active{
+    padding-left:16px;
+    background:#eff6ff;
+    border-left:4px solid var(--main-color);
+}
+
+.grading-item-header,
+.grading-detail-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+
+.grading-item-title{
+    margin:8px 0;
+    color:var(--text-main);
+    font-size:14px;
+    font-weight:600;
+    line-height:1.5;
+}
+
+.grading-item-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    color:var(--text-muted);
+    font-size:12px;
+}
+
+.grading-item-meta span{
+    display:flex;
+    align-items:center;
+    gap:4px;
+}
+
+.answer-section{
+    padding:22px 24px;
+    border-bottom:1px solid var(--border-color);
+}
+
+.answer-section:last-child{
+    border-bottom:none;
+}
+
+.answer-label{
+    margin-bottom:10px;
+    color:var(--text-muted);
+    font-size:13px;
+    font-weight:600;
+}
+
+.answer-content{
+    min-height:85px;
+    padding:16px;
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:8px;
+    color:var(--text-main);
+    font-size:14px;
+    line-height:1.7;
+    white-space:pre-wrap;
+    word-break:break-word;
+}
+
+.standard-answer{
+    background:#f0fdf4;
+    border-color:#bbf7d0;
+}
+
+.score-area{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.score-field{
+    flex:1;
+}
+
+.score-field label{
+    display:block;
+    margin-bottom:7px;
+    color:var(--text-muted);
+    font-size:13px;
+    font-weight:600;
+}
+
+.score-input-wrap{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.score-input{
+    width:130px;
+    padding:10px 12px;
+    border:1px solid var(--border-color);
+    border-radius:8px;
+    outline:none;
+    font-size:15px;
+}
+
+.score-input:focus{
+    border-color:var(--main-color);
+    box-shadow:0 0 0 3px rgba(37,99,235,0.1);
+}
+
+.score-max{
+    color:var(--text-muted);
+    font-size:14px;
+}
+
+.grading-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+}
+
+.grading-loading,
+.grading-empty{
+    padding:60px 20px;
+    color:var(--text-muted);
+    text-align:center;
+}
+
+.grading-loading{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+
+.grading-empty>i{
+    display:block;
+    margin-bottom:15px;
+    color:#cbd5e1;
+    font-size:38px;
+}
+
+.grading-empty strong{
+    display:block;
+    color:var(--text-main);
+}
+
+.grading-empty p{
+    margin:7px 0 0;
+    font-size:13px;
+}
+
+.detail-empty{
+    padding:110px 20px;
+}
+
+.grading-actions button:disabled,
+.page-header button:disabled{
+    cursor:not-allowed;
+    opacity:0.55;
+}
+
+@media(max-width:1000px){
+    .grading-layout{
+        grid-template-columns:1fr;
+    }
+
+    .grading-list{
+        max-height:400px;
+    }
+}
+
+@media(max-width:650px){
+    .grading-summary{
+        flex-direction:column;
+    }
+
+    .score-area{
+        align-items:stretch;
+        flex-direction:column;
+    }
+
+    .grading-actions{
+        justify-content:stretch;
+    }
+
+    .grading-actions button{
+        flex:1;
+    }
+}
+
