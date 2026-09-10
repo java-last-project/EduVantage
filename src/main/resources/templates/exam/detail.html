@@ -160,7 +160,7 @@ const examApp=createApp({
 			return formatTime(elapsedSeconds.value)
 		})
 		const fRemainingTime=computed(()=>{
-			const remaining = Math.max(0, totalLimitSeconds.value - elapsedSeconds.value)
+			const remaining=Math.max(0, totalLimitSeconds.value - elapsedSeconds.value)
 			return formatTime(remaining)
 		})
 		const startTimer=()=>{
@@ -178,12 +178,12 @@ const examApp=createApp({
 			if (!isAuto && !confirm('시험을 최종 제출하시겠습니까?')) return
 			if (timerInterval) clearInterval(timerInterval)
 			const payload={
-				enrollment_no: store.enrollmentNo,
+				enrollmentNo: store.enrollmentNo,
 				answers: userAnswers.value,
 				spentTime: elapsedSeconds.value
 			}
 			try{
-				// 답안 제출 API
+				await api.post('/exam/submit_vue',payload)
 				localStorage.removeItem(`exam_ans_${store.enrollmentNo}`)
 				alert('성공적으로 제출되었습니다.')
 				location.href='/exam/result?no='+store.enrollmentNo

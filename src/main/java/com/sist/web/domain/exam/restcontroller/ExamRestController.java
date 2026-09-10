@@ -84,4 +84,14 @@ public class ExamRestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @GetMapping("/exam/my_result_list_vue")
+    public ResponseEntity<?> myResultList(HttpSession session) {
+        Object sessionMid = session.getAttribute("member_id");
+        if (sessionMid == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        int memberId = Integer.parseInt(String.valueOf(sessionMid));
+        return ResponseEntity.ok(eService.getMyExamList(memberId));
+    }
 }
