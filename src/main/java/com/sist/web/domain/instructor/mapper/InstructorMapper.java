@@ -44,9 +44,23 @@ public interface InstructorMapper {
 	public List<Map<String, Object>> InstCourseEnrollStudList(int course_no);
 	
 	// 강의 상세 데이터 조회 - 강의 정보
-	@Select("SELECT title, thumbnail, student_count, star, no "
+	@Select("SELECT title, thumbnail, student_count, star, no, content, pay_price, regular_price "
 			+ "FROM course "
 			+ "WHERE no=#{no}")
 	public CourseVO InstCourseDetailData(int no);
+	
+	// 강의 상세 데이터 수정
+	/*
+	 * 	<update id="instUpdateCourseData" parameterType="com.sist.web.domain.course.vo.CourseVO">
+			UPDATE course 
+			SET title=#{title}, pay_price=#{pay_price}, regular_price=#{regular_price}, content=#{content}, thumbnail=#{thumbnail}
+			WHERE no=#{no}
+		</update>
+	 */
+	public void instUpdateCourseData(CourseVO vo);
+	
+	// 새 강의 등록
+	// <insert id="instInsertNewCourse" parameterType="com.sist.web.domain.course.vo.CourseVO">
+	public void instInsertNewCourse(CourseVO vo);
 	
 }
