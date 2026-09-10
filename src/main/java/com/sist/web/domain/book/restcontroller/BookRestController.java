@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sist.web.domain.book.service.BookService;
 import com.sist.web.domain.book.vo.BookCartVO;
+import com.sist.web.domain.book.vo.BookCommentVO;
 import com.sist.web.domain.book.vo.BookLikeVO;
 import com.sist.web.domain.book.vo.BookOrderDetailVO;
 import com.sist.web.domain.book.vo.BookOrderVO;
@@ -213,5 +214,29 @@ public class BookRestController {
         MemberVO vo = mService.memberDetailData(memberId); 
         return ResponseEntity.ok(vo);
     }
+    
+    // 댓글 목록 불러오기
+    @GetMapping("/comment/list")
+    public List<BookCommentVO> commentList(int book_no) {
+        return bService.bookCommentListData(book_no);
+    }
+
+    // 일반 새 댓글 등록
+    @PostMapping("/comment/insert")
+    public String commentInsert(BookCommentVO vo, HttpSession session) {
+        try {
+            vo.setMember_id((Integer) session.getAttribute("member_id"));
+            vo.setName((String) session.getAttribute("name"));
+            
+        	bService.bookCommentInsert(vo);
+        	
+            return "yes"; 
+        } catch (Exception e) {
+            e.printStackTrace();
+            
+            return "no";
+        }
+    }
+    
     
 }

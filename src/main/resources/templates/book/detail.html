@@ -72,11 +72,15 @@
 							<i class="fa-regular fa-heart"></i> {{ store.vo.like_count }}
 						</button> -->
 						<button class="btn-custom btn-like" @click="store.toggleLike">
-						    <i :class="store.isLiked ? 'fa-solid fa-heart text-danger' : 'fa-regular fa-heart'"></i>
-						    <span :class="{'text-danger fw-bold': store.isLiked}">{{ store.likeCount }}</span>
+							<i
+								:class="store.isLiked ? 'fa-solid fa-heart text-danger' : 'fa-regular fa-heart'"></i>
+							<span :class="{'text-danger fw-bold': store.isLiked}">{{
+								store.likeCount }}</span>
 						</button>
-						<button class="btn-custom btn-cart" @click="store.addToCart">장바구니 담기</button>
-						<button class="btn-custom btn-buy" @click="store.goToOrder">바로 구매하기</button>
+						<button class="btn-custom btn-cart" @click="store.addToCart">장바구니
+							담기</button>
+						<button class="btn-custom btn-buy" @click="store.goToOrder">바로
+							구매하기</button>
 					</div>
 
 					<ul class="perk-list">
@@ -121,28 +125,113 @@
 			</div>
 		</div>
 
-		<!-- 교재 댓글 및 리뷰 틀 -->
-		<div class="comment-section">
-			<div class="comment-title">
-				교재 댓글 및 리뷰 <span
-					style="color: #999; font-size: 14px; font-weight: normal;">({{
-					store.vo.comment_count }})</span>
-			</div>
-
-			<div class="comment-input-box">
-				<span
-					style="display: inline-flex; align-items: center; background: #eee; padding: 0 15px; border-radius: 4px;">톡</span>
-				<input type="text" placeholder="이 교재에 대한 학습 소감이나 질문을 남겨보세요.">
-				<button>등록</button>
-			</div>
-
-			<div class="comment-list-mockup">
-				<div class="comment-item" v-for="i in 3" :key="i">
-					<div class="comment-header">
-						<span>테스트 수강생 {{ i }}</span> <span
-							style="color: #999; font-size: 12px;">2026.09.03 14:13(임시)</span>
+		<!-- 교재 댓글 및 리뷰 영역 -->
+		<div class="bg-light p-4 p-md-5 border-top mt-5"
+			style="border-radius: 8px;">
+			<h5 class="fw-bold mb-4" style="color: #1e293b;">
+				교재 댓글 및 리뷰 <span class="text-danger">{{ commentStore.count }}</span>
+			</h5>
+			<!-- 댓글창  -->
+			<div class="mb-5 bg-white p-3 rounded-3 border">
+				<!-- 로그인 상태 -->
+				<template v-if="sessionId">
+					<textarea v-model="newComment"
+						class="form-control border-0 shadow-none mb-2" rows="3"
+						placeholder="이 교재에 대한 학습 소감이나 질문을 남겨보세요." style="resize: none;"></textarea>
+					<div
+						class="d-flex justify-content-end align-items-center border-top pt-2">
+						<button type="button"
+							class="btn text-white fw-bold px-4 rounded-3"
+							style="background-color: #212529;" @click="writeComment">등록</button>
 					</div>
-					<div class="comment-content">임시 댓글. 추가예정</div>
+				</template>
+				<!-- 비로그인 상태 -->
+				<template v-else>
+					<div class="text-center py-4 text-muted">
+						<i class="fa-solid fa-lock mb-2 fs-4"></i>
+						<p class="mb-2">댓글을 작성하려면 로그인이 필요합니다.</p>
+						<a href="/member/login"
+							class="btn btn-sm btn-outline-secondary px-3 rounded-3 fw-medium">로그인하러
+							가기</a>
+					</div>
+				</template>
+			</div>
+
+			<!-- 계층형 댓글 리스트 -->
+			<div v-for="reply in commentStore.list" :key="reply.no"
+				class="mb-4 d-flex gap-3"
+				:style="{marginLeft: reply.group_tab > 0 ? (reply.group_tab * 3) + 'rem' : '0'}">
+
+				<div v-if="reply.group_tab > 0" class="text-muted mt-2">
+					<i class="fa-solid fa-reply fa-rotate-180"></i>
+				</div>
+
+				<div class="comment-avatar">
+					<i class="fa-solid fa-user"></i>
+				</div>
+
+				<div class="flex-grow-1">
+					<div class="d-flex justify-content-between align-items-center mb-1">
+						<div>
+							<span class="fw-bold text-dark me-2">{{reply.name}}</span> <span
+								class="text-muted small">{{reply.dbday}}</span>
+						</div>
+
+						<div class="d-flex gap-2">
+							<button v-if="sessionId"
+								class="btn btn-sm btn-link text-muted text-decoration-none p-0"
+								@click="toggleReplyForm(reply.no)">답글</button>
+							<template
+								v-if="sessionId !== '' && sessionId === reply.member_id">
+								<button
+									class="btn btn-sm btn-link text-muted text-decoration-none p-0"
+									@click="toggleEditForm(reply)">수정</button>
+								<button
+									class="btn btn-sm btn-link text-danger text-decoration-none p-0"
+									@click="deleteComment(reply.no)">삭제</button>
+							</template>
+						</div>
+					</div>
+
+					<div v-if="editReplyNo !== reply.no" class="text-dark mb-2"
+						style="font-size: 15px; white-space: pre-wrap;">{{ reply.msg
+						}}</div>
+
+					<!-- 수정 폼 -->
+					<div v-else-if="editReplyNo === reply.no"
+						class="bg-white p-3 rounded-3 border mt-2 mb-3 shadow-sm">
+						<textarea v-model="editCommentText"
+							class="form-control border-0 shadow-none mb-2" rows="2"
+							style="resize: none;"></textarea>
+						<div
+							class="d-flex justify-content-end align-items-center border-top pt-2">
+							<button type="button"
+								class="btn btn-sm btn-outline-secondary px-3 rounded-3 me-2"
+								@click="editReplyNo = 0">취소</button>
+							<button type="button"
+								class="btn btn-sm text-white fw-bold px-3 rounded-3"
+								style="background-color: #212529;"
+								@click="updateComment(reply.no)">저장</button>
+						</div>
+					</div>
+
+					<!-- 대댓글 -->
+					<div v-if="activeReplyNo === reply.no"
+						class="bg-white p-3 rounded-3 border mt-3 shadow-sm">
+						<textarea v-model="coComment"
+							class="form-control border-0 shadow-none mb-2" rows="2"
+							placeholder="대댓글을 남겨보세요." style="resize: none;"></textarea>
+						<div
+							class="d-flex justify-content-end align-items-center border-top pt-2">
+							<button type="button"
+								class="btn btn-sm btn-outline-secondary px-3 rounded-3 me-2"
+								@click="activeReplyNo = 0">취소</button>
+							<button type="button"
+								class="btn btn-sm text-white fw-bold px-3 rounded-3"
+								style="background-color: #212529;"
+								@click="writeCoComment(reply.no)">등록</button>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

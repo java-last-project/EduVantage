@@ -67,7 +67,7 @@ const useBookListStore = defineStore('bookList', {
             try {
                 this.selectedCategory = '전체';
                 // 백엔드의 검색 API 호출 
-                const response = await axios.get('/book/api/find', {
+                const response = await axios.get('/book/find', {
                     params: {
                         keyword: this.keyword,
                         page: page,

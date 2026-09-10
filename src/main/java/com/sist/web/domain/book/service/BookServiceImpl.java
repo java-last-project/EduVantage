@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sist.web.domain.book.mapper.BookMapper;
 import com.sist.web.domain.book.vo.BookCartVO;
+import com.sist.web.domain.book.vo.BookCommentVO;
 import com.sist.web.domain.book.vo.BookLikeVO;
 import com.sist.web.domain.book.vo.BookOrderDetailVO;
 import com.sist.web.domain.book.vo.BookOrderVO;
@@ -151,6 +152,24 @@ public class BookServiceImpl implements BookService {
 	public List<BookVO> bookBestData() {
 		// TODO Auto-generated method stub
 		return bMapper.bookBestData();
+	}
+
+	@Override
+	public List<BookCommentVO> bookCommentListData(int book_no) {
+		// TODO Auto-generated method stub
+		return bMapper.bookCommentListData(book_no);
+	}
+
+	@Override
+	public int bookCommentCount(int book_no) {
+		// TODO Auto-generated method stub
+		return bMapper.bookCommentCount(book_no);
+	}
+
+	@Override
+	public void bookCommentInsert(BookCommentVO vo) {
+		// TODO Auto-generated method stub
+		bMapper.bookCommentInsert(vo);
 	}
 
 	

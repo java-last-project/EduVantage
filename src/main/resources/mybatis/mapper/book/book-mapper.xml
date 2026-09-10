@@ -192,4 +192,57 @@
 		)
 		WHERE ROWNUM &lt; = 10
 	</select>
+	
+	<!-- 
+		private int no, book_no, member_id, group_id, group_step, group_tab, root, depth;
+		private String name, msg, dbday;
+		private Date regdate;
+	 -->
+	
+	<!-- 댓글 목록 출력 -->
+	<select id="bookCommentListData" resultType="com.sist.web.domain.book.vo.BookCommentVO" parameterType="int">
+	    SELECT no, book_no, member_id, name, msg,
+	           TO_CHAR(regdate, 'YYYY-MM-DD HH24:MI') as dbday,
+	           group_tab, group_step, group_id, root, depth
+	    FROM book_reply
+	    WHERE book_no = #{book_no}
+	    ORDER BY group_id DESC, group_step ASC
+	</select>
+	
+	<!-- 도서별 총 댓글 개수 -->
+	<select id="bookCommentCount" resultType="int" parameterType="int">
+	    SELECT COUNT(*) 
+	    FROM book_reply 
+	    WHERE book_no = #{book_no}
+	</select>
+	
+	<!-- 댓글 작성 -->
+	<insert id="bookCommentInsert" parameterType="com.sist.web.domain.book.vo.BookCommentVO">
+	    <selectKey keyProperty="group_id" resultType="int" order="BEFORE">
+	        SELECT NVL(MAX(group_id)+1, 1) FROM book_reply
+	    </selectKey>
+	    INSERT INTO book_comment (
+	        no, 
+	        book_no, 
+	        member_id, 
+	        name, 
+	        msg, 
+	        regdate,
+	        group_id, 
+	        group_step, 
+	        group_tab, 
+	        root, 
+	        depth
+	    ) VALUES (
+	        br_no_seq.nextval, 
+	        #{book_no}, 
+	        #{member_id}, 
+	        #{name}, 
+	        #{msg}, 
+	        SYSDATE,
+	        #{group_id}, 0, 0, 0, 0
+	    )
+	</insert>
+	<!-- 댓글 수정 -->
+	<!-- 댓글 삭제 -->
 </mapper>
