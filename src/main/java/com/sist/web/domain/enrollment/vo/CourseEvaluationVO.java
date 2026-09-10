@@ -21,4 +21,6 @@ public class CourseEvaluationVO {
 	
 	// JOIN 컬럼
 	private String name; // 강의평 작성자
+	private int liked; // 해당 강의평에 좋아요 누른 여부
+	private int curpage; // 강의 평가 현재 페이지
 }
