@@ -20,4 +20,34 @@
 		ON c.member_id=m.member_id
 		WHERE c.course_no=#{course_no}
 	</select>
+	
+	<!-- 담당 강의 내용 수정 -->
+	<update id="instUpdateCourseData" parameterType="com.sist.web.domain.course.vo.CourseVO">
+		UPDATE course 
+		SET title=#{title}, pay_price=#{pay_price}, regular_price=#{regular_price}, content=#{content}
+		WHERE no=#{no}
+	</update>
+	
+	<!-- 새 강의 등록 -->
+	<insert id="instInsertNewCourse" parameterType="com.sist.web.domain.course.vo.CourseVO">
+		INSERT INTO course(
+			title,
+			instructor_no,
+			star,
+			student_count,
+			pay_price,
+			regular_price,
+			content
+		)
+		VALUES 
+		(
+			#{title},
+			#{instructor_no},
+			5,
+			0,
+			#{pay_price},
+			#{regular_price},
+			#{content}
+		)
+	</insert>
 </mapper>
