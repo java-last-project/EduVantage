@@ -126,44 +126,6 @@ public class ExamServiceImpl implements ExamService{
 	}
 
 	@Override
-	public List<Map<String, Object>> getPendingSubjectiveList(int graderId) {
-		return eMapper.selectPendingSubjectiveList(graderId);
-	}
-
-	@Override
-	@Transactional
-	public boolean claimTask(int answerNo, int graderId) {
-		Map<String,Object> map=new HashMap<>();
-		map.put("answerNo",answerNo);
-		map.put("graderId",graderId);
-		return eMapper.claimGradingTask(map)>0;
-	}
-
-	@Override
-	@Transactional
-	public void releaseClaim(int answerNo, int graderId) {
-		Map<String,Object> map=new HashMap<>();
-		map.put("answerNo",answerNo);
-		map.put("graderId",graderId);
-		eMapper.releaseGradingClaim(map);
-	}
-
-	@Override
-	@Transactional
-	public void gradeSubjective(int enrollmentNo, int answerNo, int graderId, int score) {
-		Map<String, Object> map = new HashMap<>();
-		map.put("answerNo", answerNo);
-		map.put("graderId", graderId);
-		map.put("score", score);
-		eMapper.gradeSubjectiveAnswer(map);
-
-		int remain=eMapper.countRemainingPending(enrollmentNo);
-		if(remain==0){
-			eMapper.finalizeEnrollmentScore(enrollmentNo);
-		}
-	}
-
-	@Override
 	public Map<String, Object> getExamResultData(int enrollmentNo) {
 		Map<String,Object> map=eMapper.selectExamResultMaster(enrollmentNo);
 		if(map==null){
