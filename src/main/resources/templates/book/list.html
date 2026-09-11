@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>도서 목록</title>
+<link rel="stylesheet" href="/css/book/list.css">
+</head>
+<body>
+	<div id="app" class="book-list-wrapper">
+		<div class="layout-container">
+
+			<!-- 좌측 사이드바 영역 -->
+			<aside class="sidebar">
+				<!-- 검색바 -->
+				<div class="search-box">
+					<input type="text" v-model="store.keyword"
+						@keyup.enter="store.findBook()" placeholder="검색어를 입력하세요">
+					<button type="button" @click="store.findBook()">
+						<i class="fa-solid fa-magnifying-glass"></i>
+					</button>
+				</div>
+				<!-- 카테고리 리스트 -->
+				<div class="sidebar-category">
+					<h4>카테고리</h4>
+					<ul>
+						<li v-for="cat in store.categories" :key="cat"
+							:class="{ active: store.selectedCategory === cat }"
+							@click="store.setCategory(cat)"><span class="checkbox-icon"></span>
+							{{ cat }}</li>
+					</ul>
+				</div>
+			</aside>
+
+			<!-- 우측 메인 콘텐츠 영역 -->
+			<main class="main-content">
+				<!-- 상단 헤더 -->
+				<div class="content-header">
+					<div class="total-info">
+						총 <strong>{{ store.count }}</strong>개의 도서
+					</div>
+					<div class="sort-options">
+						<span :class="{ active: store.sortOption === '출간일 순' }"
+							@click="store.setSortOption('출간일 순')">최신순</span> <span
+							:class="{ active: store.sortOption === '조회 수 순' }"
+							@click="store.setSortOption('조회 수 순')">인기순</span> <span
+							:class="{ active: store.sortOption === '낮은 가격순' }"
+							@click="store.setSortOption('낮은 가격순')">가격 낮은순</span> <span
+							:class="{ active: store.sortOption === '높은 가격순' }"
+							@click="store.setSortOption('높은 가격순')">가격 높은순</span>
+					</div>
+				</div>
+
+				<!-- 도서 목록 이미지카드 -->
+				<div class="book-grid" v-if="store.list && store.list.length > 0">
+					<div class="book-card" v-for="vo in store.list" :key="vo.no">
+						<div class="book-image-wrapper">
+							<img :src="vo.poster" :alt="vo.title" @click="moveDetail(vo.no)">
+						</div>
+						<div class="book-info">
+							<h4 class="book-title" @click="moveDetail(vo.no)">{{
+								vo.title }}</h4>
+							<p class="book-author">{{ vo.author }}</p>
+							<div class="book-price">₩{{ vo.price }}</div>
+							<div class="book-meta mt-2 d-flex gap-3 text-secondary"
+								style="font-size: 13px;">
+								<span><i class="fa-regular fa-heart"></i> {{
+									vo.like_count }}</span> <span><i class="fa-regular fa-eye"></i>
+									{{ vo.hit }}</span>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<!-- 검색 결과가 없을 때 보여줄 안내 문구 -->
+				<div class="no-result" v-else
+					style="text-align: center; padding: 50px 0; color: #777;">
+					<i class="fa-solid fa-circle-exclamation"
+						style="font-size: 32px; margin-bottom: 10px;"></i>
+					<p>검색 결과가 없습니다.</p>
+				</div>
+
+				<!-- 페이지네이션 -->
+				<div class="pagination">
+					<span v-if="store.startPage > 1"
+						@click="store.move(store.startPage - 1)">&laquo;</span> <span
+						v-for="i in store.range" :key="i"
+						:class="{ active: i === store.curpage }" @click="store.move(i)">
+						{{ i }} </span> <span v-if="store.endPage < store.totalpage"
+						@click="store.move(store.endPage + 1)">&raquo;</span>
+				</div>
+			</main>
+
+		</div>
+	</div>
+	<script src="/vue/book/bookListStore.js"></script>
+
+	<script>
+	const { createApp, onMounted } = Vue;
+	const { createPinia } = Pinia;
+
+	const listApp = createApp({
+	    setup() {
+	        const store = useBookListStore();
+	        // 페이지가 처음 렌더링될 때 데이터 불러오기
+	        onMounted(() => {
+	            store.bookListData();
+	        });
+
+	        // 상세 페이지로 이동
+	        const moveDetail = (no) => {
+	            location.href = `/book/detail?no=${no}`;
+	        };
+	        
+	     	// 반환 객체에 추가
+	        return { store, moveDetail }; 
+	    }
+	});
+	listApp.use(createPinia());
+	listApp.mount("#app");
+</script>
+</body>
+</html>

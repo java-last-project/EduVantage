@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<style>
+	.page-title{
+		font-size:26px;
+		font-weight:700;
+		margin:0 0 24px;
+		color:var(--text-main);
+	}
+
+
+	@media (max-width:900px){
+		.main{ padding:20px; }
+		.info-table th{ width:110px; }
+	}
+</style>
+
+<div class="layout">
+<!-- ================= Main ================= -->
+<main class="main">
+
+	<div>
+		<a href="/admin/member" class="back-link"><i class="fa-solid fa-arrow-left"></i> 목록으로</a>
+		<h1 class="page-title">회원 상세</h1>
+	</div>
+
+	<div class="profile-summary">
+		<div class="profile-summary-left">
+			<!-- <div class="profile-avatar-lg">김</div> -->
+			<div>
+				<div class="profile-name-row">
+					<span class="profile-name">[[${vo.NAME}]]</span>
+					<span class="role-tag" th:switch=${vo.AUTHORITY}>
+						<span th:case="'ROLE_ADMIN'">관리자</span>
+						<span th:case="'ROLE_INSTRUCTOR'">강사</span>
+						<span th:case="'ROLE_USER'">일반</span>
+					</span>
+				</div>
+				<div class="profile-meta">[[${vo.USERNAME}]] &middot; 가입일 [[${vo.DBDAY}]]</div>
+			</div>
+		</div>
+
+		<form th:action="@{/admin/member_update_enabled}" method="get">
+			<div class="status-control">
+				<select class="status-select" name="enabled">
+					<option value="1" th:selected="${vo.ENABLED==1}">정상</option>
+					<option value="0" th:selected="${vo.ENABLED==0}">휴면</option>
+					<option value="2" th:selected="${vo.ENABLED==2}">정지</option>
+				</select>
+				<input type="hidden" th:value="${vo.MEMBER_ID}" name="member_id">
+				<button class="btn-primary" type="submit">저장</button>
+			</div>
+		</form>
+	</div>
+
+	<div class="info-card">
+		<div class="info-card-title">상세 정보</div>
+		<table class="info-table">
+			<tr>
+				<th>이름</th>
+				<td>[[${vo.NAME}]]</td>
+			</tr>
+			<tr>
+				<th>아이디</th>
+				<td>[[${vo.USERNAME}]]</td>
+			</tr>
+			<tr>
+				<th>성별</th>
+				<td th:switch=${vo.SEX}>
+					<span th:case="'M'">남</span>
+					<span th:case="'F'">여</span>
+				</td>
+			</tr>
+			<tr>
+				<th>생년월일</th>
+				<td>[[${vo.BIRTHDAY}]]</td>
+			</tr>
+			<tr>
+				<th>연락처</th>
+				<td>[[${vo.PHONE}]]</td>
+			</tr>
+			<tr>
+				<th>이메일</th>
+				<td>
+					[[${vo.EMAIL}]]
+				</td>
+			</tr>
+			<tr>
+				<th>주소</th>
+				<td>([[${vo.POST}]]) [[${vo.ADDR1}]], [[${vo.ADDR2}]]</td>
+			</tr>
+			<tr>
+				<th>가입일</th>
+				<td>[[${vo.DBDAY}]]</td>
+			</tr>
+			<tr>
+				<th>자기소개</th>
+				<td>[[${vo.PROFILEDESC}]]</td>
+			</tr>
+		</table>
+	</div>
+
+</main>
+</div>
+
+</html>

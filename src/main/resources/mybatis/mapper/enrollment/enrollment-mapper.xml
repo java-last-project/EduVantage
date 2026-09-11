@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.web.domain.enrollment.mapper.EnrollmentMapper">
+	<select id="courseDetailData" resultType="com.sist.web.domain.course.vo.CourseVO" parameterType="int">
+		SELECT no,title,name as instructor,star,student_count,content,thumbnail
+		FROM course c
+		JOIN member m ON c.instructor_no=m.member_id
+		WHERE no=#{course_no}
+	</select>
+	
+	<!-- Evaluation -->
+	<select id="evaluationListData" resultType="com.sist.web.domain.enrollment.vo.CourseEvaluationVO" parameterType="int">
+		SELECT no,e.member_id,name,rating,review,like_count,TO_CHAR(e.regdate,'yyyy-mm-dd') as dbday,
+			CASE WHEN EXISTS (
+				SELECT 1 FROM course_evaluation_like cel
+				WHERE cel.member_id=#{member_id} AND cel.ce_no=e.no
+			) THEN 1 ELSE 0 END as liked
+		FROM course_evaluation e
+		JOIN member m ON e.member_id=m.member_id
+		WHERE course_no=#{course_no}
+		ORDER BY e.regdate DESC
+		OFFSET #{start} ROWS FETCH NEXT 3 ROWS ONLY
+	</select>
+	
+	<!-- 강의 평가 입력/삭제 트랜잭션 시 반드시 course.star update -->
+	<update id="courseStarUpdate" parameterType="int">
+		UPDATE course
+		SET star = NVL((SELECT ROUND(AVG(rating),1) FROM course_evaluation WHERE course_no=#{course_no}),0)
+		WHERE no=#{course_no}
+	</update>
+	
+	<!-- 강의 평가 입력 트랜잭션 -->
+	<insert id="evaluationInsert" parameterType="com.sist.web.domain.enrollment.vo.CourseEvaluationVO">
+		INSERT INTO course_evaluation(no,member_id,course_no,rating,review)
+		VALUES(
+    		ce_no_seq.nextval,#{member_id},#{course_no},#{rating},#{review}
+		)
+	</insert>
+	
+	<!-- 강의 평가 좋아요 트랜잭션 -->
+	<insert id="evalLikeInsert" parameterType="com.sist.web.domain.enrollment.vo.CourseEvaluationLikeVO">
+		INSERT INTO course_evaluation_like(no,ce_no,member_id) VALUES(
+		    cel_no_seq.nextval,#{ce_no},#{member_id}
+		)
+	</insert>
+	<update id="evalLikeIncrement" parameterType="int">
+		UPDATE course_evaluation SET like_count=like_count+1 WHERE no=#{ce_no}
+	</update>
+	
+	<!-- 강의 평가 좋아요 취소 트랜잭션 -->
+	<update id="evalLikeDecrement" parameterType="int">
+		UPDATE course_evaluation SET like_count=like_count-1 WHERE no=#{ce_no}
+	</update>
+	<delete id="evalLikeDelete" parameterType="int">
+		DELETE FROM course_evaluation_like WHERE ce_no=#{ce_no} AND member_id=#{member_id}
+	</delete>
+	
+	<!-- 강의 데이터 출력 -->
+	<select id="courseData" resultType="com.sist.web.domain.course.vo.CourseVO" parameterType="int">
+		SELECT title,m.name as instructor,star,thumbnail
+		FROM course c
+		JOIN member m ON c.instructor_no=m.member_id
+		WHERE no=#{course_no}
+	</select>
+	
+	<!-- 본인 강의 평가 조회 -->
+	<select id="evaluationMyData" resultType="com.sist.web.domain.enrollment.vo.CourseEvaluationVO" parameterType="int">
+		SELECT e.no,e.member_id,name,course_no,rating,review,like_count,TO_CHAR(e.regdate,'yyyy-mm-dd') as dbday,
+            CASE WHEN EXISTS (
+                SELECT 1 FROM course_evaluation_like cel
+                WHERE cel.member_id=#{member_id} AND cel.ce_no=e.no)
+                THEN 1 ELSE 0 END as liked
+		FROM course_evaluation e
+		JOIN member m ON e.member_id=m.member_id
+		WHERE course_no=#{course_no} AND e.member_id=#{member_id}
+	</select>
+	
+	
+
+</mapper>

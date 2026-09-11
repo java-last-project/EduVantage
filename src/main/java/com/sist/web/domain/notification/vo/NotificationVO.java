@@ -1,18 +1,21 @@
 package com.sist.web.domain.notification.vo;
 
-
-
+import com.sist.web.domain.notification.entity.NotificationType;
 import com.sist.web.domain.notification.entity.Notifications;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class NotificationVO {
     private int no;
-    private String type;
+    private NotificationType type;
     private String title;
     private String content;
     private int related_id;
@@ -25,7 +28,7 @@ public class NotificationVO {
                 .type(noti.getType())
                 .title(noti.getTitle())
                 .content(noti.getContent())
-                .related_id(noti.getRelated_id())
+                .related_id(noti.getRelatedId())
                 .read("Y".equals(noti.getIsRead()))
                 .regdate(noti.getRegdate())
                 .build();
