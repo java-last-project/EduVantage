@@ -1,60 +1,64 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<main class="main" id="gradingApp" v-cloak>
+<main class="main grading-workspace" id="gradingApp" v-cloak>
     <div class="page-header">
-        <div>
+        <div class="grading-heading">
             <h1 class="page-title">주관식 답안 채점</h1>
             <p class="page-desc">
-                채점 대기 답안을 선점한 후 점수를 입력할 수 있습니다.
+                대기 중인 답안을 선택하고, 제출 내용과 모범 답안을 비교해 채점하세요.
             </p>
         </div>
 
-        <button type="button" class="btn-outline" :disabled="store.loading" @click="store.loadAnswers">
+        <button type="button" class="btn-outline grading-refresh" :disabled="store.loading" @click="store.loadAnswers">
             <i class="fa-solid fa-rotate-right"></i>
             새로고침
         </button>
     </div>
 
-    <div class="grading-summary">
-        <div class="summary-card">
-            <div class="summary-label">전체 채점 대기</div>
-            <div class="summary-value">
+    <dl class="grading-summary" aria-label="채점 현황">
+        <div class="summary-item">
+            <dt class="summary-label">전체 대기</dt>
+            <dd class="summary-value">
                 {{store.answers.length}}
-            </div>
+            </dd>
         </div>
 
-        <div class="summary-card">
-            <div class="summary-label">미선점 답안</div>
-            <div class="summary-value">
+        <div class="summary-item">
+            <dt class="summary-label">미채점</dt>
+            <dd class="summary-value">
                 {{store.unclaimedCount}}
-            </div>
+            </dd>
         </div>
 
-        <div class="summary-card">
-            <div class="summary-label">내가 선점한 답안</div>
-            <div class="summary-value">
+        <div class="summary-item summary-item-emphasis">
+            <dt class="summary-label">내가 채점중</dt>
+            <dd class="summary-value">
                 {{store.claimedCount}}
-            </div>
+            </dd>
         </div>
-    </div>
+    </dl>
 
-    <div v-if="store.errorMessage" class="grading-error">
+    <div v-if="store.errorMessage" class="grading-error" role="alert">
         <i class="fa-solid fa-circle-exclamation"></i>
-        {{store.errorMessage}}
+        <span>{{store.errorMessage}}</span>
     </div>
 
     <div class="grading-layout">
         <!-- 채점 대기 목록 -->
         <section class="section-card grading-list-card">
             <div class="section-card-header">
-                <i class="fa-solid fa-list-check"></i>
-                채점 대기 목록
+                <span class="section-card-title">채점 대기 목록</span>
+                <span class="section-count">{{store.answers.length}}건</span>
             </div>
 
-            <div v-if="store.loading" class="grading-loading">
-                <span class="spinner-border spinner-border-sm"></span>
-                답안을 불러오는 중입니다.
+            <div v-if="store.loading" class="grading-loading" role="status" aria-live="polite">
+                <span class="visually-hidden">답안을 불러오는 중입니다.</span>
+                <div v-for="index in 4" :key="index" class="grading-skeleton" aria-hidden="true">
+                    <span class="skeleton-line skeleton-line-short"></span>
+                    <span class="skeleton-line"></span>
+                    <span class="skeleton-line skeleton-line-medium"></span>
+                </div>
             </div>
 
             <div v-else-if="store.answers.length===0" class="grading-empty">
@@ -64,13 +68,11 @@
             </div>
 
             <div v-else class="grading-list">
-                <article v-for="answer in store.answers" :key="answer.answer_no" class="grading-item" :class="{active:store.selectedAnswer?.answer_no===answer.answer_no}" @click="store.selectAnswer(answer)">
+                <button v-for="answer in store.answers" :key="answer.answer_no" type="button" class="grading-item" :class="{active:store.selectedAnswer?.answer_no===answer.answer_no}" :aria-pressed="store.selectedAnswer?.answer_no===answer.answer_no" @click="store.selectAnswer(answer)">
                     <div class="grading-item-header">
-                        <span class="course-tag">
-                            답안 #{{answer.answer_no}}
-                        </span>
+                        <span class="answer-number">답안 {{answer.answer_no}}</span>
 
-                        <span class="badge" :class="answer.grader_id?'badge-active':'badge-pending'">
+                        <span class="grading-status" :class="answer.grader_id?'grading-status-active':'grading-status-pending'">
                             {{answer.grader_id?'내가 채점 중':'채점 대기'}}
                         </span>
                     </div>
@@ -82,7 +84,7 @@
                     <div class="grading-item-meta">
                         <span>
                             <i class="fa-regular fa-file-lines"></i>
-                            응시 #{{answer.enrollment_no}}
+                            응시 {{answer.enrollment_no}}
                         </span>
 
                         <span>
@@ -90,7 +92,7 @@
                             배점 {{answer.score}}점
                         </span>
                     </div>
-                </article>
+                </button>
             </div>
         </section>
 
@@ -98,39 +100,38 @@
         <section class="section-card grading-detail-card">
             <template v-if="store.selectedAnswer">
                 <div class="section-card-header grading-detail-header">
-                    <span>
-                        <i class="fa-solid fa-pen-to-square"></i>
-                        답안 상세
-                    </span>
+                    <span class="section-card-title">답안 상세</span>
 
-                    <span class="badge" :class="store.selectedAnswer.grader_id?'badge-active':'badge-pending'">
+                    <span class="grading-status" :class="store.selectedAnswer.grader_id?'grading-status-active':'grading-status-pending'">
                         {{store.selectedAnswer.grader_id?'채점 가능':'선점 필요'}}
                     </span>
                 </div>
 
-                <div class="answer-section">
+                <div class="question-section">
                     <div class="answer-label">문제</div>
-                    <div class="answer-content">
+                    <div class="question-content">
                         {{store.selectedAnswer.title}}
                     </div>
                 </div>
 
-                <div class="answer-section">
-                    <div class="answer-label">수강생 답안</div>
-                    <div class="answer-content">
-                        {{store.selectedAnswer.user_answer||'(제출된 답안 없음)'}}
+                <div class="answer-comparison">
+                    <div class="answer-section">
+                        <div class="answer-label">수강생 답안</div>
+                        <div class="answer-content">
+                            {{store.selectedAnswer.user_answer||'(제출된 답안 없음)'}}
+                        </div>
+                    </div>
+
+                    <div class="answer-section standard-answer-section">
+                        <div class="answer-label">모범 답안</div>
+                        <div class="answer-content standard-answer">
+                            {{store.selectedAnswer.standard_answer
+                            ||'(등록된 모범 답안 없음)'}}
+                        </div>
                     </div>
                 </div>
 
-                <div class="answer-section">
-                    <div class="answer-label">모범 답안</div>
-                    <div class="answer-content standard-answer">
-                        {{store.selectedAnswer.standard_answer
-                        ||'(등록된 모범 답안 없음)'}}
-                    </div>
-                </div>
-
-                <div class="answer-section">
+                <div class="grading-score-section">
                     <div class="score-area">
                         <div class="score-field">
                             <label for="gradingScore">
@@ -139,23 +140,27 @@
 
                             <div class="score-input-wrap">
                                 <input id="gradingScore" v-model.number="store.score" type="number" class="score-input"
-                                        min="0" :max="store.selectedAnswer.score" :disabled="!store.selectedAnswer.grader_id|| store.submitting">
+                                        min="0" :max="store.selectedAnswer.score" inputmode="numeric" aria-describedby="gradingScoreHelp" :disabled="!store.selectedAnswer.grader_id|| store.submitting">
 
                                 <span class="score-max">
                                     / {{store.selectedAnswer.score}}점
                                 </span>
                             </div>
+
+                            <p id="gradingScoreHelp" class="score-help">
+                                {{store.selectedAnswer.grader_id?'0점부터 배점 사이의 정수를 입력하세요.':'점수를 입력하려면 먼저 답안을 선점하세요.'}}
+                            </p>
                         </div>
 
                         <div class="grading-actions">
                             <button v-if="!store.selectedAnswer.grader_id" type="button" class="btn-primary" :disabled="store.submitting" @click="store.claimAnswer">
                                 <i class="fa-solid fa-lock"></i>
-                                답안 선점
+                                채점하기
                             </button>
 
                             <template v-else>
                                 <button type="button" class="btn-outline" :disabled="store.submitting" @click="store.releaseAnswer">
-                                    선점 해제
+                                    채점 취소
                                 </button>
 
                                 <button type="button" class="btn-primary" :disabled="store.submitting" @click="store.submitGrade">
@@ -169,9 +174,9 @@
             </template>
 
             <div v-else class="grading-empty detail-empty">
-                <i class="fa-regular fa-hand-pointer"></i>
+                <i class="fa-regular fa-file-lines"></i>
                 <strong>채점할 답안을 선택해 주세요.</strong>
-                <p>왼쪽 목록에서 답안을 선택할 수 있습니다.</p>
+                <p>목록에서 답안을 선택하면 제출 내용과 모범 답안을 함께 확인할 수 있습니다.</p>
             </div>
         </section>
     </div>
