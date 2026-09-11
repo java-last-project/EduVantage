@@ -5,7 +5,7 @@
 <title>도서 상세</title>
 <link rel="stylesheet" href="/css/book/detail.css">
 <script th:inline="javascript">
-    const SESSION_ID = /*[[${session.member_id}]]*/ 0;
+    const SESSION_ID = /*[[${session?.member_id ?: 0}]]*/ 0;
 </script>
 </head>
 <body>

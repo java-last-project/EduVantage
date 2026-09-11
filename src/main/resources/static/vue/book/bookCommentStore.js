@@ -1,14 +1,12 @@
-const { defineStore } = Pinia;
-
-const useBookCommentStore = defineStore('bookComment', {
+const useBookCommentStore = Pinia.defineStore('bookComment', {
     state: () => ({
         list: [],        // 댓글 배열
         count: 0,        // 총 댓글 개수
-        fno: 0,          // 도서 번호 
+        fno: 0,          // 도서 번호
         curpage: 1,      // 현재 페이지
         totalpage: 0     // 전체 페이지 수
     }),
-    
+
     actions: {
         // 1. 댓글 목록 조회
         async commentListData() {
@@ -33,12 +31,12 @@ const useBookCommentStore = defineStore('bookComment', {
             try {
                 const res = await axios.post('/comment/insert_vue', {
                     // 백엔드 BookCommentVO의 멤버 변수명과 일치시킴
-                    book_no: payload.fno,     
-                    member_id: payload.member_id, 
+                    book_no: payload.fno,
+                    member_id: payload.member_id,
                     msg: payload.msg,
                     root: payload.root || 0   // 기존 parent_no 대신 root 사용 (일반 댓글은 0)
                 });
-                
+
                 this.list = res.data.rList;
                 this.count = res.data.count;
                 this.curpage = res.data.curpage;
@@ -56,7 +54,7 @@ const useBookCommentStore = defineStore('bookComment', {
                     msg: payload.msg,
                     book_no: this.fno // 갱신된 리스트를 받기 위해 도서 번호 전달
                 });
-                
+
                 this.list = res.data.rList;
                 this.count = res.data.count;
                 this.curpage = res.data.curpage;
@@ -75,7 +73,7 @@ const useBookCommentStore = defineStore('bookComment', {
                         fno: this.fno
                     }
                 });
-                
+
                 this.list = res.data.rList;
                 this.count = res.data.count;
                 this.curpage = res.data.curpage;

@@ -172,5 +172,59 @@ public class BookServiceImpl implements BookService {
 		bMapper.bookCommentInsert(vo);
 	}
 
+	@Override
+	public BookCommentVO bookCommentParentInfoData(int no) {
+		// TODO Auto-generated method stub
+		return bMapper.bookCommentParentInfoData(no);
+	}
+
+	@Override
+	public void bookCommentStepIncrement(BookCommentVO vo) {
+		// TODO Auto-generated method stub
+		bMapper.bookCommentStepIncrement(vo);
+	}
+
+	@Override
+	public void bookCommentReplyInsert(BookCommentVO vo) {
+		// TODO Auto-generated method stub
+		bMapper.bookCommentReplyInsert(vo);
+	}
+
+	@Override
+	public void bookCommentDepthIncrement(int no) {
+		// TODO Auto-generated method stub
+		bMapper.bookCommentDepthIncrement(no);
+	}
+
+	@Override
+	public void bookCommentUpdate(BookCommentVO vo) {
+		// TODO Auto-generated method stub
+		bMapper.bookCommentUpdate(vo);
+	}
+
+	@Override
+	public BookCommentVO bookCommentInfoData(int no) {
+		// TODO Auto-generated method stub
+		return bMapper.bookCommentInfoData(no);
+	}
+
+	@Override
+	public void bookCommentMsgUpdate(int no) {
+		// TODO Auto-generated method stub
+		bMapper.bookCommentMsgUpdate(no);
+	}
+
+	@Override
+	public void bookCommentDelete(int no) {
+		// TODO Auto-generated method stub
+		bMapper.bookCommentDelete(no);
+	}
+
+	@Override
+	public void bookCommentDepthDecrement(int no) {
+		// TODO Auto-generated method stub
+		bMapper.bookCommentDepthDecrement(no);
+	}
+
 	
 }

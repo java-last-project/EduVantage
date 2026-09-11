@@ -55,5 +55,23 @@ public interface BookService {
     
     public int bookCommentCount(int book_no);
    
-    public void bookCommentInsert (BookCommentVO vo);
+    public void bookCommentInsert(BookCommentVO vo);
+
+    public BookCommentVO bookCommentParentInfoData(int no);
+
+    public void bookCommentStepIncrement(BookCommentVO vo);
+
+    public void bookCommentReplyInsert(BookCommentVO vo);
+
+    public void bookCommentDepthIncrement(int no);
+
+    public void bookCommentUpdate(BookCommentVO vo);
+
+    public BookCommentVO bookCommentInfoData(int no);
+
+    public void bookCommentMsgUpdate(int no);
+
+    public void bookCommentDelete(int no);
+
+    public void bookCommentDepthDecrement(int no);
 }

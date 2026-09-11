@@ -3,7 +3,6 @@ package com.sist.web.domain.book.restcontroller;
 import java.util.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,6 +40,7 @@ public class BookRestController {
         map.put("totalpage", 1);
         return map;
     }
+
     // 도서 목록
     @GetMapping("/book/list_vue")
     public ResponseEntity<Map> book_list(
@@ -57,11 +57,9 @@ public class BookRestController {
             param.put("category", category);
             param.put("sort", sort);
 
-            // 목록 및 총 데이터 갯수 조회
             List<BookVO> list = bService.bookListData(param);
             int count = bService.bookTotalCount(category);
 
-            // 공통 유틸리티를 통한 페이징 계산
             Map<String, Object> pageInfo = PaginationUtil.getPageInfo(count, page);
 
             map.put("list", list);
@@ -74,12 +72,14 @@ public class BookRestController {
         }
         return ResponseEntity.ok(map);
     }
-    // 도서 상세보기
+
+    // 도서 상세보기 (이 부분의 int no에 @RequestParam("no")가 빠져있어서 에러가 났던 것입니다!)
     @GetMapping("/book/detail_vue")
     public ResponseEntity<BookVO> book_detail(@RequestParam("no") int no){
         BookVO vo = bService.bookDetailData(no);
         return new ResponseEntity<>(vo, HttpStatus.OK);
     }
+
     // 도서 검색
     @GetMapping("/book/find")
     public Map<String, Object> bookFindData(
@@ -101,14 +101,11 @@ public class BookRestController {
         dbParam.put("sort", sort);         
         dbParam.put("start", start);
         
-        // DB에서 데이터 및 조건별 검색 총 개수 가져오기
         List<BookVO> list = bService.bookFindData(dbParam);
         int count = bService.bookFindCount(dbParam); 
         
-        // 공통 유틸리티를 통한 페이징 계산 
         Map<String, Object> pageInfo = PaginationUtil.getPageInfo(count, page);
         
-        // 프론트로 보낼 데이터 구성
         response.put("list", list);
         response.put("count", count);
         response.putAll(pageInfo);
@@ -173,25 +170,18 @@ public class BookRestController {
     @PostMapping("/cart/add")
     public Map<String, String> addCart(@RequestBody BookCartVO vo) {
         Map<String, String> response = new HashMap<>();
-        
         try {
-            // 이미 장바구니에 담겨있는지 확인
             int count = bService.bookCartCheck(vo);
-            
             if (count > 0) {
-                // 이미 있으면 수량 증가 업데이트
                 bService.bookCartUpdate(vo);
             } else {
-                // 없으면 새로 추가
                 bService.bookCartInsert(vo);
             }
-            
             response.put("status", "success");
         } catch (Exception e) {
             e.printStackTrace();
             response.put("status", "error");
         }
-        
         return response;
     }
     
@@ -205,55 +195,36 @@ public class BookRestController {
     @PostMapping("/order/save")
     public Map<String, String> saveOrder(@RequestBody BookOrderVO orderVO) {
         Map<String, String> map = new HashMap<>();
-        
         try {
             bService.bookOrderComplete(orderVO, orderVO.getDetailList());
-            
             map.put("status", "success");
         } catch (Exception e) {
             e.printStackTrace();
             map.put("status", "error");
         }
-        
         return map;
     }
     
     // 배송지 입력 위한 회원 정보 
     @GetMapping("/member/info_vue")
     public ResponseEntity<MemberVO> getMemberInfo(HttpSession session) {
-        int memberId = (int) session.getAttribute("member_id");
-        MemberVO vo = mService.memberDetailData(memberId); 
+        Integer memberId = (Integer) session.getAttribute("member_id");
+        if (memberId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        MemberVO vo = mService.memberDetailData(memberId);
         return ResponseEntity.ok(vo);
     }
     
     // 댓글 목록 불러오기
-    @GetMapping("/comment/list")
-    public List<BookCommentVO> commentList(int book_no) {
-        return bService.bookCommentListData(book_no);
-    }
-
-    // 일반 새 댓글 등록
-    @PostMapping("/comment/insert")
-    public String commentInsert(BookCommentVO vo, HttpSession session) {
-        try {
-            vo.setMember_id((Integer) session.getAttribute("member_id"));
-            vo.setName((String) session.getAttribute("name"));
-            
-        	bService.bookCommentInsert(vo);
-        	
-            return "yes"; 
-        } catch (Exception e) {
-            e.printStackTrace();
-            
-            return "no";
-        }
-    }
-    
     @GetMapping("/comment/list_vue")
-    public Map<String, Object> commentListVue(@RequestParam("fno") int fno, @RequestParam(defaultValue="1") int page) {
+    public Map<String, Object> commentListVue(
+            @RequestParam("fno") int fno, 
+            @RequestParam(value="page", defaultValue="1") int page) {
         return getCommentList(fno, page);
     }
 
+    // 댓글 및 대댓글 등록
     @PostMapping("/comment/insert_vue")
     public Map<String, Object> commentInsertVue(@RequestBody BookCommentVO vo, HttpSession session) {
         String name = (String) session.getAttribute("name");
@@ -262,24 +233,24 @@ public class BookRestController {
         if (vo.getRoot() == 0) {
             bService.bookCommentInsert(vo); // 일반 댓글
         } else {
-            bService.bookCommentInsert(vo); // 대댓글
+            bService.bookCommentReplyInsert(vo); // 대댓글
         }
         return getCommentList(vo.getBook_no(), 1);
     }
 
-    /*
+    // 댓글 수정
     @PutMapping("/comment/update_vue")
     public Map<String, Object> commentUpdateVue(@RequestBody BookCommentVO vo) {
         bService.bookCommentUpdate(vo);
         return getCommentList(vo.getBook_no(), 1);
     }
 
+    // 댓글 삭제
     @DeleteMapping("/comment/delete_vue")
-    public Map<String, Object> commentDeleteVue(@RequestParam("no") int no, @RequestParam("fno") int fno) {
+    public Map<String, Object> commentDeleteVue(
+            @RequestParam("no") int no,
+            @RequestParam("fno") int fno) {
         bService.bookCommentDelete(no);
         return getCommentList(fno, 1);
     }
-	*/
-    
-    
 }

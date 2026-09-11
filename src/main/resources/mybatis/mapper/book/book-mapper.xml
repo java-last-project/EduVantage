@@ -215,7 +215,7 @@
 	    <selectKey keyProperty="group_id" resultType="int" order="BEFORE">
 	        SELECT NVL(MAX(group_id)+1, 1) FROM book_reply
 	    </selectKey>
-	    INSERT INTO book_comment (
+	    INSERT INTO book_reply (
 	        no, 
 	        book_no, 
 	        member_id, 
