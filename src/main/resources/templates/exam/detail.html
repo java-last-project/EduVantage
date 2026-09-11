@@ -5,30 +5,31 @@
 const SESSION_NAME = /*[[${session.name}]]*/ ''
 const EXAM_THEME = /*[[${theme}]]*/ 0
 const EXAM_COUNT = /*[[${count}]]*/ 20
+const EXAM_NO = /*[[${examNo}]]*/ null
 </script>
 	<div class="exam-layout">
-		<th:block th:include="exam/sidebar"></th:block>
+		<th:block th:replace="~{exam/sidebar::sidebar('examing')}"></th:block>
 	
 		<main class="exam-main">
 			<header class="exam-header">
-				<h2 class="fs-4 fw-bold mb-0" v-text="store.theme===1?'정보처리기사 기출문제 모의고사':'정보보안기사 기출문제 모의고사'"></h2>
+				<h2 class="fs-4 fw-bold mb-0" v-text="examTitle"></h2>
 			</header>
 	
 			<div class="exam-content">
 				<div class="flex-grow-1">     
-	                <!-- 타이머 및 제출 바 -->
+
 					<div class="exam-card d-flex justify-content-between align-items-center">
 						<div class="d-flex align-items-center gap-3">
 							<span class="badge" style="background-color: var(--bg-light-blue); color: var(--main-color);">시험 진행 중</span>
-							<h5 class="fw-bold mb-0" v-text="store.theme===1?'정보처리기사 기출문제 모의고사':'정보보안기사 기출문제 모의고사'"></h5>
+							<h5 class="fw-bold mb-0" v-text="examTitle"></h5>
 						</div>
 						<div class="d-flex align-items-center gap-4 fw-medium">
-							<span class="text-muted"><i class="fa-regular fa-clock"></i> 경과시간: 00:15:23</span>
-							<span class="text-danger"><i class="fa-solid fa-stopwatch"></i> 남은시간: 00:44:37</span>
-							<button class="btn text-white px-4" style="background-color: var(--main-color);">제출하기</button>
+							<span class="text-muted"><i class="fa-regular fa-clock"></i> 경과시간: {{fElapsedTime}}</span>
+							<span class="text-danger"><i class="fa-solid fa-stopwatch"></i> 남은시간: {{fRemainingTime}}</span>
+							<button class="btn text-white px-4" style="background-color: var(--main-color);" @click="submitExam">제출하기</button>
 						</div>
 					</div>
-	                <!-- 객관식 문제 -->
+
 					<div v-for="(q,index) in store.list" :key="index" class="exam-card" :id="'q-box-'+index">
 						<div class="d-flex justify-content-between mb-3">
 							<span v-if="q.type === 1" class="badge bg-light text-secondary border">객관식</span>
@@ -36,22 +37,28 @@ const EXAM_COUNT = /*[[${count}]]*/ 20
 							<span class="fw-bold" style="color: var(--main-color);">문제 {{index+1}} / {{store.list.length}}</span>
 						</div>
 						<h5 class="fw-bold mb-4" style="line-height: 1.5;">{{ q.title }}</h5>
-     
+						<div v-if="q.image" class="text-center my-3 p-2 bg-white rounded border">
+							<img :src="q.image"
+							     :alt="'문제 '+(index+1)+' 이미지'"
+							     class="img-fluid rounded"
+							     referrerpolicy="no-referrer"
+							     style="max-height: 360px; object-fit: contain;">
+						</div>
 						<div v-if="q.type === 1" class="d-flex flex-column gap-2">
 							<label class="option-box" :class="{selected: userAnswers[q.no]==='1'}">
-			                    <input type="radio" :name="'q_' + q.no" value="1" v-model="userAnswers[q.no]">
+			                    <input type="radio" :name="'q_'+q.no" value="1" v-model="userAnswers[q.no]">
 			                    <span>① {{q.ovo?.option1}}</span>
 			                </label>
 			                <label class="option-box" :class="{selected: userAnswers[q.no]==='2'}">
-			                    <input type="radio" :name="'q_' + q.no" value="2" v-model="userAnswers[q.no]">
+			                    <input type="radio" :name="'q_'+q.no" value="2" v-model="userAnswers[q.no]">
 			                    <span>② {{q.ovo?.option2}}</span>
 			                </label>
 			                <label class="option-box" :class="{selected: userAnswers[q.no]==='3'}">
-			                    <input type="radio" :name="'q_' + q.no" value="3" v-model="userAnswers[q.no]">
+			                    <input type="radio" :name="'q_'+q.no" value="3" v-model="userAnswers[q.no]">
 			                    <span>③ {{q.ovo?.option3}}</span>
 			                </label>
 			                <label class="option-box" :class="{selected: userAnswers[q.no]==='4'}">
-			                    <input type="radio" :name="'q_' + q.no" value="4" v-model="userAnswers[q.no]">
+			                    <input type="radio" :name="'q_'+q.no" value="4" v-model="userAnswers[q.no]">
 			                    <span>④ {{q.ovo?.option4}}</span>
 			                </label>
 						</div>
@@ -61,7 +68,7 @@ const EXAM_COUNT = /*[[${count}]]*/ 20
 						</div>
 					</div>
 				</div>
-				<div class="omr-col" style="min-width: 300px;"> <!-- 패널 최소 가로 폭 확보 -->
+				<div class="omr-col" style="min-width: 300px;">
 					<div class="exam-card">
 						<h6 class="fw-bold mb-1">답안 현황</h6>
 						<p class="text-muted mb-4" style="font-size: 13px;">문제를 클릭하면 해당 번호로 즉시 이동합니다.</p> 
@@ -89,42 +96,138 @@ const EXAM_COUNT = /*[[${count}]]*/ 20
 						<div class="p-3 rounded" style="background-color: var(--bg-body);">
 							<div class="d-flex justify-content-between fw-bold mb-2">
 								<span style="font-size: 14px;">전체 진행률</span>
-								<span style="color: var(--main-color);">40%</span>
+								<span style="color: var(--main-color);">{{progressPercent}}%</span>
 							</div>
 							<div class="progress mb-2" style="height: 6px;">
-								<div class="progress-bar" role="progressbar" style="width: 40%; background-color: var(--main-color);" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+								<div class="progress-bar" role="progressbar" :style="{width: progressPercent+'%', backgroundColor: 'var(--main-color)'}" :aria-valuenow="progressPercent" aria-valuemin="0" aria-valuemax="100"></div>
 							</div>
-							<div class="text-end text-muted" style="font-size: 12px;">풀이 완료: 8 / 20</div>
+							<div class="text-end text-muted" style="font-size: 12px;">풀이 완료: {{solvedCount}} / {{store.list.length}}</div>
 						</div>
+						<button class="btn w-100 py-3 text-white fw-bold shadow-sm"
+						        style="background-color: var(--main-color); border-radius: 8px; font-size: 15px;"
+						        @click="submitExam">
+							<i class="fa-solid fa-paper-plane me-1"></i> 제출하기
+						</button>
 					</div>
 				</div>
 			</div>
 		</main>
 	</div>
-<script src="/vue/axios.js"></script>
 <script src="/vue/exam/examStore.js"></script>
 <script>
-const {onMounted,ref,createApp}=Vue
+const {onMounted,onUnmounted,ref,computed,createApp,watch}=Vue
 const {createPinia}=Pinia
 const examApp=createApp({
     setup(){
         const store=useExamStore()
         const userAnswers=ref({})
+		const totalLimitSeconds=ref(60 * 60)
+		const elapsedSeconds=ref(0)
+		let timerInterval=null
+		const examTitleMap = {
+			1: '정보처리기사 기출문제 모의고사',
+			2: '정보보안기사 기출문제 모의고사',
+			3: 'SQLD 기출문제 모의고사',
+			4: '리눅스 마스터 기출문제 모의고사',
+			5: '빅데이터 분석기사 기출문제 모의고사'
+		}
+		const examTitle=computed(()=>{
+			if(store.title && store.title.trim()!==''){
+				return store.title
+			}
+			return examTitleMap[store.theme]
+		})
         const scrollToQuestion=(index)=>{
 			const target = document.getElementById('q-box-'+index)
 			if(target) {
 				target.scrollIntoView({behavior:'smooth', block:'center'})
 			}
 		}
-        onMounted(()=>{
+		const solvedCount = computed(()=>{
+			return Object.values(userAnswers.value).filter(val=>val && String(val).trim()!=='').length
+		})
+		const progressPercent=computed(()=>{
+			if (!store.list.length) return 0
+			return Math.round((solvedCount.value/store.list.length)*100)
+		})
+		const formatTime=(seconds)=>{
+			const h=String(Math.floor(seconds/3600)).padStart(2,'0')
+			const m=String(Math.floor((seconds%3600)/60)).padStart(2,'0')
+			const s=String(seconds%60).padStart(2,'0')
+			return `${h}:${m}:${s}`
+		}
+		const fElapsedTime=computed(()=>{
+			return formatTime(elapsedSeconds.value)
+		})
+		const fRemainingTime=computed(()=>{
+			const remaining=Math.max(0, totalLimitSeconds.value - elapsedSeconds.value)
+			return formatTime(remaining)
+		})
+		const startTimer=()=>{
+			timerInterval=setInterval(()=>{
+				elapsedSeconds.value++
+
+				if (elapsedSeconds.value>=totalLimitSeconds.value) {
+					clearInterval(timerInterval)
+					alert('시험 제한 시간이 종료되었습니다. 답안이 자동으로 제출됩니다.')
+					submitExam(true)
+				}
+			}, 1000)
+		}
+		const submitExam=async (isAuto=false)=>{
+			if (!isAuto && !confirm('시험을 최종 제출하시겠습니까?')) return
+			if (timerInterval) clearInterval(timerInterval)
+			const payload={
+				enrollmentNo: store.enrollmentNo,
+				answers: userAnswers.value,
+				spentTime: elapsedSeconds.value
+			}
+			try{
+				await api.post('/exam/submit_vue',payload)
+				localStorage.removeItem(`exam_ans_${store.enrollmentNo}`)
+				alert('성공적으로 제출되었습니다.')
+				location.href='/exam/result?no='+store.enrollmentNo
+			}catch(err){
+				console.error(err)
+				alert('제출처리에 실패했습니다. 다시 시도해주세요.')
+			}
+		}
+		watch(userAnswers,(newVal)=>{
+			if(store.enrollmentNo){
+				localStorage.setItem(`exam_ans_${store.enrollmentNo}`,JSON.stringify(newVal))
+			}
+		},{deep:true})
+        onMounted(async ()=>{
             store.username=SESSION_NAME
-            const requestParams={theme:EXAM_THEME,count:EXAM_COUNT}
-            store.examDetailData(requestParams)
+            const requestParams={
+				theme:EXAM_THEME,
+				count:EXAM_COUNT,
+				examNo:EXAM_NO
+			}
+            await store.examDetailData(requestParams)
+			if(store.enrollmentNo){
+				const savedAnswers=localStorage.getItem(`exam_ans_${store.enrollmentNo}`)
+				if(savedAnswers){
+					userAnswers.value=JSON.parse(savedAnswers)
+				}
+			}
+
+			startTimer()
         })
+		onUnmounted(()=>{
+			if(timerInterval) clearInterval(timerInterval)
+		})
         return{
             store,
+			examTitle,
+			solvedCount,
+			progressPercent,
             userAnswers,
-            scrollToQuestion
+			fElapsedTime,
+			fRemainingTime,
+			startTimer,
+            scrollToQuestion,
+			submitExam
         }
     }
 })

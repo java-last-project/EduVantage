@@ -8,8 +8,6 @@ import com.sist.web.domain.book.vo.*;
 public interface BookMapper {
 
 	public List<BookVO> bookListData(Map map);
-
-	public int bookTotalPage(String category);
 	
 	public int bookTotalCount(String category);
 	
@@ -20,4 +18,32 @@ public interface BookMapper {
 	public int bookFindCount(Map<String, Object> map);
 
 	public List<BookVO> bookFindData(Map<String, Object> map);
+	
+	public int bookLikeOn(BookLikeVO vo);
+
+	public int bookLikeOff(BookLikeVO vo);
+
+	public int bookLikeCount(int book_no);
+
+	public int bookLikeCheck(BookLikeVO vo);
+	
+	public void bookLikeIncrement(int book_no);
+	
+	public void bookLikeDecrement(int book_no);
+	
+	public int bookCartCheck(BookCartVO vo);
+
+	public void bookCartUpdate(BookCartVO vo);
+
+	public void bookCartInsert(BookCartVO vo);
+	
+	public List<BookCartVO> bookCartListData(int member_id);
+	
+    public List<BookOrderVO> bookOrderListData(int member_id);
+
+    public void bookOrderInsert(BookOrderVO vo);
+
+    public void bookOrderDetailInsert(BookOrderDetailVO vo);
+    
+    public List<BookVO> bookBestData();
 }

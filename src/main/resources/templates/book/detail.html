@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <title>도서 상세</title>
 <link rel="stylesheet" href="/css/book/detail.css">
+<script th:inline="javascript">
+    const SESSION_ID = /*[[${session.member_id}]]*/ 0;
+</script>
 </head>
 <body>
 	<div id="app" class="detail-wrapper">
@@ -65,13 +68,15 @@
 				<!-- 구매 버튼 -->
 				<div class="action-pannel">
 					<div class="action-btn-wrap">
-						<button class="btn-custom btn-like">
+						<!-- <button class="btn-custom btn-like" @click="store.likeClick'">
 							<i class="fa-regular fa-heart"></i> {{ store.vo.like_count }}
+						</button> -->
+						<button class="btn-custom btn-like" @click="store.toggleLike">
+						    <i :class="store.isLiked ? 'fa-solid fa-heart text-danger' : 'fa-regular fa-heart'"></i>
+						    <span :class="{'text-danger fw-bold': store.isLiked}">{{ store.likeCount }}</span>
 						</button>
-						<button class="btn-custom btn-cart" @click="store.goToCart">
-							장바구니 담기</button>
-						<button class="btn-custom btn-buy" @click="store.goToOrder">
-							바로 구매하기</button>
+						<button class="btn-custom btn-cart" @click="store.addToCart">장바구니 담기</button>
+						<button class="btn-custom btn-buy" @click="store.goToOrder">바로 구매하기</button>
 					</div>
 
 					<ul class="perk-list">
@@ -98,7 +103,6 @@
 			<div v-show="store.activeTab === 'intro'">
 				<h3 class="tab-content-title">책 소개</h3>
 				<p v-html="store.vo.book_desc"></p>
-				x
 				<div class="desc-image" v-if="store.vo.desc_img">
 					<img :src="store.vo.desc_img" style="width: 100%;" alt="도서 상세 이미지">
 				</div>
@@ -157,6 +161,7 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const no = urlParams.get('no') || 1; 
                 store.fetchBookDetail(no);
+                store.fetchLikeStatus(no);
             });
 
             const formattedToc = computed(() => {

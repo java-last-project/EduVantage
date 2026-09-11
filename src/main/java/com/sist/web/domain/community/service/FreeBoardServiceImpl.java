@@ -2,6 +2,7 @@ package com.sist.web.domain.community.service;
 
 import java.util.*;
 
+import com.sist.web.domain.notification.producer.NotificationProducer;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class FreeBoardServiceImpl implements FreeBoardService {
+	private final NotificationProducer notificationProducer;
 	private final FreeBoardMapper fMapper;
 	private final FreeBoardCommentMapper cMapper;
 	private final int ROW=20;
@@ -117,6 +119,22 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	@Override
 	public void freeBoardCommentInsert(FreeCommentVO vo) {
 		cMapper.freeBoardCommentInsert(vo);
+		FreeBoardVO parentFreeBoard = fMapper.freeBoardInfo(vo.getBoard_no());
+		//이벤트 발행
+		if(vo.getParent_no() == 0){
+			notificationProducer.publishPostCommented(parentFreeBoard.getMember_id(), vo.getBoard_no(), parentFreeBoard.getSubject());
+		}else{
+			//본인 게시글에 본인이 단 경우 제외
+			if(parentFreeBoard.getMember_id()!=vo.getMember_id()){
+				notificationProducer.publishPostCommented(parentFreeBoard.getMember_id(), vo.getBoard_no(), parentFreeBoard.getSubject());
+			}
+			//부모댓글 정보
+			FreeCommentVO pvo = cMapper.parentFeeBoardCommentInfo(vo.getParent_no());
+			//본인댓글에 본인이 단 경우 제외
+			if(pvo.getMember_id() != vo.getMember_id()){
+				notificationProducer.publishCommentReplied(pvo.getMember_id(), vo.getBoard_no(), parentFreeBoard.getSubject());
+			}
+		}
 	}
 
 	@Override

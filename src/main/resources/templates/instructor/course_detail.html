@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<style>
+	.btn-outline:hover{ background:#f3f4f6; }
+	.btn-primary{
+		padding:10px 18px;
+		background:var(--main-color);
+		border:1px solid var(--main-color);
+		border-radius:8px;
+		font-size:14px;
+		font-weight:500;
+		color:#ffffff;
+		cursor:pointer;
+		white-space:nowrap;
+	}
+	.btn-primary:hover{ background:var(--main-hover); }
+	
+</style>
+
+<div class="layout">
+<main class="main">
+
+	<a href="/instructor/course" class="back-link"><i class="fa-solid fa-arrow-left"></i> 담당 강의 목록으로</a>
+
+	<div class="course-summary">
+		<div class="course-summary-left">
+			<div class="course-thumb img-placeholder"><img th:src="${vo.thumbnail}"></div>
+			<div>
+				<a th:href="@{/course/detail(no=${vo.no})}" class="plain-link">
+				<h1 class="course-title">[[${vo.title}]]</h1></a>
+				<div class="course-meta">
+					<span><i class="fa-solid fa-star" style="color:#f59e0b;"></i> [[${vo.star}]]</span>
+					<span><i class="fa-solid fa-user"></i> 수강생 [[${vo.student_count}]]명</span>
+				</div>
+			</div>
+		</div>
+		<div class="summary-actions">
+			<button class="btn-outline"><i class="fa-solid fa-bullhorn"></i> 새소식</button>
+			<a class="btn btn-primary" th:href="@{/instructor/course_edit(course_no=${vo.no})}"><i class="fa-solid fa-pen"></i> 정보 수정</a>
+		</div>
+	</div>
+
+	<div class="section-card table-card">
+		<div class="section-card-header">수강 학생 목록</div>
+		<table>
+			<thead>
+				<tr>
+					<th>이름</th>
+					<th>수강 시작일</th>
+					<th>최근 학습일</th>
+					<th>진도율</th>
+					<th>수료 여부</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="s:${sList}">
+					<td>[[${s.NAME}]]</td>
+					<td>[[${s.REGDATE}]]</td>
+					<td>[[${s.LASTACCESSED}]]</td>
+					<td><span class="progress-track"><span class="progress-fill" th:style="'width:' + ${s.PROGRESS} + '%'"></span></span>[[${s.PROGRESS}]]%</td>
+					<td><span class="badge" th:classappend="${s['ISCOMPLETED'] == 'Y' ? 'badge-active':'badge-pending'}">[[${s['ISCOMPLETED'] == 'Y' ? '수료' : '미수료'}]]</span></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+</main>
+</div>
+
+</html>

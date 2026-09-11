@@ -2,6 +2,7 @@ package com.sist.web.domain.community.service;
 
 import java.util.*;
 
+import com.sist.web.domain.notification.producer.NotificationProducer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class QnaServiceImpl implements QnaService {
+	private final NotificationProducer notificationProducer;
 	private final QnaMapper qMapper;
 	private final QnaReplyMapper rMapper;
 	private final int ROW=20;
