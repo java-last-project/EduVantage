@@ -4,8 +4,10 @@ import java.util.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +32,15 @@ public class BookRestController {
     
     private final BookService bService;
     private final MemberService mService; 
+    
+    private Map<String, Object> getCommentList(int book_no, int page) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("rList", bService.bookCommentListData(book_no));
+        map.put("count", bService.bookCommentCount(book_no));
+        map.put("curpage", page);
+        map.put("totalpage", 1);
+        return map;
+    }
     // 도서 목록
     @GetMapping("/book/list_vue")
     public ResponseEntity<Map> book_list(
@@ -237,6 +248,38 @@ public class BookRestController {
             return "no";
         }
     }
+    
+    @GetMapping("/comment/list_vue")
+    public Map<String, Object> commentListVue(@RequestParam("fno") int fno, @RequestParam(defaultValue="1") int page) {
+        return getCommentList(fno, page);
+    }
+
+    @PostMapping("/comment/insert_vue")
+    public Map<String, Object> commentInsertVue(@RequestBody BookCommentVO vo, HttpSession session) {
+        String name = (String) session.getAttribute("name");
+        vo.setName(name);
+
+        if (vo.getRoot() == 0) {
+            bService.bookCommentInsert(vo); // 일반 댓글
+        } else {
+            bService.bookCommentInsert(vo); // 대댓글
+        }
+        return getCommentList(vo.getBook_no(), 1);
+    }
+
+    /*
+    @PutMapping("/comment/update_vue")
+    public Map<String, Object> commentUpdateVue(@RequestBody BookCommentVO vo) {
+        bService.bookCommentUpdate(vo);
+        return getCommentList(vo.getBook_no(), 1);
+    }
+
+    @DeleteMapping("/comment/delete_vue")
+    public Map<String, Object> commentDeleteVue(@RequestParam("no") int no, @RequestParam("fno") int fno) {
+        bService.bookCommentDelete(no);
+        return getCommentList(fno, 1);
+    }
+	*/
     
     
 }

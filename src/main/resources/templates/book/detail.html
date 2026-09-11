@@ -237,29 +237,119 @@
 		</div>
 	</div>
 	<script src="/vue/book/bookDetailStore.js"></script>
-
-	<script>
-	const { createApp, onMounted, computed } = Vue;
+	<script src="/vue/book/bookCommentStore.js"></script>
+    
+    
+    <script>
+    const { createApp, onMounted, computed, ref } = Vue; 
     const { createPinia } = Pinia;
     
     const bookDetailApp = createApp({
         setup() {
+            // Store 인스턴스 생성
             const store = useBookDetailStore();
+            const commentStore = useBookCommentStore(); 
             
+            // 댓글 UI 제어를 위한 반응형 변수들 선언
+            const newComment = ref('');          // 새 댓글 입력값
+            const editReplyNo = ref(0);          // 현재 수정 중인 댓글 번호
+            const editCommentText = ref('');     // 수정할 댓글 입력값
+            const activeReplyNo = ref(0);        // 대댓글 폼이 열려있는 댓글 번호
+            const coComment = ref('');           // 대댓글 입력값
+
             onMounted(() => {
                 const urlParams = new URLSearchParams(window.location.search);
                 const no = urlParams.get('no') || 1; 
                 store.fetchBookDetail(no);
                 store.fetchLikeStatus(no);
+
+                // 화면 진입 시 해당 도서의 댓글 목록 불러오기
+                commentStore.fno = no;
+                commentStore.commentListData();
             });
 
             const formattedToc = computed(() => {
                 if (!store.vo.toc) return '';
                 return store.vo.toc.replace(/▣/g, '<br><br><b>▣</b>');
             });
+
+            // 새 댓글 작성 함수
+            const writeComment = async () => {
+                if (newComment.value.trim() === '') {
+                    alert("댓글 내용을 입력해주세요.");
+                    return;
+                }
+                await commentStore.insertComment({
+                    fno: commentStore.fno,
+                    member_id: SESSION_ID, 
+                    msg: newComment.value,
+                    root: 0 // 원댓글
+                });
+                newComment.value = ''; // 전송 후 입력창 비우기
+            };
+
+            // 대댓글창 열기/닫기 토글
+            const toggleReplyForm = (no) => {
+                if (activeReplyNo.value === no) {
+                    activeReplyNo.value = 0; // 이미 열려있으면 닫기
+                } else {
+                    activeReplyNo.value = no;
+                    coComment.value = ''; // 열 때 입력창 비우기
+                    editReplyNo.value = 0; // 수정창이 열려있다면 닫기
+                }
+            };
+
+            // 대댓글 작성 전송 함수
+            const writeCoComment = async (root_no) => {
+                if (coComment.value.trim() === '') {
+                    alert("대댓글 내용을 입력해주세요.");
+                    return;
+                }
+                await commentStore.insertComment({
+                    fno: commentStore.fno,
+                    member_id: SESSION_ID,
+                    msg: coComment.value,
+                    root: root_no // 클릭한 부모 댓글의 번호 전달
+                });
+                activeReplyNo.value = 0; // 전송 후 폼 닫기
+                coComment.value = '';
+            };
+
+            // 수정창 열기 
+            const toggleEditForm = (reply) => {
+                editReplyNo.value = reply.no;
+                editCommentText.value = reply.msg; // 기존 내용을 입력창에 채워줌
+                activeReplyNo.value = 0; // 대댓글창 닫기
+            };
+
+            // 수정 내역 전송 함수
+            const updateComment = async (no) => {
+                if (editCommentText.value.trim() === '') {
+                    alert("수정할 내용을 입력해주세요.");
+                    return;
+                }
+                await commentStore.updateComment({
+                    no: no,
+                    msg: editCommentText.value
+                });
+                editReplyNo.value = 0; // 전송 후 폼 닫기
+            };
+
+            // 삭제 처리 함수
+            const deleteComment = async (no) => {
+                if (confirm("정말로 삭제하시겠습니까?")) {
+                    await commentStore.deleteComment(no);
+                }
+            };
+
             return { 
                 store, 
-                formattedToc 
+                formattedToc,
+                // 댓글 관련 리턴
+                commentStore,
+                sessionId: SESSION_ID, 
+                newComment, editReplyNo, editCommentText, activeReplyNo, coComment,
+                writeComment, toggleReplyForm, writeCoComment, toggleEditForm, updateComment, deleteComment
             };
         }
     });

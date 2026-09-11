@@ -193,12 +193,6 @@
 		WHERE ROWNUM &lt; = 10
 	</select>
 	
-	<!-- 
-		private int no, book_no, member_id, group_id, group_step, group_tab, root, depth;
-		private String name, msg, dbday;
-		private Date regdate;
-	 -->
-	
 	<!-- 댓글 목록 출력 -->
 	<select id="bookCommentListData" resultType="com.sist.web.domain.book.vo.BookCommentVO" parameterType="int">
 	    SELECT no, book_no, member_id, name, msg,
@@ -243,6 +237,56 @@
 	        #{group_id}, 0, 0, 0, 0
 	    )
 	</insert>
+	
+	<!-- 대댓글 작성을 위한 부모 정보 조회 -->
+	<select id="bookCommentParentInfoData" resultType="com.sist.web.domain.book.vo.BookCommentVO" parameterType="int">
+	    SELECT group_id, group_step, group_tab FROM book_reply WHERE no = #{no}
+	</select>
+	
+	<!-- 대댓글 순서 밀어내기 -->
+	<update id="bookCommentStepIncrement" parameterType="com.sist.web.domain.book.vo.BookCommentVO">
+	    UPDATE book_reply SET group_step = group_step + 1
+	    WHERE group_id = #{group_id} AND group_step > #{group_step}
+	</update>
+	
+	<!-- 대댓글 등록 -->
+	<insert id="bookCommentReplyInsert" parameterType="com.sist.web.domain.book.vo.BookCommentVO">
+	    INSERT INTO book_reply (
+	        no, book_no, member_id, name, msg, regdate, group_id, group_step, group_tab, root, depth
+	    ) VALUES (
+	        br_no_seq.nextval, #{book_no}, #{member_id}, #{name}, #{msg}, SYSDATE,
+	        #{group_id}, #{group_step} + 1, #{group_tab} + 1, #{root}, 0
+	    )
+	</insert>
+	
+	<!-- 부모 댓글 depth 증가 -->
+	<update id="bookCommentDepthIncrement" parameterType="int">
+	    UPDATE book_reply SET depth = depth + 1 WHERE no = #{no}
+	</update>
+	
 	<!-- 댓글 수정 -->
-	<!-- 댓글 삭제 -->
+	<update id="bookCommentUpdate" parameterType="com.sist.web.domain.book.vo.BookCommentVO">
+	    UPDATE book_reply SET msg = #{msg} WHERE no = #{no}
+	</update>
+	
+	<!-- 댓글 삭제를 위한 정보 조회 -->
+	<select id="bookCommentInfoData" resultType="com.sist.web.domain.book.vo.BookCommentVO" parameterType="int">
+	    SELECT depth, root FROM book_reply WHERE no = #{no}
+	</select>
+	
+	<!-- 자식이 있는 댓글 내용 변경 -->
+	<update id="bookCommentMsgUpdate" parameterType="int">
+	    UPDATE book_reply SET msg = '관리자가 삭제한 댓글입니다.' WHERE no = #{no}
+	</update>
+	
+	<!-- 실제 댓글 삭제 -->
+	<delete id="bookCommentDelete" parameterType="int">
+	    DELETE FROM book_reply WHERE no = #{no}
+	</delete>
+	
+	<!-- 부모 댓글 depth 감소 -->
+	<update id="bookCommentDepthDecrement" parameterType="int">
+	    UPDATE book_reply SET depth = depth - 1 WHERE no = #{no}
+	</update>
+	
 </mapper>
