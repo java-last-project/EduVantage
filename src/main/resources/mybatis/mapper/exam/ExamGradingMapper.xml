@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.web.domain.exam.mapper.ExamGradingMapper">
+
+    <select id="selectPendingSubjectiveList" parameterType="int" resultType="hashmap">
+        SELECT a.no AS "answer_no",
+               a.enrollment_no AS "enrollment_no",
+               a.question_no AS "question_no",
+               a.user_answer AS "user_answer",
+               a.grader_id AS "grader_id",
+               q.title AS "title",
+               q.answer AS "standard_answer",
+               q.score AS "score",
+               e.theme AS "theme",
+               e.exam_no AS "exam_no"
+        FROM exam_user_answer a
+                 JOIN exam_question q ON a.question_no=q.no
+                 JOIN exam_enrollment e ON a.enrollment_no=e.no
+        WHERE a.is_correct='W'
+          AND (a.grader_id IS NULL OR a.grader_id=#{graderId})
+        ORDER BY a.no
+    </select>
+
+    <update id="claimGradingTask" parameterType="hashmap">
+        UPDATE exam_user_answer
+        SET grader_id=#{graderId}
+        WHERE no=#{answerNo}
+          AND is_correct='W'
+          AND grader_id IS NULL
+    </update>
+
+    <update id="releaseGradingClaim" parameterType="hashmap">
+        UPDATE exam_user_answer
+        SET grader_id=NULL
+        WHERE no=#{answerNo}
+          AND grader_id=#{graderId}
+          AND is_correct='W'
+    </update>
+
+    <select id="selectClaimedEnrollmentNo" parameterType="hashmap" resultType="int">
+        SELECT enrollment_no
+        FROM exam_user_answer
+        WHERE no=#{answerNo}
+          AND grader_id=#{graderId}
+          AND is_correct='W'
+    </select>
+
+    <update id="gradeSubjectiveAnswer" parameterType="hashmap">
+        UPDATE exam_user_answer
+        SET score=#{score},
+            is_correct=CASE WHEN #{score} &gt; 0 THEN 'Y' ELSE 'N' END,
+            graded_at=SYSDATE
+        WHERE no=#{answerNo}
+          AND grader_id=#{graderId}
+          AND is_correct='W'
+    </update>
+
+    <select id="countRemainingPending" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM exam_user_answer
+        WHERE enrollment_no=#{enrollmentNo}
+          AND is_correct='W'
+    </select>
+
+    <update id="finalizeEnrollmentScore" parameterType="int">
+        UPDATE exam_enrollment
+        SET totalscore=(
+                SELECT NVL(SUM(score), 0)
+                FROM exam_user_answer
+                WHERE enrollment_no=#{enrollmentNo}
+            ),
+            status='COMPLETE'
+        WHERE no=#{enrollmentNo}
+    </update>
+
+</mapper>

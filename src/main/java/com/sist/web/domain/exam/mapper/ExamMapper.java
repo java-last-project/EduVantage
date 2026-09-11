@@ -21,12 +21,6 @@ public interface ExamMapper {
 	public List<ExamQuestionVO> getQuestionForGrading(List<Integer> qno);
 	public void insertUserAnswers(List<ExamUserAnswerVO> answers);
 	public void updateEnrollmentFinish(ExamEnrollmentVO vo);
-	public List<Map<String, Object>> selectPendingSubjectiveList(int graderId);
-	public int claimGradingTask(Map<String, Object> map);
-	public void releaseGradingClaim(Map<String, Object> map);
-	public void gradeSubjectiveAnswer(Map<String, Object> map);
-	public int countRemainingPending(int enrollmentNo);
-	public void finalizeEnrollmentScore(int enrollmentNo);
 	public Map<String, Object> selectExamResultMaster(int enrollmentNo);
 	public List<Map<String, Object>> selectExamResultDetails(int enrollmentNo);
 	public List<Map<String, Object>> selectMyExamList(int memberId);

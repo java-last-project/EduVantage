@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<main class="main" id="gradingApp" v-cloak>
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">주관식 답안 채점</h1>
+            <p class="page-desc">
+                채점 대기 답안을 선점한 후 점수를 입력할 수 있습니다.
+            </p>
+        </div>
+
+        <button type="button" class="btn-outline" :disabled="store.loading" @click="store.loadAnswers">
+            <i class="fa-solid fa-rotate-right"></i>
+            새로고침
+        </button>
+    </div>
+
+    <div class="grading-summary">
+        <div class="summary-card">
+            <div class="summary-label">전체 채점 대기</div>
+            <div class="summary-value">
+                {{store.answers.length}}
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">미선점 답안</div>
+            <div class="summary-value">
+                {{store.unclaimedCount}}
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">내가 선점한 답안</div>
+            <div class="summary-value">
+                {{store.claimedCount}}
+            </div>
+        </div>
+    </div>
+
+    <div v-if="store.errorMessage" class="grading-error">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        {{store.errorMessage}}
+    </div>
+
+    <div class="grading-layout">
+        <!-- 채점 대기 목록 -->
+        <section class="section-card grading-list-card">
+            <div class="section-card-header">
+                <i class="fa-solid fa-list-check"></i>
+                채점 대기 목록
+            </div>
+
+            <div v-if="store.loading" class="grading-loading">
+                <span class="spinner-border spinner-border-sm"></span>
+                답안을 불러오는 중입니다.
+            </div>
+
+            <div v-else-if="store.answers.length===0" class="grading-empty">
+                <i class="fa-regular fa-circle-check"></i>
+                <strong>채점 대기 답안이 없습니다.</strong>
+                <p>모든 주관식 답안의 채점이 완료되었습니다.</p>
+            </div>
+
+            <div v-else class="grading-list">
+                <article v-for="answer in store.answers" :key="answer.answer_no" class="grading-item" :class="{active:store.selectedAnswer?.answer_no===answer.answer_no}" @click="store.selectAnswer(answer)">
+                    <div class="grading-item-header">
+                        <span class="course-tag">
+                            답안 #{{answer.answer_no}}
+                        </span>
+
+                        <span class="badge" :class="answer.grader_id?'badge-active':'badge-pending'">
+                            {{answer.grader_id?'내가 채점 중':'채점 대기'}}
+                        </span>
+                    </div>
+
+                    <div class="grading-item-title">
+                        {{answer.title}}
+                    </div>
+
+                    <div class="grading-item-meta">
+                        <span>
+                            <i class="fa-regular fa-file-lines"></i>
+                            응시 #{{answer.enrollment_no}}
+                        </span>
+
+                        <span>
+                            <i class="fa-solid fa-star"></i>
+                            배점 {{answer.score}}점
+                        </span>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- 채점 상세 -->
+        <section class="section-card grading-detail-card">
+            <template v-if="store.selectedAnswer">
+                <div class="section-card-header grading-detail-header">
+                    <span>
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        답안 상세
+                    </span>
+
+                    <span class="badge" :class="store.selectedAnswer.grader_id?'badge-active':'badge-pending'">
+                        {{store.selectedAnswer.grader_id?'채점 가능':'선점 필요'}}
+                    </span>
+                </div>
+
+                <div class="answer-section">
+                    <div class="answer-label">문제</div>
+                    <div class="answer-content">
+                        {{store.selectedAnswer.title}}
+                    </div>
+                </div>
+
+                <div class="answer-section">
+                    <div class="answer-label">수강생 답안</div>
+                    <div class="answer-content">
+                        {{store.selectedAnswer.user_answer||'(제출된 답안 없음)'}}
+                    </div>
+                </div>
+
+                <div class="answer-section">
+                    <div class="answer-label">모범 답안</div>
+                    <div class="answer-content standard-answer">
+                        {{store.selectedAnswer.standard_answer
+                        ||'(등록된 모범 답안 없음)'}}
+                    </div>
+                </div>
+
+                <div class="answer-section">
+                    <div class="score-area">
+                        <div class="score-field">
+                            <label for="gradingScore">
+                                점수 입력
+                            </label>
+
+                            <div class="score-input-wrap">
+                                <input id="gradingScore" v-model.number="store.score" type="number" class="score-input"
+                                        min="0" :max="store.selectedAnswer.score" :disabled="!store.selectedAnswer.grader_id|| store.submitting">
+
+                                <span class="score-max">
+                                    / {{store.selectedAnswer.score}}점
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="grading-actions">
+                            <button v-if="!store.selectedAnswer.grader_id" type="button" class="btn-primary" :disabled="store.submitting" @click="store.claimAnswer">
+                                <i class="fa-solid fa-lock"></i>
+                                답안 선점
+                            </button>
+
+                            <template v-else>
+                                <button type="button" class="btn-outline" :disabled="store.submitting" @click="store.releaseAnswer">
+                                    선점 해제
+                                </button>
+
+                                <button type="button" class="btn-primary" :disabled="store.submitting" @click="store.submitGrade">
+                                    <i class="fa-solid fa-check"></i>
+                                    채점 완료
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <div v-else class="grading-empty detail-empty">
+                <i class="fa-regular fa-hand-pointer"></i>
+                <strong>채점할 답안을 선택해 주세요.</strong>
+                <p>왼쪽 목록에서 답안을 선택할 수 있습니다.</p>
+            </div>
+        </section>
+    </div>
+</main>
+
+<script src="/vue/exam/gradingStore.js"></script>
+<script>
+    const gradingPinia=Pinia.createPinia()
+    const gradingApp=Vue.createApp({
+        setup(){
+            const{onMounted}=Vue
+            const store=useExamGradingStore()
+
+            onMounted(()=>{
+                store.loadAnswers()
+            })
+
+            return{
+                store
+            }
+        }
+    })
+    gradingApp.use(gradingPinia)
+    gradingApp.mount('#gradingApp')
+</script>
+</html>
