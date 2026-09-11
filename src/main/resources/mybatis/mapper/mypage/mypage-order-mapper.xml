@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.web.domain.mypage.mapper.MyPageOrderMapper">
+  <select id="coursePaymentListData" resultType="com.sist.web.domain.mypage.vo.CoursePaymentVO" parameterType="int">
+		SELECT p.no,course_no,title,thumbnail,m.name as instructor,price,
+		TO_CHAR(p.regdate,'yyyy-mm-dd hh24:mi:ss') as dbday, order_status
+		FROM course_payment p
+		JOIN course c ON p.course_no=c.no
+		JOIN member m ON c.instructor_no=m.member_id
+		WHERE p.member_id=#{member_id}
+	    <if test="order_status != null and order_status != ''">
+	        AND p.order_status = #{order_status}
+	    </if>		
+		ORDER BY p.no DESC
+		OFFSET #{start} ROWS FETCH NEXT 3 ROWS ONLY
+  </select>
+  
+	<select id="coursePaymentRowCount" resultType="int">
+		SELECT COUNT(*) FROM course_payment
+		WHERE member_id=#{member_id}
+	    <if test="order_status != null and order_status != ''">
+	        AND order_status = #{order_status}
+	    </if>
+	</select>
+	
+  <select id="courseCartListData" resultType="com.sist.web.domain.mypage.vo.CourseCartVO" parameterType="int">
+		SELECT a.no,course_no,title,thumbnail,m.name as instructor,pay_price,regular_price
+		FROM course_cart a
+		JOIN course c ON a.course_no=c.no
+		JOIN member m ON c.instructor_no=m.member_id
+		WHERE a.member_id=#{member_id}
+		ORDER BY a.regdate DESC
+		OFFSET #{start} ROWS FETCH NEXT 3 ROWS ONLY
+  </select>
+
+	<select id="bookOrderRowCount" resultType="int">
+		SELECT COUNT(*) FROM book_order
+		WHERE member_id=#{member_id}
+	    <if test="order_status != null and order_status != ''">
+	        AND order_status = #{order_status}
+	    </if>
+	</select>  
+  
+    <!-- 바로구매 주문 데이터 조회 -->
+    <select id="bookOrderListData" resultType="com.sist.web.domain.book.vo.BookOrderVO">
+	    SELECT no, member_id, total_price, order_status,
+	           TO_CHAR(regdate, 'yyyy-MM-dd') as dbday
+	    FROM book_order
+	    WHERE member_id = #{member_id}
+	    <if test="order_status != null and order_status != ''">
+	        AND order_status = #{order_status}
+	    </if>
+	    ORDER BY no DESC
+	    OFFSET #{start} ROWS FETCH NEXT 3 ROWS ONLY
+	</select>
+	<select id="bookOrderDetailListData" resultType="com.sist.web.domain.book.vo.BookOrderDetailVO" parameterType="int">
+	   	SELECT bod.no, bod.book_order_no, bod.book_no, bod.quantity, bod.price,
+	           b.title, b.poster
+	    FROM book_order_detail bod
+	    JOIN book b ON b.no = bod.book_no
+	    WHERE bod.book_order_no = #{book_order_no}
+	</select>
+</mapper>

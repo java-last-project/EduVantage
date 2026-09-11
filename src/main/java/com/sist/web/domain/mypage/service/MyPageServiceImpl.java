@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.sist.web.domain.book.vo.BookOrderDetailVO;
+import com.sist.web.domain.book.vo.BookOrderVO;
 import com.sist.web.domain.enrollment.vo.*;
 import com.sist.web.domain.member.vo.MemberVO;
 import com.sist.web.domain.mypage.vo.CourseCartVO;
@@ -16,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MyPageServiceImpl implements MyPageService {
 	private final MyPageMapper mMapper;
+	private final MyPageOrderMapper oMapper;
+	
 	@Override
 	public List<CourseEnrollmentVO> mypageCourseListData(int member_id) {
 		// TODO Auto-generated method stub
@@ -42,18 +46,20 @@ public class MyPageServiceImpl implements MyPageService {
 		mMapper.memberUpdateData(vo);
 	}
 	@Override
-	public List<CoursePaymentVO> coursePaymentListData(int page,int member_id) {
+	public List<CoursePaymentVO> coursePaymentListData(int page,int member_id,String order_status) {
 		// TODO Auto-generated method stub
 		final int ROWSIZE=3;
 		int start=(page*ROWSIZE)-ROWSIZE;
-		return mMapper.coursePaymentListData(start,member_id);
+		return oMapper.coursePaymentListData(start,member_id,order_status);
 	}
 	@Override
-	public int[] pages(String type, int page,int member_id) {
+	public int[] pages(String type, int page,int member_id,String order_status) {
 		// TODO Auto-generated method stub
 		int count=0;
-		if(type.equals("course_payment")) count=mMapper.coursePaymentRowCount(member_id);
-		else if(type.equals("course_cart")) count=mMapper.courseCartRowCount(member_id);
+		if(type.equals("course_payment")) count=oMapper.coursePaymentRowCount(member_id,order_status);
+		else if(type.equals("course_cart")) count=oMapper.courseCartRowCount(member_id);
+		else if(type.equals("book_order")) count=oMapper.bookOrderRowCount(member_id,order_status);
+		else if(type.equals("book_cart")) count=oMapper.courseCartRowCount(member_id);
 		
 		int totalpage=(int)Math.ceil(count/3.0);
 		final int BLOCK=10;
@@ -69,7 +75,33 @@ public class MyPageServiceImpl implements MyPageService {
 		// TODO Auto-generated method stub
 		final int ROWSIZE=3;
 		int start=(page*ROWSIZE)-ROWSIZE;
-		return mMapper.courseCartListData(start, member_id);
+		return oMapper.courseCartListData(start, member_id);
+	}
+	@Override
+	public List<BookOrderVO> bookOrderListData(int page,int member_id,String order_status) {
+		// TODO Auto-generated method stub
+		final int ROWSIZE=3;
+		int start=(page*ROWSIZE)-ROWSIZE;
+		List<BookOrderVO> list=oMapper.bookOrderListData(start,member_id,order_status);
+		for(BookOrderVO vo:list) {
+			vo.setDetailList(oMapper.bookOrderDetailListData(vo.getNo()));
+		}
+		return list;
+	}
+	@Override
+	public void bookOrderAwaitRefund(int no,int member_id) {
+		// TODO Auto-generated method stub
+		oMapper.bookOrderAwaitRefund(no,member_id);
+	}
+	@Override
+	public int bookOrderTotalCount(int member_id) {
+		// TODO Auto-generated method stub
+		return oMapper.bookOrderTotalCount(member_id);
+	}
+	@Override
+	public int coursePaymentTotalCount(int member_id) {
+		// TODO Auto-generated method stub
+		return oMapper.coursePaymentTotalCount(member_id);
 	}
 
 }
