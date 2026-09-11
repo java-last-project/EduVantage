@@ -10,4 +10,6 @@ public interface InstructorService {
 	public List<Map<String, Object>> InstCourseDataList(int member_id);
 	public List<Map<String, Object>> InstCourseEnrollStudList(int course_no);
 	public CourseVO InstCourseDetailData(int course_no);
+	public void instUpdateCourseData(CourseVO vo);
+	public void instInsertNewCourse(CourseVO vo);
 }

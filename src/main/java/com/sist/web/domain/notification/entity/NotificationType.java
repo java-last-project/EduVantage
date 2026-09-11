@@ -4,5 +4,6 @@ public enum NotificationType {
     COURSE_COMPLETED,
     EXAM_SUBSCRIBED,
     COMMENT_REPLIED,
-    POST_COMMENTED
+    POST_COMMENTED,
+    NOTICE_UPLOAD,
 }

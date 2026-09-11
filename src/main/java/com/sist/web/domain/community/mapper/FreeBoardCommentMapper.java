@@ -1,6 +1,7 @@
 package com.sist.web.domain.community.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 import com.sist.web.domain.community.vo.FreeCommentVO;
@@ -18,4 +19,11 @@ public interface FreeBoardCommentMapper {
 	public void freeBoardCommentHardDelete(int no);
 	public void freeBoardCommentSoftDelete(int no);
 	public void freeBoardCommentDeleteForBoardDelete(int board_no);
+	//대댓글 알림용: 부모 댓글 정보
+	@Select("""
+		SELECT *
+		FROM free_comment
+		WHERE no=#{parentNo}
+	""")
+	public FreeCommentVO parentFeeBoardCommentInfo(int parentNo);
 }

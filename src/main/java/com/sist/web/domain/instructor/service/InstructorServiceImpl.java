@@ -40,4 +40,16 @@ public class InstructorServiceImpl implements InstructorService
 		return iMapper.InstCourseDetailData(course_no);
 	}
 
+	@Override
+	public void instUpdateCourseData(CourseVO vo) {
+		// TODO Auto-generated method stub
+		iMapper.instUpdateCourseData(vo);
+	}
+
+	@Override
+	public void instInsertNewCourse(CourseVO vo) {
+		// TODO Auto-generated method stub
+		iMapper.instInsertNewCourse(vo);
+	}
+
 }

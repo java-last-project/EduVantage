@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<style>
+	.section-card-body{ padding:24px; }
+
+	@media (max-width:900px){
+		.price-row{ flex-direction:column; }
+	}
+</style>
+
+<div class="layout">
+<main class="main">
+
+	<a href="/instructor/course" class="back-link"><i class="fa-solid fa-arrow-left"></i> 목록으로</a>
+
+	<div class="page-header">
+		<h1 class="page-title">새 강의 등록</h1>
+	</div>
+
+	<form th:action="@{/instructor/new_course_insert}" method="post">
+	<div class="section-card">
+		<div class="section-card-header">썸네일</div>
+		<div class="section-card-body">
+			<div class="thumb-upload">
+				<i class="fa-solid fa-image fa-lg"></i>
+				<span>클릭해서 썸네일 업로드</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="section-card">
+		<div class="section-card-header">기본 정보</div>
+		<div class="section-card-body">
+			<div class="form-row">
+				<label>강의명</label>
+				<!-- <input type="hidden" th:value="${vo.no}" name="no"> -->
+				
+				<input type="text" class="form-input" name="title">
+			</div>
+			<div class="price-row">
+				<div class="form-row">
+					<label>정가</label>
+					<input type="number" class="form-input" name="regular_price">
+				</div>
+				<div class="form-row">
+					<label>판매가</label>
+					<input type="number" class="form-input" name="pay_price">
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="section-card">
+		<div class="section-card-header">강의 소개</div>
+		<div class="section-card-body">
+			<textarea class="form-textarea" placeholder="html 형식으로 입력..." name="content"></textarea>
+		</div>
+	</div>
+
+	<div class="form-actions">
+		<a class="btn btn-outline" href="/instructor/course">취소</a>
+		<button class="btn-primary" type="submit">저장</button>
+	</div>
+	</form>
+</main>
+</div>
+
+</html>
