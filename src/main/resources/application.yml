@@ -80,3 +80,6 @@ logging:
     org.hibernate.orm.jdbc.bind: TRACE
 # security
 # websocket => kafka
+youtube:
+  api:
+    key: ${YOUTUBE_API_KEY}

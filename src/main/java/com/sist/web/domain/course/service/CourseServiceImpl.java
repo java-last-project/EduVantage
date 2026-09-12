@@ -85,7 +85,8 @@ public class CourseServiceImpl implements CourseService {
 
 	@Override
 	public CourseVO courseDetail(int no) {
-		CourseVO vo=cMapper.courseDetail(no);
+		CourseVO vo=new CourseVO();
+		vo=cMapper.courseDetail(no);
 		if (vo != null && vo.getTechList()!=null) {
 	        List<String> uniqueCategories = vo.getTechList().stream()
 	            .map(TechStackVO::getCategory)

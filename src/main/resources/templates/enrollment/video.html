@@ -1,100 +1,131 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
-<div class="flex-grow-1 p-4">
+<link rel="stylesheet" href="/css/enrollment/video.css">
+<script th:inline="javascript">
+  	const initialYoutubeVideos=/*[[${youtubeList}]]*/ []
+  	const initialCourseTitle=/*[[${course.title}]]*/ ''
+	const initialEnrollmentNo=/*[[${enrollment_no}]]*/ 0
+</script>
+<div id="video-app" class="video-page" v-cloak>
 
-      <!-- <nav class="mb-3">
-        <ol class="breadcrumb small mb-0">
-          <li class="breadcrumb-item"><a href="#" class="text-decoration-none text-secondary">🏠</a></li>
-          <li class="breadcrumb-item"><a href="#" class="text-decoration-none text-secondary">나의 강의실</a></li>
-          <li class="breadcrumb-item active text-dark fw-semibold">강의 영상</li>
-        </ol>
-      </nav> -->
+		<div class="container-fluid px-3 px-xl-4 py-4">
+			<section v-if="videos.length>0" class="learning-summary mb-4" aria-labelledby="learning-summary-title">
+				<div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3 mb-3">
+				<div>
+					<p class="learning-kicker mb-2">나의 학습 현황</p>
+					<h2 id="learning-summary-title" class="learning-title mb-1">{{courseTitle}}</h2>
+					<p class="text-secondary mb-0">추천 영상을 순서대로 학습하고 진도를 확인해 보세요.</p>
+				</div>
+				<div class="summary-rate text-md-end" aria-live="polite">
+					<span class="summary-rate-label d-block mb-1">전체 진행률</span>
+					<strong>{{overallProgress}}%</strong>
+				</div>
+			</div>
 
-      <div class="row g-3">
+			<div class="progress learning-progress" role="progressbar" aria-label="강의 전체 진행률" aria-valuemin="0"
+					 aria-valuemax="100" :aria-valuenow="overallProgress">
+				<div class="progress-bar" :style="{ width: overallProgress + '%' }"></div>
+			</div>
+			<div class="d-flex justify-content-between align-items-center mt-2 small">
+				<span class="text-secondary">완료한 영상</span>
+				<strong>{{completedCount}} / {{videos.length}} 완료</strong>
+			</div>
+		</section>
 
-        <div class="col-lg-8">
-          <div class="card border mb-3">
-            <div class="bg-dark d-flex align-items-center justify-content-center rounded-top"
-                 style="aspect-ratio: 16/9;">
-              <span class="text-white" style="font-size: 48px;">▶</span>
-            </div>
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <div>
-                  <div class="text-secondary small mb-1">섹션 2. 기본 문법 및 핵심 개념 기초 실습</div>
-                  <h6 class="fw-bold mb-0">04. TypeScript 타입 명시와 Interface 패턴</h6>
-                </div>
-                <span class="text-secondary small flex-shrink-0">32:10</span>
-              </div>
-              <div class="progress" style="height: 6px;">
-                <div class="progress-bar" role="progressbar" style="width: 62%"
-                     aria-valuenow="62" aria-valuemin="0" aria-valuemax="100"></div>
-              </div>
-            </div>
-          </div>
+		<div v-if="isLoading" class="row g-4" aria-busy="true" aria-label="학습 영상을 불러오는 중">
+			<div class="col-xl-8">
+				<div class="video-skeleton skeleton-player"></div>
+				<div class="video-skeleton skeleton-line mt-3"></div>
+				<div class="video-skeleton skeleton-line skeleton-line-short mt-2"></div>
+			</div>
+			<div class="col-xl-4">
+				<div class="video-skeleton skeleton-list"></div>
+			</div>
+		</div>
 
-          <!-- 재생 컨트롤 -->
-          <div class="card border mb-3">
-            <div class="card-body d-flex justify-content-between align-items-center">
-              <button class="btn btn-outline-secondary btn-sm px-3">
-                <i class="bi bi-skip-backward-fill"></i> 이전 강의
-              </button>
-              <span class="text-secondary small">전체 24강 중 4강</span>
-              <button class="btn btn-dark btn-sm px-3">
-                다음 강의 <i class="bi bi-skip-forward-fill"></i>
-              </button>
-            </div>
-          </div>
-        </div>
+		<div v-else-if="errorMessage" class="learning-state" role="alert">
+			<i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+			<h3>영상을 불러오지 못했습니다</h3>
+			<p>{{errorMessage}}</p>
+			<button type="button" class="btn btn-outline-primary" @click="loadVideos">다시 시도</button>
+		</div>
 
-        <!-- 우측: 커리큘럼 목록 -->
-        <div class="col-lg-4">
-          <div class="card border h-100">
-            <div class="card-body p-0 d-flex flex-column h-100">
+		<div v-else-if="!selectedVideo" class="learning-state">
+			<i class="bi bi-camera-video" aria-hidden="true"></i>
+			<h3>학습 영상이 아직 없습니다</h3>
+			<p>강의와 관련된 추천 영상이 준비되면 이곳에 표시됩니다.</p>
+		</div>
 
-              <div class="p-3" style="border-bottom: 1px solid #f1f3f5;">
-                <h6 class="fw-bold mb-1">커리큘럼</h6>
-                <div class="text-secondary small">4 / 24강 완료</div>
-                <div class="progress mt-2" style="height: 6px;">
-                  <div class="progress-bar" role="progressbar" style="width: 17%"></div>
-                </div>
-              </div>
+		<div v-else class="row g-4 align-items-start">
+			<main class="col-xl-8">
+				<section class="player-panel" aria-labelledby="current-video-title">
 
-              <div style="overflow-y: auto;">
+                    <div class="ratio ratio-16x9 player-frame">
+                        <div id="youtube-player"></div>
+                    </div>
 
-                <div class="px-3 pt-3 pb-1 text-secondary small fw-semibold">섹션 1. 오리엔테이션 및 개발 환경 구축</div>
-                <a href="#" class="d-flex justify-content-between align-items-center px-3 py-2 text-decoration-none"
-                   style="color: #495057;">
-                  <span><i class="bi bi-check-circle-fill text-success me-2"></i>01. 수강 가이드 및 학습 로드맵 개요</span>
-                  <span class="text-secondary small flex-shrink-0">12:30</span>
-                </a>
-                <a href="#" class="d-flex justify-content-between align-items-center px-3 py-2 text-decoration-none"
-                   style="color: #495057;">
-                  <span><i class="bi bi-check-circle-fill text-success me-2"></i>02. React &amp; TypeScript 프로젝트 생성법</span>
-                  <span class="text-secondary small flex-shrink-0">24:15</span>
-                </a>
-                <a href="#" class="d-flex justify-content-between align-items-center px-3 py-2 text-decoration-none"
-                   style="color: #495057;">
-                  <span><i class="bi bi-check-circle-fill text-success me-2"></i>03. ESLint와 Prettier 정적 분석 도구 연동</span>
-                  <span class="text-secondary small flex-shrink-0">18:40</span>
-                </a>
-				<a href="#" class="d-flex justify-content-between align-items-center px-3 py-2 text-decoration-none fw-semibold"
-                   style="background: #eff6ff; color: #0d6efd;">
-                  <span><i class="bi bi-play-circle-fill me-2"></i>04. TypeScript 타입 명시와 Interface 패턴</span>
-                  <span class="small flex-shrink-0">32:10</span>
-                </a>
+					<div class="player-info">
+						<div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+							<div class="min-w-0">
+								<p class="current-label mb-1">현재 학습 영상</p>
+								<h3 id="current-video-title" class="current-title mb-0">{{selectedVideo.title}}</h3>
+							</div>
+							<strong class="video-rate flex-shrink-0">{{ selectedVideo.progress }}%</strong>
+						</div>
 
-              </div>
-            </div>
-          </div>
-        </div>
+						<div class="progress video-progress" role="progressbar" :aria-label="selectedVideo.title+' 진행률'"
+								 aria-valuemin="0" aria-valuemax="100" :aria-valuenow="selectedVideo.progress">
+							<div class="progress-bar" :style="{width: selectedVideo.progress+'%'}"></div>
+						</div>
+						<div class="d-flex justify-content-between mt-2 small">
+							<span class="text-secondary">영상 진행률</span>
+							<span :class="selectedVideo.completed ? 'status-complete' : 'text-secondary'">
+								<i :class="selectedVideo.completed ? 'bi bi-check-circle-fill' : 'bi bi-play-circle'"
+									 aria-hidden="true"></i>
+								{{selectedVideo.completed ? '학습 완료' : '학습 중' }}
+							</span>
+						</div>
+					</div>
+				</section>
+			</main>
 
-      </div>
-    </div>
-</body>
-</html>
+			<aside class="col-xl-4" aria-labelledby="video-list-title">
+				<section class="playlist-panel">
+					<div class="playlist-header">
+						<div>
+							<h3 id="video-list-title" class="playlist-title mb-1">학습 영상 목록</h3>
+							<p class="text-secondary small mb-0">YouTube 추천 학습 영상</p>
+						</div>
+						<span class="playlist-count">{{videos.length}}개</span>
+					</div>
+
+					<div class="playlist">
+						<button v-for="(video, index) in videos" :key="video.videoId" type="button" class="playlist-item"
+										:class="{active: video.videoId===selectedVideo.videoId}" :aria-pressed="video.videoId===selectedVideo.videoId"
+										:aria-label="video.title+', 진행률 '+video.progress+'% 재생'" @click="selectVideo(video.videoId)">
+							<span class="thumbnail-wrap">
+								<img :src="video.thumbnail" :alt="video.title+' 썸네일'" width="160" height="90">
+								<span class="video-order" aria-hidden="true">{{index+1}}</span>
+							</span>
+
+							<span class="playlist-copy">
+								<strong class="playlist-video-title">{{video.title}}</strong>
+								<span class="playlist-meta">
+									<span>{{video.progress}}%</span>
+									<span v-if="video.completed" class="status-complete">
+										<i class="bi bi-check-circle-fill" aria-hidden="true"></i> 완료
+									</span>
+									<span v-else>진행 중</span>
+								</span>
+								<span class="progress item-progress" aria-hidden="true">
+									<span class="progress-bar" :style="{ width: video.progress + '%' }"></span>
+								</span>
+							</span>
+						</button>
+					</div>
+				</section>
+			</aside>
+		</div>
+	</div>
+</div>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script src="/vue/enrollment/video/videoStore.js"></script>
+<script src="/vue/enrollment/video/video.js"></script>
