@@ -50,4 +50,86 @@
 			#{content}
 		)
 	</insert>
+	
+	<!-- 강사페이지 수강생 QnA 목록 출력 -->
+	<select id="instQnaListData" parameterType="hashmap" resultType="hashmap">
+		SELECT Q.NO,Q.MEMBER_ID,Q.COURSE_NO,Q.SUBJECT,Q.STATUS,Q.HIT,TO_CHAR(Q.REGDATE,'yyyy-mm-dd') as REGDATE,c.title,M.NAME
+		FROM COURSE_QNA Q
+		JOIN COURSE C
+		ON Q.COURSE_NO=C.NO
+		JOIN MEMBER M
+		ON Q.MEMBER_ID=M.MEMBER_ID
+		WHERE C.INSTRUCTOR_NO=#{member_id}
+		
+		<if test="status!=null and status!='all'">
+			AND status=#{status}
+		</if>
+		<if test="title!=null and title!='all'">
+			AND title=#{title}
+		</if>
+		
+		ORDER BY Q.REGDATE DESC, Q.NO DESC
+		OFFSET #{start} ROWS FETCH NEXT 10 ROWS ONLY
+	</select>
+	
+	<!-- 강사페이지 수강생 QnA 목록 갯수 -->
+	<select id="instCountQnaList" parameterType="hashmap" resultType="int">
+		SELECT COUNT(*)
+		FROM COURSE_QNA Q
+		JOIN COURSE C
+		ON Q.COURSE_NO = C.NO
+		WHERE C.INSTRUCTOR_NO=#{member_id}
+		<if test="status!=null and status!='all'">
+			AND status=#{status}
+		</if>
+		<if test="title!=null and title!='all'">
+			AND title=#{title}
+		</if>
+	</select>
+	
+	<!-- 강사페이지 수강생 QnA 상세 페이지 조회 -->
+	<select id="instQnaDetailData" parameterType="int" resultType="hashmap">
+		SELECT Q.NO,Q.MEMBER_ID,M.NAME,Q.SUBJECT,TO_CHAR(Q.CONTENT) AS CONTENT,
+		    Q.STATUS,Q.HIT,TO_CHAR(Q.REGDATE,'YYYY.MM.DD') AS REGDATE,C.TITLE
+		FROM COURSE_QNA Q
+		JOIN MEMBER M
+		ON Q.MEMBER_ID=M.MEMBER_ID
+		JOIN COURSE C
+		ON Q.COURSE_NO=C.NO
+		WHERE Q.NO=#{no}
+	</select>
+	
+	<!-- 수강생 QnA 강의 필터 사용 목적 담당 강사의 강의 목록 출력 -->
+	<select id="instQnaFilterCourse" parameterType="int" resultType="string">
+		SELECT title
+		FROM course c
+		JOIN member m
+		ON member_id=instructor_no
+		WHERE member_id=#{member_id}
+		ORDER BY title ASC
+	</select>
+	
+	<!-- 수강생 QnA 답변 출력 -->
+	<select id="instQnaAnswerData" parameterType="int" resultType="com.sist.web.domain.enrollment.vo.CourseQnaReplyVO">
+		SELECT TO_CHAR(A.ANSWER) AS ANSWER,TO_CHAR(A.REGDATE,'YYYY-MM-DD') AS dbday
+		FROM COURSE_QNA_REPLY A
+		JOIN COURSE_QNA Q
+		ON A.COURSE_QNA_NO=Q.NO
+		WHERE Q.NO=#{no}
+	</select>
+	
+	<!-- 수강생 QnA 답변 등록 Insert -->
+	<insert id="instQnaAnswerInsert" parameterType="com.sist.web.domain.enrollment.vo.CourseQnaReplyVO">
+		INSERT INTO COURSE_QNA_REPLY
+		(no,course_qna_no,member_id,answer)
+		VALUES (CQR_NO_SEQ.nextval,#{course_qna_no},#{member_id},#{answer})
+	</insert>
+	
+	<!-- 동시에 수강생 QnA 의 답변 상태를 Update -->
+	<update id="instQnaUpdateStatus" parameterType="int">
+		UPDATE COURSE_QNA
+		SET STATUS='Y'
+		WHERE NO=#{no}
+	</update>
+	
 </mapper>
