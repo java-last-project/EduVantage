@@ -74,6 +74,21 @@
 		JOIN member m ON e.member_id=m.member_id
 		WHERE course_no=#{course_no} AND e.member_id=#{member_id}
 	</select>
+
+	<update id="videoProgressUpdate">
+		UPDATE COURSE_ENROLLMENT
+		SET progress=#{progress},
+		    IS_COMPLETED=#{isCompleted},
+		    LAST_ACCESSED=SYSDATE
+		WHERE no=#{enrollment_no}
+	</update>
+
+	<select id="enrollmentNoData" resultType="int">
+		SELECT NO
+		FROM COURSE_ENROLLMENT
+		WHERE MEMBER_ID=#{member_id}
+		AND COURSE_NO=#{course_no}
+	</select>
 	
 	
 

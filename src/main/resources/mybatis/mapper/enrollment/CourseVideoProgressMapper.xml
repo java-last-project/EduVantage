@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.web.domain.enrollment.mapper.CourseVideoProgressMapper">
+
+	<select id="videoProgressList" resultType="com.sist.web.domain.enrollment.vo.CourseVideoProgressVO">
+		SELECT no,
+			enrollment_no,
+			video_no,
+			current_time AS currentTime,
+			duration,
+			progress,
+			completed,
+			updated_at AS updatedAt
+		FROM course_video_progress
+		WHERE enrollment_no=#{enrollment_no}
+	</select>
+
+	<update id="videoProgressSave" parameterType="com.sist.web.domain.enrollment.vo.CourseVideoProgressVO">
+		MERGE INTO course_video_progress p
+		USING(
+			SELECT
+				#{enrollment_no} AS enrollment_no,
+				#{video_no} AS video_no
+			FROM dual
+		) s
+		ON(
+			p.enrollment_no=s.enrollment_no
+			AND p.video_no=s.video_no
+		)
+		WHEN MATCHED THEN
+			UPDATE SET
+				p.current_time=#{currentTime},
+				p.duration=#{duration},
+				p.progress=#{progress},
+				p.completed=#{completed},
+				p.updated_at=SYSDATE
+		WHEN NOT MATCHED THEN
+			INSERT(
+				enrollment_no,
+				video_no,
+				current_time,
+				duration,
+				progress,
+				completed,
+				updated_at
+			)
+			VALUES(
+				#{enrollment_no},
+				#{video_no},
+				#{currentTime},
+				#{duration},
+				#{progress},
+				#{completed},
+				SYSDATE
+			)
+	</update>
+
+	<select id="videoTotalCount" resultType="int" parameterType="int">
+		SELECT COUNT(*)
+		FROM course_video cv
+		JOIN course_enrollment ce
+			ON cv.course_no=ce.course_no
+		WHERE ce.no=#{enrollment_no}
+	</select>
+
+	<select id="videoCompletedCount" resultType="int" parameterType="int">
+		SELECT COUNT(*)
+		FROM course_video_progress
+		WHERE enrollment_no=#{enrollment_no}
+		AND completed='Y'
+	</select>
+
+</mapper>
