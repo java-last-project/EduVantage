@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<div class="layout">
+<main class="main">
+
+	<a href="/instructor/qna" class="back-link"><i class="fa-solid fa-arrow-left"></i> 목록으로</a>
+
+	<!-- 질문 내용 -->
+	<div class="section-card">
+		<div class="section-card-header">질문</div>
+		<div class="section-card-body">
+			<h1 class="question-title">[[${vo.SUBJECT}]]</h1>
+			<div class="question-meta">
+				<span class="author-text">[[${vo.NAME}]]</span>
+				&middot;
+				<span class="course-tag">[[${vo.TITLE}]]</span>
+				&middot;
+				<span class="date-text">[[${vo.REGDATE}]]</span>
+			</div>
+			<p class="bio-text">
+				[[${vo.CONTENT}]]
+			</p>
+		</div>
+	</div>
+
+	<!-- 답변완료일 경우 답변 내용 노출 -->
+	<div class="section-card" th:if="${vo.STATUS=='Y'}">
+		<div class="section-card-header">
+			답변
+			<span class="badge badge-active">답변완료</span>
+		</div>
+		<div class="section-card-body">
+			<p class="bio-text">
+				[[${ans.answer}]]
+			</p>
+			<div class="date-text" style="margin-top:12px;">답변일: [[${ans.dbday}]]</div>
+		</div>
+	</div>
+
+	<!-- 답변대기일 경우 답변할 수 있는 textarea 노출 -->
+	<div class="section-card" th:if="${vo.STATUS=='N'}">
+		<div class="section-card-header">
+			답변 작성
+			<span class="badge badge-pending">답변대기</span>
+		</div>
+		<form method="post" action="/instructor/qna_answer">
+		<div class="section-card-body">
+			<textarea class="form-textarea" placeholder="답변을 입력하세요" style="min-height:160px;" name="answer"></textarea>
+			<input type="hidden" th:value="${vo.NO}" name="no">
+			<div class="form-actions" style="margin-top:12px;">
+				<button class="btn-primary">답변 등록</button>
+			</div>
+		</div>
+		</form>
+	</div>
+
+</main>
+</div>
+
+</html>
