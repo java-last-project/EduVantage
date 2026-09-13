@@ -41,8 +41,8 @@
                             </thead>
                             <tbody>
                             <tr v-for="(item, index) in list" :key="item.ENROLLMENT_NO">
-                                <td class="text-muted">{{ list.length - idx }}</td>
-                                <td class="text-start fw-bold ps-4">{{ item.EXAM_TITLE }}</td>
+                                <td class="text-muted">{{list.length-index}}</td>
+                                <td class="text-start fw-bold ps-4">{{item.EXAM_TITLE}}</td>
                                 <td class="text-muted">{{ item.START_TIME }}</td>
                                 <td>
                                     <span v-if="item.STATUS==='COMPLETE'" class="badge bg-success px-2 py-1">채점 완료</span>
