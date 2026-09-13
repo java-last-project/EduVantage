@@ -26,6 +26,7 @@ const useCourseStore=defineStore('course_store',{
     actions:{
         async courseListData(params){
 			if (params) {
+				// 페이지 이동 중 검색·정렬 조건 유지
 				this.column=params.column
 				this.categories=params.categories
 				this.curpage=params.page

@@ -19,6 +19,7 @@ public class VideoProgressRestController {
     @PostMapping
     public ResponseEntity<Void> videoProgressSave(@RequestBody CourseVideoProgressVO vo, HttpSession session){
         try{
+            // 요청값 대신 session 회원 ID로 접근 권한 검증
             Integer member_id=(Integer)session.getAttribute("member_id");
             pService.saveProgress(vo,member_id);
             return ResponseEntity.ok().build();

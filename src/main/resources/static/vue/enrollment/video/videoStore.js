@@ -12,7 +12,7 @@ const useVideoStore=defineStore('video_store',{
         completedCount:(state)=>{
             return state.videos.filter(video=>video.completed).length
         },
-        // 전체 진도율
+        // 전체 진도는 완료 영상 수 기준
         overallProgress: (state)=>{
             if(state.videos.length===0) return 0
             const completedCount=state.videos.filter(video=>video.completed).length
@@ -50,6 +50,7 @@ const useVideoStore=defineStore('video_store',{
             const video=this.videos.find(video=>video.videoId===videoId)
             if(!video) return
             video.progress=progress
+            // 완료 상태 역행 방지
             if(progress>=90){
                 video.completed=true
             }
@@ -57,6 +58,7 @@ const useVideoStore=defineStore('video_store',{
         async loadProgress(enrollmentNo){
             try{
                 const res=await api.get(`/api/enrollment/progress/${enrollmentNo}`)
+                // 영상 PK 기준으로 서버 progress 병합
                 res.data.forEach(progressData=>{
                     const video=this.videos.find(
                         video=>video.no===progressData.video_no

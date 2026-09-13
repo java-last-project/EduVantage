@@ -40,6 +40,7 @@ public class ExamGradingServiceImpl implements ExamGradingService {
         Map<String, Object> params = gradingParams(answerNo, graderId);
         params.put("score", score);
 
+        // 선점 여부와 채점자 일치 여부 DB 재검증
         Integer enrollmentNo = gradingMapper.selectClaimedEnrollmentNo(params);
         if (enrollmentNo == null) {
             throw new IllegalStateException("선점하지 않았거나 이미 처리된 답안입니다.");
@@ -49,6 +50,7 @@ public class ExamGradingServiceImpl implements ExamGradingService {
             throw new IllegalStateException("선점하지 않았거나 이미 처리된 답안입니다.");
         }
 
+        // 마지막 주관식 채점 후에만 총점 확정
         if (gradingMapper.countRemainingPending(enrollmentNo) == 0) {
             gradingMapper.finalizeEnrollmentScore(enrollmentNo);
         }

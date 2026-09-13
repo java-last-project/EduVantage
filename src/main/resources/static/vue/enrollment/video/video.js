@@ -37,6 +37,7 @@ const videoApp=createApp({
             if(!selectedVideo.value) return
             const currentTime=selectedVideo.value.currentTime || 0
             if(currentTime>0){
+                // 저장된 currentTime부터 이어보기
                 player.seekTo(currentTime,true)
             }
         }
@@ -55,6 +56,7 @@ const videoApp=createApp({
         }
         const startProgressTimer=()=>{
             if(progressTimer) return
+            // UI progress 갱신 주기
             progressTimer=setInterval(()=>{
                 updateProgress()
             },1000)
@@ -101,6 +103,7 @@ const videoApp=createApp({
         }
         const startSaveTimer=()=>{
             if(saveTimer) return
+            // UI 갱신과 DB 저장 주기 분리
             saveTimer=setInterval(()=>{
                 saveProgress()
             },30000)
@@ -113,6 +116,7 @@ const videoApp=createApp({
 
         const selectVideo=async(videoId)=>{
             if(selectedVideo.value){
+                // 영상 전환 전 마지막 재생 위치 저장
                 await saveProgress()
             }
             videoStore.selectVideo(videoId)
@@ -132,6 +136,7 @@ const videoApp=createApp({
 
             const progress=Math.floor(currentTime/duration*100)
 
+            // pagehide 시 keepalive로 마지막 진도 저장
             fetch('/api/enrollment/progress',{
                 method:'POST',
                 headers:{

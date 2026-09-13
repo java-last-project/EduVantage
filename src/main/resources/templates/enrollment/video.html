@@ -1,5 +1,6 @@
 <link rel="stylesheet" href="/css/enrollment/video.css">
 <script th:inline="javascript">
+	// 서버의 강좌·영상 데이터를 Vue 초기 상태로 전달
   	const initialYoutubeVideos=/*[[${youtubeList}]]*/ []
   	const initialCourseTitle=/*[[${course.title}]]*/ ''
 	const initialEnrollmentNo=/*[[${enrollment_no}]]*/ 0

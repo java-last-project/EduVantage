@@ -39,6 +39,7 @@
 <!--	</select>-->
 
 	<select id="examDetailData" resultMap="questionMap" parameterType="hashmap">
+		<!-- 예약 시험은 지정 문항, 상시 시험은 주제별 무작위 출제 -->
 		SELECT q.no,q.title,q.image,q.answer,o.option1,o.option2,o.option3,o.option4,q.type,q.theme,q.score
 		FROM (
 			SELECT *
@@ -64,6 +65,7 @@
 			ORDER BY q.no
 	</select>
 	
+	<!-- 제한 시간 내 미완료 응시 기록 재사용 -->
 	<select id="findActiveEnrollment" parameterType="hashmap" resultType="com.sist.web.domain.exam.vo.ExamEnrollmentVO">
 		SELECT no, member_id, exam_no, theme, starttime
 		FROM EXAM_ENROLLMENT
@@ -124,6 +126,7 @@
 		</foreach>
 	</select>
 
+	<!-- 답안 일괄 INSERT로 제출 단위 유지 -->
 	<insert id="insertUserAnswers" parameterType="list">
 		INSERT INTO exam_user_answer (
 		enrollment_no,
@@ -157,6 +160,7 @@
 		WHERE no=#{no}
 	</update>
 
+	<!-- 결과 화면용 응시 결과 + 주관식 채점 현황 집계 -->
 	<select id="selectExamResultMaster" parameterType="int" resultType="hashmap">
 		SELECT e.no AS enrollment_no,
 		       e.member_id AS member_id,

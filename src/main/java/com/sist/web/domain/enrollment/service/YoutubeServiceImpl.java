@@ -22,11 +22,12 @@ public class YoutubeServiceImpl implements YoutubeService {
     @Value("${youtube.api.key}")
     private String apiKey;
 
-    // 외부 HTTP API 호출용
+    // DB cache miss일 때만 YouTube API 호출
     private final RestClient restClient=RestClient.create("https://www.googleapis.com");
 
     @Override
     public List<CourseVideoVO> searchVideos(CourseVO course) {
+        // DB cache hit 시 API 호출 생략
         List<CourseVideoVO> videoList=vMapper.courseVideoList(course.getNo());
         if(videoList!=null && !videoList.isEmpty()){
             return videoList;
@@ -36,6 +37,7 @@ public class YoutubeServiceImpl implements YoutubeService {
 
         int order=1;
 
+        // API 영상을 내부 PK로 저장해 사용자 진도와 연결
         for(YoutubeVideoVO video:vList){
             CourseVideoVO vo=new CourseVideoVO();
             vo.setCourse_no(course.getNo());
@@ -45,11 +47,12 @@ public class YoutubeServiceImpl implements YoutubeService {
             vo.setVOrder(order++);
             vMapper.courseVideoInsert(vo);
         }
+        // Identity PK가 반영된 영상 목록 재조회
         return vMapper.courseVideoList(course.getNo());
     }
 
     private List<YoutubeVideoVO> requestYoutube(String keyword){
-        // 요청 주소 조립
+        // 한국어권 임베드 영상만 검색
         JsonNode response=restClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/youtube/v3/search")
@@ -101,7 +104,7 @@ public class YoutubeServiceImpl implements YoutubeService {
                 }
                 String techName=tech.getTech().trim();
 
-                // 가비지데이터 거름망
+                // 긴 기술명 제외로 검색 정확도 유지
                 if(techName.length()>30){
                     continue;
                 }

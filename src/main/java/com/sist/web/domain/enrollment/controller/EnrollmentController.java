@@ -44,6 +44,7 @@ public class EnrollmentController {
 	
 	@GetMapping("/video")
 	public String enrollment_video(@PathVariable("course_no") int course_no, HttpSession session, Model model) {
+		// session 회원 ID 기준 수강 기록 조회
 		Integer member_id=(Integer)session.getAttribute("member_id");
 		CourseVO course=cService.courseDetail(course_no);
 		List<CourseVideoVO> youtubeList=yService.searchVideos(course);

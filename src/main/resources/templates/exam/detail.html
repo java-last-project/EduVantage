@@ -193,6 +193,7 @@ const examApp=createApp({
 			}
 		}
 		watch(userAnswers,(newVal)=>{
+			// 응시 기록별 임시 답안 저장
 			if(store.enrollmentNo){
 				localStorage.setItem(`exam_ans_${store.enrollmentNo}`,JSON.stringify(newVal))
 			}
@@ -206,6 +207,7 @@ const examApp=createApp({
 			}
             await store.examDetailData(requestParams)
 			if(store.enrollmentNo){
+				// 서버에서 받은 enrollmentNo 기준으로 임시 답안 복원
 				const savedAnswers=localStorage.getItem(`exam_ans_${store.enrollmentNo}`)
 				if(savedAnswers){
 					userAnswers.value=JSON.parse(savedAnswers)
