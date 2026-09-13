@@ -98,6 +98,9 @@ public class ExamServiceImpl implements ExamService{
 					avo.setIs_correct("N");
 					avo.setScore(0);
 				}
+			}else if(qvo.getType()==2 && userAns.isBlank()){
+				avo.setIs_correct("N");
+				avo.setScore(0);
 			}else{
 				avo.setIs_correct("W");
 				avo.setScore(0);

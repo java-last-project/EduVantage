@@ -205,13 +205,19 @@ const examApp=createApp({
 				count:EXAM_COUNT,
 				examNo:EXAM_NO
 			}
-            await store.examDetailData(requestParams)
+			await store.examDetailData(requestParams)
 			if(store.enrollmentNo){
 				// 서버에서 받은 enrollmentNo 기준으로 임시 답안 복원
 				const savedAnswers=localStorage.getItem(`exam_ans_${store.enrollmentNo}`)
 				if(savedAnswers){
-					userAnswers.value=JSON.parse(savedAnswers)
+					const parsedAnswers=JSON.parse(savedAnswers)
+					store.list.forEach(q=>{
+						if(Object.prototype.hasOwnProperty.call(parsedAnswers,q.no)){
+							initializedAnswers[q.no]=parsedAnswers[q.no]
+						}
+					})
 				}
+				userAnswers.value=initializedAnswers
 			}
 
 			startTimer()
