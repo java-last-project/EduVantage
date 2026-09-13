@@ -4,7 +4,10 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
+import com.sist.web.domain.community.vo.QnaReplyVO;
 import com.sist.web.domain.course.vo.CourseVO;
+import com.sist.web.domain.enrollment.vo.CourseQnaReplyVO;
+import com.sist.web.domain.enrollment.vo.CourseQnaVO;
 import com.sist.web.domain.member.vo.MemberVO;
 import java.util.*;
 
@@ -62,5 +65,88 @@ public interface InstructorMapper {
 	// 새 강의 등록
 	// <insert id="instInsertNewCourse" parameterType="com.sist.web.domain.course.vo.CourseVO">
 	public void instInsertNewCourse(CourseVO vo);
+	
+	// 강사페이지 수강생 QnA 목록 조회
+	/*
+	 * 	<select id="instQnaListData" parameterType="int" resultType="com.sist.web.domain.enrollment.vo.CourseQnaVO">
+			SELECT Q.NO,Q.MEMBER_ID,Q.COURSE_NO,Q.SUBJECT,Q.STATUS,Q.HIT,Q.REGDATE
+			FROM COURSE_QNA Q
+			JOIN COURSE C
+			ON Q.COURSE_NO=C.NO
+			WHERE C.INSTRUCTOR_NO=#{member_id}
+			ORDER BY Q.REGDATE DESC
+		</select>
+	 */
+	public List<Map<String, Object>>instQnaListData(Map<String, Object> map);
+	
+	// 총 수강생 QnA 목록 수
+	/*
+	 * 	<select id="instCountQnaList" parameterType="int" resultType="int">
+			SELECT COUNT(*)
+			FROM COURSE_QNA Q
+			JOIN COURSE C
+			ON Q.COURSE_NO = C.NO
+			WHERE C.INSTRUCTOR_NO=#{member_id}
+		</select>
+	 */
+	public int instCountQnaList(Map<String, Object> map);
+	
+	// 수강생 QnA 상세 페이지 조회
+	/*
+	 * 	<select id="instQnaDetailData" parameterType="int" resultType="hashmap">
+			SELECT Q.NO,Q.MEMBER_ID,M.NAME,Q.SUBJECT,Q.CONTENT,
+			    Q.STATUS,Q.HIT,Q.REGDATE
+			FROM COURSE_QNA Q
+			JOIN MEMBER M
+			ON Q.MEMBER_ID=M.MEMBER_ID
+			WHERE Q.NO=#{no}
+		</select>
+	 */
+	public Map<String, Object> instQnaDetailData(int no);
+	
+	// 수강생 QnA 필터링용 담당 강사의 강의 목록 출력
+	/*
+	 * 	<select id="instQnaFilterCourse" parameterType="int" resultType="string">
+			SELECT title
+			FROM course c
+			JOIN member m
+			ON member_id=instructor_no
+			WHERE member_id=#{member_id}
+			ORDER BY title ASC
+		</select>
+	 */
+	public List<String> instQnaFilterCourse(int member_id);
+	
+	// 수강생 QnA 답변 출력
+	/*
+	 * 	<select id="instQnaAnswerData" parameterType="int" resultType="com.sist.web.domain.community.vo.QnaReplyVO">
+			SELECT A.ANSWER,A.REGDATE
+			FROM COURSE_QNA_REPLY A
+			JOIN COURSE_QNA Q
+			ON A.COURSE_QNA_NO=Q.NO
+			WHERE Q.NO=#{no}
+		</select>
+	 */
+	public CourseQnaReplyVO instQnaAnswerData(int no);
+	
+	// 수강생 QnA 답변 등록
+	/*
+		<insert id="instQnaAnswerInsert" parameterType="com.sist.web.domain.enrollment.vo.CourseQnaReplyVO">
+			INSERT INTO COURSE_QNA_REPLY
+			(no,course_qna_no,member_id,answer)
+			VALUES (CQR_NO_SEQ.nextval,#{course_qna_no},#{member_id},#{answer});
+		</insert>
+	*/
+	public void instQnaAnswerInsert(CourseQnaReplyVO vo);
+	
+	// 수강생 QnA 답변 달린 후 status 갱신
+	/*
+		<update id="instQnaUpdateStatus" parameterType="int">
+			UPDATE COURSE_QNA
+			SET STATUS='Y'
+			WHERE NO=#{no};
+		</update>
+	 */
+	public void instQnaUpdateStatus(int no);
 	
 }
