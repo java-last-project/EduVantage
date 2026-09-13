@@ -70,6 +70,7 @@ const useExamGradingStore=defineStore('examGradingStore',{
             try{
                 await api.post(`/instructor/exam/grading/${answerNo}/claim`)
 
+				// 선점 후 서버 상태 재조회
                 await this.loadAnswers()
 
                 this.selectedAnswer=this.answers.find(answer=>answer.answer_no===answerNo)||null
@@ -77,6 +78,7 @@ const useExamGradingStore=defineStore('examGradingStore',{
                 console.error(error)
 
                 if(error.response?.status===409){
+					// 동시 선점 실패는 409 Conflict로 구분
                     this.errorMessage='다른 강사가 먼저 선점한 답안입니다.'
                 }else{
                     this.handleError(error, '답안을 선점하지 못했습니다.')
@@ -124,6 +126,7 @@ const useExamGradingStore=defineStore('examGradingStore',{
             const maxScore=Number(this.selectedAnswer.score)
             const inputScore=Number(this.score)
 
+			// 문항 배점 범위 + 정수 검증
             if(
                 !Number.isInteger(inputScore) ||
                 inputScore<0 ||

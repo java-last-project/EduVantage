@@ -37,6 +37,7 @@ public class ExamServiceImpl implements ExamService{
 		map.put("exam_no",examNo);
 		map.put("theme",theme!=null&&theme!=0?theme:null);
 
+		// 제한 시간 내 재접속 시 기존 응시 기록 유지
 		ExamEnrollmentVO activeVo=eMapper.findActiveEnrollment(map);
 		if(activeVo!=null){
 			return activeVo;
@@ -70,6 +71,7 @@ public class ExamServiceImpl implements ExamService{
 		}
 		List<ExamQuestionVO> questions=eMapper.getQuestionForGrading(qno);
 
+		// 실제 출제 문항 수 기준 100점 균등 배점
 		int totalCount=questions.size();
 		double pointPerQuestion=100.0/totalCount;
 
@@ -107,6 +109,7 @@ public class ExamServiceImpl implements ExamService{
 			answers.add(avo);
 		}
 
+		// 답안 저장 + 응시 상태 함께 반영
 		if(!answers.isEmpty()){
 			eMapper.insertUserAnswers(answers);
 		}
@@ -135,6 +138,7 @@ public class ExamServiceImpl implements ExamService{
 			throw new IllegalArgumentException("존재하지 않는 응시기록입니다.");
 		}
 		List<Map<String,Object>> details=eMapper.selectExamResultDetails(enrollmentNo);
+		// MyBatis Map key 대소문자 차이 대응
 		Object rawExamNo = map.get("EXAM_NO") != null ? map.get("EXAM_NO") : map.get("exam_no");
 		Integer examNo = null;
 		if (rawExamNo != null && !String.valueOf(rawExamNo).isEmpty()) {
