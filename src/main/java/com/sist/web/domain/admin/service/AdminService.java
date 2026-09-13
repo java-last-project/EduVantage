@@ -37,4 +37,17 @@ public interface AdminService {
 	public int adminGetTotalInstCount();	// 총 강사수
 	public List<CourseVO> adminGetBest5Course();	// 수강생 수 Best 5 강좌
 	
+	public List<Map<String, Object>> adminCoursePaymentListData(int page);	// 결제관리 - 강의
+	public int adminCountCoursePayment();
+	
+	public List<Map<String, Object>> adminExamListData(int page);
+	public int adminExamCount();
+	
+	public List<Map<String, Object>> adminQnaListData(int page, int categoryno, String status);
+	public int adminQnaCount(int categoryno, String status);
+	
+	public Map<String, Object> adminQnaDetailData(int no);
+	
+	public void adminQnaAnswerInsert(int member_id, int no, String content);
+	
 }

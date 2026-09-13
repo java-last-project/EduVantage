@@ -647,6 +647,13 @@
 	margin-bottom: 16px;
 }
 
+pre {
+    font-family: 'Pretendard Variable', sans-serif;  /* 프로젝트에서 쓰는 폰트로 */
+    white-space: pre-wrap;   /* 줄바꿈 유지 + 긴 줄은 자동 줄바꿈도 되게 */
+    word-break: break-word;  /* 긴 단어/URL도 넘치지 않게 */
+    margin: 0;
+}
+
 @media ( max-width :900px) {
 	.main {
 		padding: 20px;

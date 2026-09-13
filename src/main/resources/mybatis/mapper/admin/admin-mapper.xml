@@ -107,4 +107,106 @@
 		WHERE rownum &lt;= 5
 	</select>
 	
+	<!-- 강의 결제 목록 출력 -->
+	<select id="adminCoursePaymentListData" resultType="hashmap" parameterType="int">
+		SELECT P.NO, P.MEMBER_ID, M.NAME, P.COURSE_NO, C.TITLE, TO_CHAR(P.PRICE,'999,999') as price, TO_CHAR(P.REGDATE,'YYYY.MM.DD') AS REGDATE, P.ORDER_STATUS
+		FROM COURSE_PAYMENT P
+		JOIN MEMBER M
+		ON P.MEMBER_ID=M.MEMBER_ID
+		JOIN COURSE C
+		ON P.COURSE_NO=C.NO
+		ORDER BY P.REGDATE DESC, P.NO DESC
+		OFFSET #{start} ROWS FETCH NEXT 10 ROWS ONLY
+	</select>
+	
+	<!-- 시험결과 출력 -->
+	<select id="adminExamListData" resultType="hashmap" parameterType="int">
+		SELECT m.name, NVL(se.title, '상시 모의고사') AS examtitle, e.totalscore, TO_CHAR(e.regdate) AS REGDATE,e.no
+		FROM exam_enrollment e
+		JOIN member m ON e.member_id = m.member_id
+		LEFT JOIN scheduled_exam se ON e.exam_no = se.no
+		WHERE e.totalscore IS NOT NULL
+		ORDER BY e.regdate DESC
+		OFFSET #{start} ROWS FETCH NEXT 10 ROWS ONLY
+	</select>
+	
+	<!-- 시험결과 갯수 -->
+	<select id="adminExamCount" resultType="int">
+		SELECT count(*)
+		FROM exam_enrollment e
+		JOIN member m ON e.member_id = m.member_id
+		LEFT JOIN scheduled_exam se ON e.exam_no = se.no
+		WHERE e.totalscore IS NOT NULL
+		ORDER BY e.regdate DESC
+	</select>
+	
+	<!-- QnA 리스트 데이터 -->
+	<select id="adminQnaListData" resultType="hashmap" parameterType="hashmap">
+		SELECT Q.NO,Q.MEMBER_ID,M.NAME,Q.SUBJECT,Q.CATEGORY_NO as categoryno,C.CATEGORY,
+		    TO_CHAR(Q.REGDATE) AS REGDATE,Q.STATUS
+		FROM QNABOARD Q
+		JOIN MEMBER M
+		ON Q.MEMBER_ID=M.MEMBER_ID
+		JOIN QNA_CATEGORY C
+		ON Q.CATEGORY_NO=C.NO
+		<where>
+			<if test="categoryno != null and categoryno!='-1'">
+				AND category_no=#{categoryno}
+			</if>
+			<if test="status != null and status!='all'">
+				AND status=#{status}
+			</if>
+		</where>
+		ORDER BY Q.REGDATE DESC, Q.NO DESC
+		OFFSET #{start} ROWS FETCH NEXT 10 ROWS ONLY
+	</select>
+	
+	<!-- QnA 리스트 갯수 -->
+	<select id="adminQnaCount" resultType="int" parameterType="hashmap">
+		SELECT count(*)
+		FROM QNABOARD Q
+		JOIN MEMBER M
+		ON Q.MEMBER_ID=M.MEMBER_ID
+		JOIN QNA_CATEGORY C
+		ON Q.CATEGORY_NO=C.NO
+		<where>
+			<if test="categoryno != null and categoryno!='-1'">
+				AND category_no=#{categoryno}
+			</if>
+			<if test="status != null and status!='all'">
+				AND status=#{status}
+			</if>
+		</where>
+	</select>
+	
+	<!-- QnA 상세 내용 -->
+	<select id="adminQnaDetailData" resultType="hashmap" parameterType="int">
+		SELECT Q.NO,Q.MEMBER_ID,M.NAME,Q.SUBJECT,Q.CATEGORY_NO,C.CATEGORY,
+		    TO_CHAR(Q.REGDATE) AS REGDATE,Q.STATUS,TO_CHAR(Q.CONTENT) CONTENT,
+		    TO_CHAR(R.CONTENT) ANSCONTENT, TO_CHAR(R.REGDATE) AS ANSDATE
+		FROM QNABOARD Q
+		JOIN MEMBER M
+		ON Q.MEMBER_ID=M.MEMBER_ID
+		JOIN QNA_CATEGORY C
+		ON Q.CATEGORY_NO=C.NO
+		LEFT JOIN QNAREPLY R
+		ON Q.NO=R.QNA_NO
+		WHERE Q.NO=#{no}
+	</select>
+	
+	 <!-- QnA 답변 등록 Insert -->
+	 <insert id="adminQnaAnswerInsert" parameterType="hashmap">
+		INSERT INTO QNAREPLY
+		(member_id,qna_no,content)
+		VALUES
+		(#{member_id},#{no},#{content})
+	 </insert>
+	 
+	 <!-- 동시에 QnA 당변 상태를 Update -->
+	 <update id="adminQnaStatusUpdate" parameterType="int">
+	 	UPDATE QNABOARD
+		SET STATUS='Y'
+		WHERE NO=#{no}
+	 </update>
+	
 </mapper>
