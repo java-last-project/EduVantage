@@ -25,4 +25,9 @@
 	        (SELECT member_id FROM member WHERE username = #{username}), 'ROLE_USER'
 	    )
 	</insert>
+	<select id="memberDetailData" resultType="com.sist.web.domain.member.vo.MemberVO" parameterType="int">
+		SELECT * 
+		FROM member
+		WHERE member_id = #{member_id}
+	</select>
 </mapper>

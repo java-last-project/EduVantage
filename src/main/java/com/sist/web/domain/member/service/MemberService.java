@@ -10,4 +10,6 @@ public interface MemberService {
 	public int memberInsertData(MemberVO vo);
 	
 	public int memberAuthInsert(String username);
+	
+	public MemberVO memberDetailData(int member_id);
 }

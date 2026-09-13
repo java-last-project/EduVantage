@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
+import com.sist.web.domain.course.vo.CourseVO;
 import com.sist.web.domain.member.vo.MemberVO;
 
 import java.util.*;
@@ -103,4 +104,63 @@ public interface AdminMapper
 			+ "SET enabled=#{enabled}"
 			+ "WHERE member_id=#{member_id}")
 	public void adminUpdateMemberEnabled(MemberVO vo);
+	
+	// 전체 강의 목록 조희
+	/*
+	 * 	<select id="adminCourseListData" resultType="hashmap">
+			SELECT c.no,c.title,m.name,c.pay_price,c.thumbnail,c.student_count,c.star
+			FROM course c
+			JOIN member m
+			ON c.instructor_no=m.member_id
+			ORDER BY c.no desc
+		</select>
+	 */
+	public List<Map<String, Object>> adminCourseListData(int start);
+	
+	// 강의 관리 총 갯수 얻기
+	@Select("SELECT count(*) FROM course")
+	public int adminGetCountCourse();
+	
+	// 강의명으로 검색
+	/*
+	 * 	<select id="adminFindCourseListData" resultType="hashmap" parameterType="hashmap">
+			SELECT c.no,c.title,m.name,TO_CHAR(c.pay_price, 'FM999,999,999') as payprice,c.thumbnail,c.student_count,c.star
+			FROM course c
+			JOIN member m
+			ON c.instructor_no=m.member_id
+			WHERE c.title LIKE '%'||#{title}||'%'
+			ORDER BY c.no desc
+			OFFSET #{start} ROWS FETCH NEXT 10 ROWS ONLY
+		</select>
+	 */
+	public List<Map<String, Object>> adminFindCourseListData(Map<String, Object> map);
+	
+	// 강의명으로 검색 시 해당 결과의 총 갯수
+	@Select("SELECT count(*) FROM course WHERE title LIKE '%'||#{title}||'%'")
+	public int adminGetCountFindCourse(String title);
+	
+	// 대시보드 출력용
+	// 총 강사 수
+	/*
+	 * 	<select id="adminGetTotalInstCount" resultType="int">
+			SELECT COUNT(*)
+			FROM member m
+			JOIN authority a
+			ON m.member_id=a.member_id
+			WHERE a.authority='ROLE_INSTRUCTOR'
+		</select>
+	 */
+	public int adminGetTotalInstCount();
+	
+	// 수강생 top5 강의
+	/*
+	 * 	<select id="adminGetBest5Course" resultType="com.sist.web.domain.course.vo.CourseVO">
+			SELECT title, student_count
+			FROM (SELECT title, student_count
+			        FROM course
+			        ORDER BY student_count DESC)
+			WHERE rownum &lt;= 5
+		</select>
+	 */
+	public List<CourseVO> adminGetBest5Course();
 }

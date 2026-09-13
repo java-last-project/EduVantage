@@ -41,4 +41,10 @@ public class MemberServiceImpl implements MemberService{
 		// TODO Auto-generated method stub
 		return mMapper.memberAuthInsert(username);
 	}
+
+	@Override
+	public MemberVO memberDetailData(int member_id) {
+		// TODO Auto-generated method stub
+		return mMapper.memberDetailData(member_id);
+	}
 }

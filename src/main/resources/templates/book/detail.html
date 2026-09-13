@@ -72,8 +72,8 @@
 							<i class="fa-regular fa-heart"></i> {{ store.vo.like_count }}
 						</button> -->
 						<button class="btn-custom btn-like" @click="store.toggleLike">
-						    <i :class="store.isLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
-						    {{ store.likeCount }}
+						    <i :class="store.isLiked ? 'fa-solid fa-heart text-danger' : 'fa-regular fa-heart'"></i>
+						    <span :class="{'text-danger fw-bold': store.isLiked}">{{ store.likeCount }}</span>
 						</button>
 						<button class="btn-custom btn-cart" @click="store.addToCart">장바구니 담기</button>
 						<button class="btn-custom btn-buy" @click="store.goToOrder">바로 구매하기</button>

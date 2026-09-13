@@ -67,13 +67,6 @@ public class EnrollmentController {
 	@GetMapping("/evaluation")
 	public String enrollment_evaluation(@PathVariable("course_no") int course_no, Model model) {
 		model.addAttribute("menu","evaluation");
-		CourseVO vo=eService.courseDetailData(course_no);
-		int eCount=eService.evaluationCount(course_no);
-		List<CourseEvaluationVO> eList=eService.evaluationListData(course_no);
-
-		model.addAttribute("vo",vo);
-		model.addAttribute("eCount",eCount);
-		model.addAttribute("eList",eList);
 		model.addAttribute("enrollment_html","enrollment/evaluation");
 		return "enrollment/layout/main";
 	}

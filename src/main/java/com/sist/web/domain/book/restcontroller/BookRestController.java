@@ -3,6 +3,7 @@ package com.sist.web.domain.book.restcontroller;
 import java.util.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,7 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sist.web.domain.book.service.BookService;
 import com.sist.web.domain.book.vo.BookCartVO;
 import com.sist.web.domain.book.vo.BookLikeVO;
+import com.sist.web.domain.book.vo.BookOrderDetailVO;
+import com.sist.web.domain.book.vo.BookOrderVO;
 import com.sist.web.domain.book.vo.BookVO;
+import com.sist.web.domain.member.service.MemberService;
+import com.sist.web.domain.member.vo.MemberVO;
 import com.sist.web.domain.book.commons.PaginationUtil; 
 
 import jakarta.servlet.http.HttpSession;
@@ -23,7 +28,8 @@ import lombok.RequiredArgsConstructor;
 public class BookRestController {
     
     private final BookService bService;
-
+    private final MemberService mService; 
+    // 도서 목록
     @GetMapping("/book/list_vue")
     public ResponseEntity<Map> book_list(
             @RequestParam(value = "page", defaultValue = "1") int page,
@@ -56,13 +62,13 @@ public class BookRestController {
         }
         return ResponseEntity.ok(map);
     }
-    
+    // 도서 상세보기
     @GetMapping("/book/detail_vue")
     public ResponseEntity<BookVO> book_detail(@RequestParam("no") int no){
         BookVO vo = bService.bookDetailData(no);
         return new ResponseEntity<>(vo, HttpStatus.OK);
     }
-    
+    // 도서 검색
     @GetMapping("/book/find")
     public Map<String, Object> bookFindData(
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
@@ -120,7 +126,7 @@ public class BookRestController {
 
         return response;
     }
-
+    
     // 좋아요 버튼 클릭 시 토글 처리
     @PostMapping("/book/like/toggle")
     public Map<String, Object> bookLikeToggle(
@@ -150,6 +156,8 @@ public class BookRestController {
 
         return response;
     }
+    
+    // 장바구니 추가
     @PostMapping("/cart/add")
     public Map<String, String> addCart(@RequestBody BookCartVO vo) {
         Map<String, String> response = new HashMap<>();
@@ -174,9 +182,36 @@ public class BookRestController {
         
         return response;
     }
+    
+    // 장바구니 목록
     @GetMapping("/cart/list")
     public List<BookCartVO> bookCartList(@RequestParam("member_id") int memberId) {
         return bService.bookCartListData(memberId);
     }
-
+    
+    // 주문 사항 저장
+    @PostMapping("/order/save")
+    public Map<String, String> saveOrder(@RequestBody BookOrderVO orderVO) {
+        Map<String, String> map = new HashMap<>();
+        
+        try {
+            bService.bookOrderComplete(orderVO, orderVO.getDetailList());
+            
+            map.put("status", "success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("status", "error");
+        }
+        
+        return map;
+    }
+    
+    // 배송지 입력 위한 회원 정보 
+    @GetMapping("/member/info_vue")
+    public ResponseEntity<MemberVO> getMemberInfo(HttpSession session) {
+        int memberId = (int) session.getAttribute("member_id");
+        MemberVO vo = mService.memberDetailData(memberId); 
+        return ResponseEntity.ok(vo);
+    }
+    
 }

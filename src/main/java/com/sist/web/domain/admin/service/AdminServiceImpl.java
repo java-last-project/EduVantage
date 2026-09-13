@@ -6,6 +6,7 @@ import com.sist.web.domain.member.vo.*;
 import org.springframework.stereotype.Service;
 
 import com.sist.web.domain.admin.mapper.AdminMapper;
+import com.sist.web.domain.course.vo.CourseVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -111,6 +112,51 @@ public class AdminServiceImpl implements AdminService
 		vo.setMember_id(member_id);
 		aMapper.adminUpdateMemberEnabled(vo);
 	}
+
+	@Override
+	public List<Map<String, Object>> adminCourseListData(int page) {
+		// TODO Auto-generated method stub
+		int start = (page*10)-10;
+		
+		return aMapper.adminCourseListData(start);
+	}
+
+	@Override
+	public int adminGetCountCourse() {
+		// TODO Auto-generated method stub
+		return aMapper.adminGetCountCourse();
+	}
+	
+	@Override
+	public int adminGetCountFindCourse(String title) {
+		// TODO Auto-generated method stub
+		return aMapper.adminGetCountFindCourse(title);
+	}
+
+	@Override
+	public List<Map<String, Object>> adminFindCourseListData(String title, int page) {
+		// TODO Auto-generated method stub
+		int start = (page*10)-10;
+		Map<String, Object> map = new HashMap<>();
+		map.put("title", title);
+		map.put("start", start);
+		
+		return aMapper.adminFindCourseListData(map);
+	}
+
+	@Override
+	public int adminGetTotalInstCount() {
+		// TODO Auto-generated method stub
+		return aMapper.adminGetTotalInstCount();
+	}
+
+	@Override
+	public List<CourseVO> adminGetBest5Course() {
+		// TODO Auto-generated method stub
+		return aMapper.adminGetBest5Course();
+	}
+
+	
 
 	
 
