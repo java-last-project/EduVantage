@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 
 import com.sist.web.domain.enrollment.service.YoutubeService;
+import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.ConcurrentModel;
 
@@ -26,6 +27,8 @@ class EnrollmentControllerTest {
 		YoutubeService youtubeService=mock(YoutubeService.class);
 		EnrollmentController controller=new EnrollmentController(enrollmentService,courseService,youtubeService);
 		ConcurrentModel model=new ConcurrentModel();
+		HttpSession session=mock(HttpSession.class);
+		when(session.getAttribute("member_id")).thenReturn(1);
 
 		TechStackVO tech=new TechStackVO();
 		tech.setTech("Spring Boot");
@@ -36,7 +39,7 @@ class EnrollmentControllerTest {
 		course.setCategoryList(List.of("백엔드"));
 		when(courseService.courseDetail(35)).thenReturn(course);
 
-		String view=controller.enrollment_video(35,model);
+		String view=controller.enrollment_video(35,session,model);
 
 		assertEquals("enrollment/layout/main",view);
 		assertSame(course,model.getAttribute("course"));
