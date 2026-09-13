@@ -163,4 +163,120 @@ public interface AdminMapper
 		</select>
 	 */
 	public List<CourseVO> adminGetBest5Course();
+	
+	// 강의 결제 내역 조회
+	/*
+	 * 	<select id="adminCoursePaymentListData" resultType="hashmap">
+			SELECT P.NO, P.MEMBER_ID, M.NAME, P.COURSE_NO, C.TITLE, P.PRICE, TO_CHAR(P.REGDATE,'YYYY.MM.DD') AS REGDATE, P.ORDER_STATUS
+			FROM COURSE_PAYMENT P
+			JOIN MEMBER M
+			ON P.MEMBER_ID=M.MEMBER_ID
+			JOIN COURSE C
+			ON P.COURSE_NO=C.NO
+			ORDER BY P.REGDATE DESC, P.NO DESC
+		</select>
+	 */
+	public List<Map<String, Object>> adminCoursePaymentListData(int start);
+	
+	@Select("SELECT count(*) "
+			+ "FROM COURSE_PAYMENT P "
+			+ "JOIN MEMBER M "
+			+ "ON P.MEMBER_ID=M.MEMBER_ID "
+			+ "JOIN COURSE C "
+			+ "ON P.COURSE_NO=C.NO ")
+	public int adminCountCoursePayment();
+	
+	// 시험관리
+	/*
+	 * 	<select id="adminExamListData" resultType="hashmap" parameterType="int">
+			SELECT m.name AS memberName, NVL(se.title, '상시 모의고사') AS examTitle, e.totalscore, TO_CHAR(e.regdate) AS REGDATE
+			FROM exam_enrollment e
+			JOIN member m ON e.member_id = m.member_id
+			LEFT JOIN scheduled_exam se ON e.exam_no = se.no
+			WHERE e.totalscore IS NOT NULL
+			ORDER BY e.regdate DESC
+			OFFSET #{start} ROWS FETCH NEXT 10 ROWS ONLY
+		</select>
+	 */
+	public List<Map<String, Object>> adminExamListData(int start);
+	
+	// 시험관리 - 갯수
+	/*
+	 * 	<select id="adminExamCount">
+			SELECT count(*)
+			FROM exam_enrollment e
+			JOIN member m ON e.member_id = m.member_id
+			LEFT JOIN scheduled_exam se ON e.exam_no = se.no
+			WHERE e.totalscore IS NOT NULL
+			ORDER BY e.regdate DESC
+		</select>
+	 */
+	public int adminExamCount();
+	
+	// QnA 리스트 데이터
+	/*
+	 * 	<select id="adminQnaListData" resultType="hashmap" parameterType="int">
+			SELECT Q.NO,Q.MEMBER_ID,M.NAME,Q.SUBJECT,Q.CATEGORY_NO,C.CATEGORY,
+			    TO_CHAR(Q.REGDATE) AS REGDATE,Q.STATUS
+			FROM QNABOARD Q
+			JOIN MEMBER M
+			ON Q.MEMBER_ID=M.MEMBER_ID
+			JOIN QNA_CATEGORY C
+			ON Q.CATEGORY_NO=C.NO
+			ORDER BY Q.REGDATE DESC, Q.NO DESC
+			OFFSET #{start} ROWS FETCH NEXT 10 ROWS ONLY
+		</select>
+	 */
+	public List<Map<String, Object>> adminQnaListData(Map<String, Object> map);
+	
+	// QnA 리스트 갯수
+	/*
+	 * 	<select id="adminQnaCount" resultType="hashmap" parameterType="int">
+			SELECT count(*)
+			FROM QNABOARD Q
+			JOIN MEMBER M
+			ON Q.MEMBER_ID=M.MEMBER_ID
+			JOIN QNA_CATEGORY C
+			ON Q.CATEGORY_NO=C.NO
+		</select>
+	 */
+	public int adminQnaCount(Map<String, Object> map);
+	
+	// QnA 상세 데이터
+	/*
+	 * 	<select id="adminQnaDetailData" resultType="hashmap" parameterType="int">
+			SELECT Q.NO,Q.MEMBER_ID,M.NAME,Q.SUBJECT,Q.CATEGORY_NO,C.CATEGORY,
+			    TO_CHAR(Q.REGDATE) AS REGDATE,Q.STATUS,Q.CONTENT,
+			    R.CONTENT ANSCONTENT, TO_CHAR(R.REGDATE) AS ANSDATE
+			FROM QNABOARD Q
+			JOIN MEMBER M
+			ON Q.MEMBER_ID=M.MEMBER_ID
+			JOIN QNA_CATEGORY C
+			ON Q.CATEGORY_NO=C.NO
+			JOIN QNAREPLY R
+			ON Q.NO=R.QNA_NO
+			WHERE Q.NO=#{no}
+		</select>
+	 */
+	public Map<String, Object> adminQnaDetailData(int no);
+	
+	// QnA 답변 등록 - 트랜잭션
+	/*
+	 * 	<!-- QnA 답변 등록 Insert -->
+		 <insert id="adminQnaAnswerInsert" parameterType="hashmap">
+			INSERT INTO QNAREPLY
+			(member_id,qna_no,content)
+			VALUES
+			(#{member_id},#{no},#{content});
+		 </insert>
+		 
+		 <!-- 동시에 QnA 당변 상태를 Update -->
+		 <update id="adminQnaStatusUpdate" parameterType="int">
+		 	UPDATE QNABOARD
+			SET STATUS='Y'
+			WHERE NO=#{no};
+		 </update>
+	 */
+	public void adminQnaAnswerInsert(Map<String, Object> map);
+	public void adminQnaStatusUpdate(int no);
 }
