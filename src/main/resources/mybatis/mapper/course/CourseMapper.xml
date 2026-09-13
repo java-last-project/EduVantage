@@ -33,6 +33,7 @@
 		WHERE ROWNUM &lt;=10
 	</select>
 	
+	<!-- 기술 스택 다대다 JOIN 전 강좌 단위 페이징 -->
 	<select id="courseListData" resultMap="courseResultMap" parameterType="hashmap">
 		SELECT p_c.no, p_c.title, p_c.instructor_no, m.name AS instructor, 
 	           p_c.star, p_c.student_count, p_c.pay_price, p_c.regular_price, 
@@ -43,6 +44,7 @@
 	        FROM Course c
 	        WHERE c.thumbnail IS NOT NULL AND c.content IS NOT NULL AND c.images IS NOT NULL
 	        
+	        <!-- 매핑 테이블에서 강좌 번호만 추려 중복 없이 분류 필터링 -->
 	        <if test="categories!=null and categories.size()>0">
 	            AND c.no IN (
 	                SELECT ctm.course_no 
@@ -59,6 +61,7 @@
 				AND c.title LIKE '%'||#{fd}||'%'
 			</if>
 	        
+	        <!-- 허용된 정렬식만 선택해 동적 SQL 입력 제한 -->
 	        ORDER BY 
 	        <choose>
 				<when test="column=='star'">star DESC, no DESC</when>

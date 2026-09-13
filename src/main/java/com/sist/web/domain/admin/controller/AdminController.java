@@ -4,12 +4,16 @@ import org.apache.naming.StringManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.sist.web.domain.admin.service.AdminService;
+import com.sist.web.domain.community.service.NoticeBoardService;
+import com.sist.web.domain.community.vo.NoticeBoardVO;
 import com.sist.web.domain.course.vo.CourseVO;
 import com.sist.web.domain.member.vo.MemberVO;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import java.util.*;
 
@@ -18,6 +22,7 @@ import java.util.*;
 public class AdminController 
 {
 	private final AdminService aService;
+	private final NoticeBoardService nService;
 	
 	@GetMapping("/admin/member")
 	public String admin_member(
@@ -172,28 +177,153 @@ public class AdminController
 	}
 	
 	@GetMapping("/admin/order")
-	public String admin_order(Model model)
+	public String admin_order(@RequestParam(value="page", required = false) String page, Model model)
 	{
+		if(page==null) page="1";
+		
+		int curpage = Integer.parseInt(page);
+		int count = aService.adminCountCoursePayment();
+		
+		int totalpage = (int)(Math.ceil(count/10.0));
+		final int BLOCK = 10;
+		int startPage = ((curpage-1)/BLOCK*BLOCK)+1;
+		int endPage = ((curpage-1)/BLOCK*BLOCK)+BLOCK;
+		
+		// TODO: 상태(결제완료,취소,환불)에 따른 처리 로직 추가
+		
+		List<Map<String,Object>> list = aService.adminCoursePaymentListData(curpage);
+		
+		if(endPage>totalpage)
+			endPage = totalpage;
+		
+		int startNum = (curpage-1) * 10 + 1;
+		int endNum = curpage * 10 > count ? count : curpage * 10;
+		
+		model.addAttribute("startNum", startNum);
+		model.addAttribute("endNum", endNum);
+		model.addAttribute("count", count);
+		
+		model.addAttribute("list", list);
+		model.addAttribute("curpage", curpage);
+		model.addAttribute("totalpage", totalpage);
+		model.addAttribute("startPage", startPage);
+		model.addAttribute("endPage", endPage);
+		
 		model.addAttribute("admin_html", "admin/order");
 		model.addAttribute("main_html", "admin/main");
 		return "main/main";
 	}
 	
 	@GetMapping("/admin/notice")
-	public String admin_notice(Model model)
+	public String admin_notice(@RequestParam(value="page", required = false) String page,
+							@RequestParam(value="fd", required = false) String fd,
+							@RequestParam(value="categoryNo", required = false) Integer categoryNo,
+							Model model)
 	{
+		if(page==null) page="1";
+		if(categoryNo==null) categoryNo=0;
+		
+		List<NoticeBoardVO> list = nService.noticeBoardList(Integer.parseInt(page), fd, categoryNo);
+		Map<String, Object> pages = nService.noticeBoardPage(Integer.parseInt(page), fd, categoryNo);
+        
+		
+		int startNum = (Integer.parseInt(page)-1) * 20 + 1;
+		int endNum = Integer.parseInt(page) * 20 > (int)pages.get("count") ? (int)pages.get("count") : Integer.parseInt(page) * 20;
+		
+		model.addAttribute("startNum", startNum);
+		model.addAttribute("endNum", endNum);
+		
+        model.addAttribute("list", list);
+        model.addAttribute("curpage", pages.get("curpage"));
+        model.addAttribute("totalpage", pages.get("totalpage"));
+        model.addAttribute("startPage", pages.get("startPage"));
+        model.addAttribute("endPage", pages.get("endPage"));
+        model.addAttribute("count", pages.get("count"));
+        
+        if(fd!=null)
+        	model.addAttribute("fd",fd);
+        if(categoryNo!=null)
+        	model.addAttribute("category_no", categoryNo);
+		
 		model.addAttribute("admin_html", "admin/notice");
 		model.addAttribute("main_html", "admin/main");
 		return "main/main";
 	}
 	
-	@GetMapping("/admin/qna")
-	public String admin_qna(Model model)
+	@GetMapping("/admin/notice_insert")
+	public String admin_notice_insert(Model model)
 	{
+		model.addAttribute("admin_html", "admin/notice_insert");
+		model.addAttribute("main_html", "admin/main");
+		return "main/main";
+	}
+	
+	@GetMapping("/admin/qna")
+	public String admin_qna(@RequestParam(value="page", required = false) String page, 
+					@RequestParam(value="categoryno", required = false) String categoryno, 
+					@RequestParam(value="status", required = false) String status, 
+					Model model)
+	{
+		if(page==null) page="1";
+		if(categoryno==null) categoryno="-1";
+		if(status==null) status="all";
+		
+		int curpage = Integer.parseInt(page);
+		int count = aService.adminQnaCount(Integer.parseInt(categoryno), status);
+		
+		int totalpage = (int)(Math.ceil(count/10.0));
+		final int BLOCK = 10;
+		int startPage = ((curpage-1)/BLOCK*BLOCK)+1;
+		int endPage = ((curpage-1)/BLOCK*BLOCK)+BLOCK;
+		
+		List<Map<String, Object>> list = aService.adminQnaListData(curpage, Integer.parseInt(categoryno), status);
+		
+		if(endPage>totalpage)
+			endPage = totalpage;
+		
+		int startNum = (curpage-1) * BLOCK + 1;
+		int endNum = curpage * BLOCK > count ? count : curpage * BLOCK;
+		
+		model.addAttribute("startNum", startNum);
+		model.addAttribute("endNum", endNum);
+		
+		model.addAttribute("list", list);
+		model.addAttribute("curpage", curpage);
+		model.addAttribute("totalpage", totalpage);
+		model.addAttribute("startPage", startPage);
+		model.addAttribute("endPage", endPage);
+		model.addAttribute("count", count);
+		
+		model.addAttribute("categoryno", categoryno);
+		model.addAttribute("status", status);
+		
 		model.addAttribute("admin_html", "admin/qna");
 		model.addAttribute("main_html", "admin/main");
 		return "main/main";
 	}
+	
+	@GetMapping("/admin/qna_detail")
+	public String admin_qna_detail(@RequestParam("no") int no,Model model)
+	{
+		Map<String, Object> vo = aService.adminQnaDetailData(no);
+		
+		model.addAttribute("vo", vo);
+		
+		model.addAttribute("admin_html", "admin/qna_detail");
+		model.addAttribute("main_html", "admin/main");
+		return "main/main";
+	}
+	
+	@PostMapping("/admin/qna_answer")
+	public String admin_qna_answer(@RequestParam("no") int no, @RequestParam("content") String content, HttpSession session, Model model)
+	{
+		int member_id = (int)session.getAttribute("member_id");
+		
+		aService.adminQnaAnswerInsert(member_id, no, content);
+		
+		return "redirect:qna_detail?no="+no;
+	}
+		
 	
 	@GetMapping("/admin/dashboard")
 	public String admin_dashboard(Model model)
@@ -231,4 +361,39 @@ public class AdminController
 		return "main/main";
 	}
 
+	@GetMapping("/admin/exam")
+	public String admin_exam(@RequestParam(value="page", required = false) String page, Model model)
+	{
+		if(page==null) page="1";
+		
+		int curpage = Integer.parseInt(page);
+		int count = aService.adminExamCount();
+		
+		int totalpage = (int)(Math.ceil(count/10.0));
+		final int BLOCK = 10;
+		int startPage = ((curpage-1)/BLOCK*BLOCK)+1;
+		int endPage = ((curpage-1)/BLOCK*BLOCK)+BLOCK;
+		
+		List<Map<String, Object>> list = aService.adminExamListData(curpage);
+		
+		if(endPage>totalpage)
+			endPage = totalpage;
+		
+		int startNum = (curpage-1) * BLOCK + 1;
+		int endNum = curpage * BLOCK > count ? count : curpage * BLOCK;
+		
+		model.addAttribute("startNum", startNum);
+		model.addAttribute("endNum", endNum);
+		
+		model.addAttribute("list", list);
+		model.addAttribute("curpage", curpage);
+		model.addAttribute("totalpage", totalpage);
+		model.addAttribute("startPage", startPage);
+		model.addAttribute("endPage", endPage);
+		model.addAttribute("count", count);
+		
+		model.addAttribute("admin_html", "admin/exam");
+		model.addAttribute("main_html", "admin/main");
+		return "main/main";
+	}
 }

@@ -1,5 +1,7 @@
 package com.sist.web.domain.notification.consumer;
 
+import com.sist.web.domain.member.mapper.MemberMapper;
+import com.sist.web.domain.member.vo.MemberVO;
 import com.sist.web.domain.notification.entity.NotificationTopics;
 import com.sist.web.domain.notification.entity.NotificationType;
 import com.sist.web.domain.notification.entity.Notifications;
@@ -13,7 +15,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
 /**
@@ -29,6 +33,7 @@ import java.util.Map;
 public class NotificationConsumer {
     private final NotificationRepository notificationRepository;
     private final EmitterRepository emitterRepository;
+    private final MemberMapper memberMapper;
 
     //groupid를 명시해서 처리하는 컨슈머 인스턴스를 나눠야하는 이유
     //강의 수료 리스너
@@ -124,5 +129,75 @@ public class NotificationConsumer {
                         emitterRepository.deleteByMemberId(event.getMemberId());
                     }
                 });
+    }
+
+    //대댓글 알림 리스너
+    @KafkaListener(topics = NotificationTopics.COMMENT_REPLIED, groupId = "notification-group")
+    public void handleCommentReplied(NotificationEventVO event){
+        String title = "내 댓글에 답변이 달렸어요!";
+        String content = "눌러서 바로 ["+event.getTarget()+"] 게시글로 이동해보세요.";
+
+        //db저장
+        Notifications notification = Notifications.builder()
+                .memberId(event.getMemberId())
+                .type(NotificationType.COMMENT_REPLIED)
+                .title(title)
+                .content(content)
+                .relatedId(event.getTargetNo())
+                .eventKey(event.getEventKey())
+                .build();
+        notificationRepository.save(notification);
+        int no = notification.getNo();
+        int related_id = notification.getRelatedId();
+
+        //유저 접속 여부 확인(emitter)
+        emitterRepository.findByMemberId(event.getMemberId())
+                //온라인
+                .ifPresent(emitter -> {
+                    try{
+                        emitter.send(SseEmitter.event()
+                                .data(Map.of("no", no,"type",NotificationType.COMMENT_REPLIED.toString(),"title",title,"content",content,"related_id", related_id)));
+                    }catch(IOException e){
+                        emitterRepository.deleteByMemberId(event.getMemberId());
+                    }
+                });
+    }
+
+    //공지 전역 알림 리스너
+    @KafkaListener(topics = NotificationTopics.NOTICE_UPLOAD, groupId = "notification-group")
+    public void handleNoticeUpload(NotificationEventVO event) {
+        String title = "새로운 공지가 등록됐어요!";
+        String content = "눌러서 바로 [" + event.getTarget() + "] 게시글로 이동해보세요.";
+
+        //관리자 제외 모든 유저에게 알림 전송
+        List<Integer> memberIds = memberMapper.getAllMemberIdsExcludeAdmin();
+        String eventKey=null;
+        for (int memberId : memberIds) {
+            eventKey = UUID.randomUUID().toString();
+            //db저장
+            Notifications notification = Notifications.builder()
+                    .memberId(memberId)
+                    .type(NotificationType.NOTICE_UPLOAD)
+                    .title(title)
+                    .content(content)
+                    .relatedId(event.getTargetNo())
+                    .eventKey(eventKey)
+                    .build();
+            notificationRepository.save(notification);
+            int no = notification.getNo();
+            int related_id = notification.getRelatedId();
+
+            //유저 접속 여부 확인(emitter)
+            emitterRepository.findByMemberId(memberId)
+                    //온라인
+                    .ifPresent(emitter -> {
+                        try {
+                            emitter.send(SseEmitter.event()
+                                    .data(Map.of("no", no, "type", NotificationType.NOTICE_UPLOAD.toString(), "title", title, "content", content, "related_id", related_id)));
+                        } catch (IOException e) {
+                            emitterRepository.deleteByMemberId(memberId);
+                        }
+                    });
+        }
     }
 }

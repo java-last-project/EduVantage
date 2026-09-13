@@ -33,4 +33,9 @@ public class NotificationServiceImpl implements NotificationService{
     public void markAllAsRead(List<Integer> nos) {
         notificationMapper.markAllAsRead(nos);
     }
+
+    @Override
+    public void markAsRead(int no) {
+        notificationMapper.markAsRead(no);
+    }
 }

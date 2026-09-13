@@ -12,7 +12,14 @@
             return {
                 nnList: computed(()=>store.nnList),
                 markAllRead: store.markAllRead,
-                move: store.move
+                markRead: store.markRead,
+                move: store.move,
+                handleClick: store.handleClick,
+                //탭
+                activeTab: computed(()=>store.activeTab),
+                tabs: computed(()=>store.tabs),
+                filteredList: computed(()=>store.filteredList),
+                setActiveTab: store.setActiveTab,
             }
         }
     })
