@@ -16,7 +16,12 @@ public class VideoProgressServiceImpl implements VideoProgressService{
 
     @Override
     @Transactional
-    public void saveProgress(CourseVideoProgressVO vo) {
+    public void saveProgress(CourseVideoProgressVO vo,Integer member_id) {
+        int check=pMapper.videoAccessCheck(vo.getEnrollment_no(),vo.getVideo_no(),member_id);
+        if(check==0){
+            throw new IllegalArgumentException("잘못된 접근입니다.");
+        }
+
         String completed=vo.getProgress()>=90?"Y":"N";
         vo.setCompleted(completed);
 
@@ -32,7 +37,11 @@ public class VideoProgressServiceImpl implements VideoProgressService{
     }
 
     @Override
-    public List<CourseVideoProgressVO> progressList(Integer enrollment_no) {
+    public List<CourseVideoProgressVO> progressList(Integer enrollment_no,Integer member_id) {
+        int check=pMapper.enrollmentAccessCheck(enrollment_no,member_id);
+        if(check==0){
+            throw new IllegalArgumentException("잘못된 접근입니다.");
+        }
         return pMapper.videoProgressList(enrollment_no);
     }
 }
