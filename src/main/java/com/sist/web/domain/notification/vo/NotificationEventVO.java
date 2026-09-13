@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NotificationEventVO {
-    private int memberId;
+    private Integer memberId;
     //알림에 연결 URL이 있는경우
     private int targetNo;
     //알림대상(수료알림:강의제목,도서구매알림:책제목 등)

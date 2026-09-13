@@ -4,6 +4,7 @@ import java.util.*;
 import com.sist.web.domain.member.vo.*;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sist.web.domain.admin.mapper.AdminMapper;
 import com.sist.web.domain.course.vo.CourseVO;
@@ -154,6 +155,75 @@ public class AdminServiceImpl implements AdminService
 	public List<CourseVO> adminGetBest5Course() {
 		// TODO Auto-generated method stub
 		return aMapper.adminGetBest5Course();
+	}
+
+	@Override
+	public List<Map<String, Object>> adminCoursePaymentListData(int page) {
+		// TODO Auto-generated method stub
+		int start = (page*10)-10;
+		return aMapper.adminCoursePaymentListData(start);
+	}
+
+	@Override
+	public int adminCountCoursePayment() {
+		// TODO Auto-generated method stub
+		return aMapper.adminCountCoursePayment();
+	}
+
+	@Override
+	public List<Map<String, Object>> adminExamListData(int page) {
+		// TODO Auto-generated method stub
+		int start = (page*10)-10;
+		
+		return aMapper.adminExamListData(start);
+	}
+
+	@Override
+	public int adminExamCount() {
+		// TODO Auto-generated method stub
+		return aMapper.adminExamCount();
+	}
+
+	@Override
+	public List<Map<String, Object>> adminQnaListData(int page, int categoryno, String status) {
+		// TODO Auto-generated method stub
+		Map<String, Object> map = new HashMap<>();
+		int start = (page*10)-10;
+		
+		map.put("start", start);
+		map.put("categoryno", categoryno);
+		map.put("status", status);
+		
+		return aMapper.adminQnaListData(map);
+	}
+
+	@Override
+	public int adminQnaCount(int categoryno, String status) {
+		// TODO Auto-generated method stub
+		Map<String, Object> map = new HashMap<>();
+		map.put("categoryno", categoryno);
+		map.put("status", status);
+		
+		return aMapper.adminQnaCount(map);
+	}
+
+	@Override
+	public Map<String, Object> adminQnaDetailData(int no) {
+		// TODO Auto-generated method stub
+		return aMapper.adminQnaDetailData(no);
+	}
+
+	@Override
+	@Transactional
+	public void adminQnaAnswerInsert(int member_id, int no, String content) {
+		// TODO Auto-generated method stub
+		Map<String, Object> map = new HashMap<>();
+		map.put("member_id", member_id);
+		map.put("no", no);
+		map.put("content", content);
+		
+		aMapper.adminQnaAnswerInsert(map);
+		aMapper.adminQnaStatusUpdate(no);
 	}
 
 	

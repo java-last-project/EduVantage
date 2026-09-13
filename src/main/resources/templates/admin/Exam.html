@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<div class="layout">
+<main class="main">
+
+	<div class="page-header">
+		<div>
+			<h1 class="page-title">시험 관리</h1>
+			<p class="page-desc">시험 응시 기록을 조회합니다.</p>
+		</div>
+	</div>
+	
+
+	<div class="table-card">
+		<table>
+			<thead>
+				<tr>
+					<th style="width:60px;">No</th>
+					<th>응시자명</th>
+					<th>시험명</th>
+					<th>총점</th>
+					<th>응시일</th>
+				</tr>
+			</thead>
+			<tbody>
+
+				<!-- 반복 -->
+				<tr th:each="vo:${list}">
+					<td>[[${vo.NO}]]</td>
+					<td>[[${vo.NAME}]]</td>
+					<td>[[${vo.EXAMTITLE}]]</td>
+					<td>[[${vo.TOTALSCORE}]]</td>
+					<td>[[${vo.REGDATE}]]</td>
+				</tr>
+
+			</tbody>
+		</table>
+
+		<div class="pagination">
+			<div>전체 <b>[[${count}]]</b>건 중 <b>[[${startNum}]]-[[${endNum}]]</b> 표시</div>
+			
+			<div class="page-controls" th:if="${count>10}">
+				<a th:if="${startPage > 1}" class="btn page-btn nav" th:href="@{/admin/exam(page=${startPage-1})}"><i class="fa-solid fa-chevron-left"></i></a>
+				<a th:each="i:${#numbers.sequence(startPage,endPage)}" th:class="${curpage==i}?'btn page-btn active':'btn page-btn'" th:href="@{/admin/exam(page=${i})}">[[${i}]]</a>
+				<a th:if="${endPage < totalpage}" class="btn page-btn nav" th:href="@{/admin/exam(page=${endPage+1})}"><i class="fa-solid fa-chevron-right"></i></a>
+			</div>
+		</div>
+	</div>
+
+</main>
+</div>
+
+</html>

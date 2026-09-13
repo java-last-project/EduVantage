@@ -23,6 +23,14 @@ public class ScheduledExamController {
     private final ScheduledExamService scheduledExamService;
     private final MemberMapper memberMapper;
 
+    /**
+     * 정기 시험 목록 조회(홈 출력용)
+     * @param authentication
+     * @param year
+     * @param month
+     * @param page
+     * @return ScheduledExamVO 페이지네이션
+     */
     @GetMapping("/scheduled-exam")
     public ResponseEntity<Page<ScheduledExamVO>> getScheduledExamByMonth(
             Authentication authentication,
@@ -61,6 +69,12 @@ public class ScheduledExamController {
         }
     }
 
+    /**
+     * 정기 시험 구독 취소
+     * @param examNo
+     * @param authentication
+     * @return -> delete 후 프론트단에서 store refetch 및 토스트알림(온라인유저-sse)
+     */
     @DeleteMapping("/exam/subscribe/{examNo}")
     public ResponseEntity<Void> unsubscribeExam(@PathVariable("examNo") int examNo, Authentication authentication){
         String username = authentication.getName();

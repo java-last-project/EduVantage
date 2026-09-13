@@ -121,7 +121,20 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 		cMapper.freeBoardCommentInsert(vo);
 		FreeBoardVO parentFreeBoard = fMapper.freeBoardInfo(vo.getBoard_no());
 		//이벤트 발행
-		notificationProducer.publishPostCommented(parentFreeBoard.getMember_id(), vo.getBoard_no(), parentFreeBoard.getSubject());
+		if(vo.getParent_no() == 0){
+			notificationProducer.publishPostCommented(parentFreeBoard.getMember_id(), vo.getBoard_no(), parentFreeBoard.getSubject());
+		}else{
+			//본인 게시글에 본인이 단 경우 제외
+			if(parentFreeBoard.getMember_id()!=vo.getMember_id()){
+				notificationProducer.publishPostCommented(parentFreeBoard.getMember_id(), vo.getBoard_no(), parentFreeBoard.getSubject());
+			}
+			//부모댓글 정보
+			FreeCommentVO pvo = cMapper.parentFeeBoardCommentInfo(vo.getParent_no());
+			//본인댓글에 본인이 단 경우 제외
+			if(pvo.getMember_id() != vo.getMember_id()){
+				notificationProducer.publishCommentReplied(pvo.getMember_id(), vo.getBoard_no(), parentFreeBoard.getSubject());
+			}
+		}
 	}
 
 	@Override

@@ -5,15 +5,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sist.web.domain.book.vo.BookOrderVO;
 import com.sist.web.domain.member.vo.MemberVO;
 import com.sist.web.domain.mypage.service.*;
 import com.sist.web.domain.mypage.vo.CourseCartVO;
 import com.sist.web.domain.mypage.vo.CoursePaymentVO;
 import com.sist.web.domain.mypage.vo.MyMemberVO;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 import java.net.URI;
@@ -24,6 +27,19 @@ import java.util.*;
 public class MyPageRestController {
 	private final MyPageService mService;
 	private final PasswordEncoder passwordEncoder;
+	
+	private Map commonsBookOrdersListData(int page,int member_id,String order_status) {
+		Map map = new HashMap();
+		List<BookOrderVO> bList=mService.bookOrderListData(page, member_id,order_status);
+		int[] pages=mService.pages("book_order",page, member_id,order_status);
+		map.put("bList", bList);
+		map.put("page", pages[0]);
+		map.put("totalpage", pages[1]);
+		map.put("startpage", pages[2]);
+		map.put("endpage", pages[3]);
+		map.put("bCount", pages[4]);
+		return map;
+	}
 	
 	@GetMapping("/mypage/profile_update")
 	public ResponseEntity<Map> mypage_profile_update(
@@ -62,17 +78,20 @@ public class MyPageRestController {
 	@GetMapping("/mypage/course_orders_vue")
 	public ResponseEntity<Map> mypage_course_orders_vue(
 			@RequestParam("page") int page,
-			@RequestParam("member_id") int member_id){
+			@RequestParam("member_id") int member_id,
+			@RequestParam("order_status") String order_status
+			){
 		Map map=new HashMap();
 		try {
-			List<CoursePaymentVO> cList=mService.coursePaymentListData(page,member_id);
-			int[] pages=mService.pages("course_payment",page, member_id);
+			List<CoursePaymentVO> cList=mService.coursePaymentListData(page,member_id,order_status);
+			int[] pages=mService.pages("course_payment",page, member_id,order_status);
 			map.put("cList", cList);
 			map.put("page", pages[0]);
 			map.put("totalpage", pages[1]);
 			map.put("startpage", pages[2]);
 			map.put("endpage", pages[3]);
 			map.put("cCount", pages[4]);
+			map.put("cTotalCount", mService.coursePaymentTotalCount(member_id));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.internalServerError().build();
@@ -88,13 +107,51 @@ public class MyPageRestController {
 		Map map=new HashMap();
 		try {
 			List<CourseCartVO> cList=mService.courseCartListData(page,member_id);
-			int[] pages=mService.pages("course_cart",page, member_id);
+			int[] pages=mService.pages("course_cart",page, member_id,"");
 			map.put("cList", cList);
 			map.put("page", pages[0]);
 			map.put("totalpage", pages[1]);
 			map.put("startpage", pages[2]);
 			map.put("endpage", pages[3]);
 			map.put("cCount", pages[4]);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().build();
+		}
+		return ResponseEntity.ok(map);
+	}
+	
+	// 도서 구매 목록 api
+	@GetMapping("/mypage/book_orders_vue")
+	public ResponseEntity<Map> mypage_book_orders_vue(
+			@RequestParam("page") int page,
+			@RequestParam("member_id") int member_id,
+			@RequestParam("order_status") String order_status
+			){
+		Map map=new HashMap();
+		try {
+			map=commonsBookOrdersListData(page, member_id,order_status);
+			map.put("bTotalCount", mService.bookOrderTotalCount(member_id));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().build();
+		}
+		return ResponseEntity.ok(map);
+	}
+	
+	// 환불 대기 상태 변경
+	@PutMapping("/mypage/book_wait_refund_vue")
+	public ResponseEntity<Map> mypage_book_wait_refund_vue(
+			@RequestParam("page") int page,
+			@RequestParam("no") int no,
+			@RequestParam("order_status") String order_status,
+			HttpSession session
+			){
+		Map map=new HashMap();
+		try {
+			int member_id=(int)session.getAttribute("member_id");
+			mService.bookOrderAwaitRefund(no, member_id);
+			map=commonsBookOrdersListData(page, member_id,order_status);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.internalServerError().build();
