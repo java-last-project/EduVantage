@@ -124,9 +124,34 @@ const videoApp=createApp({
             }
         }
 
+        const handlePageHide=()=>{
+            if(!player || !selectedVideo.value) return
+            const currentTime=Math.floor(player.getCurrentTime())
+            const duration=Math.floor(player.getDuration())
+            if(duration<=0) return
+
+            const progress=Math.floor(currentTime/duration*100)
+
+            fetch('/api/enrollment/progress',{
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify({
+                    enrollment_no:initialEnrollmentNo,
+                    video_no:selectedVideo.value.no,
+                    currentTime,
+                    duration,
+                    progress
+                }),
+                keepalive:true
+            })
+        }
+
         onMounted(async()=>{
             loadVideos()
             await videoStore.loadProgress(initialEnrollmentNo)
+            window.addEventListener('pagehide',handlePageHide)
             window.onYouTubeIframeAPIReady=()=>{
                 createPlayer()
             }
@@ -136,7 +161,7 @@ const videoApp=createApp({
         })
 
         onBeforeUnmount(()=>{
-            saveProgress()
+            window.removeEventListener("pagehide",handlePageHide)
             stopProgressTimer()
             stopSaveTimer()
             if(player){

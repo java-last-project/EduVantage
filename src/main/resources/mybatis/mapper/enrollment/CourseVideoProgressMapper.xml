@@ -31,8 +31,16 @@
 			UPDATE SET
 				p.current_time=#{currentTime},
 				p.duration=#{duration},
-				p.progress=#{progress},
-				p.completed=#{completed},
+				p.progress=GREATEST(
+					NVL(p.progress,0),
+					#{progress}
+				),
+				p.completed=
+					CASE
+						WHEN p.completed='Y' OR #{completed}='Y'
+						THEN 'Y'
+						ELSE 'N'
+					END,
 				p.updated_at=SYSDATE
 		WHEN NOT MATCHED THEN
 			INSERT(
@@ -68,6 +76,23 @@
 		FROM course_video_progress
 		WHERE enrollment_no=#{enrollment_no}
 		AND completed='Y'
+	</select>
+
+	<select id="videoAccessCheck" resultType="int">
+		SELECT COUNT(*)
+		FROM course_enrollment e
+		JOIN course_video v
+		ON e.course_no=v.course_no
+		WHERE e.no=#{enrollment_no}
+		AND e.member_id=#{member_id}
+		AND v.no=#{video_no}
+	</select>
+
+	<select id="enrollmentAccessCheck" resultType="int">
+		SELECT COUNT(*)
+		FROM course_enrollment
+		WHERE no=#{enrollment_no}
+		AND member_id=#{member_id}
 	</select>
 
 </mapper>

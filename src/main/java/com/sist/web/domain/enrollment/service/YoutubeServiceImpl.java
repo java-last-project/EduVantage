@@ -34,8 +34,8 @@ public class YoutubeServiceImpl implements YoutubeService {
         String keyword=makeKeyword(course);
         List<YoutubeVideoVO> vList=requestYoutube(keyword);
 
-        videoList=new ArrayList<>();
         int order=1;
+
         for(YoutubeVideoVO video:vList){
             CourseVideoVO vo=new CourseVideoVO();
             vo.setCourse_no(course.getNo());
@@ -44,9 +44,8 @@ public class YoutubeServiceImpl implements YoutubeService {
             vo.setThumbnail(video.getThumbnail());
             vo.setVOrder(order++);
             vMapper.courseVideoInsert(vo);
-            videoList.add(vo);
         }
-        return videoList;
+        return vMapper.courseVideoList(course.getNo());
     }
 
     private List<YoutubeVideoVO> requestYoutube(String keyword){

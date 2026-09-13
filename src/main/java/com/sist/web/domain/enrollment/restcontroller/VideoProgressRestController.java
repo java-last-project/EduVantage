@@ -2,6 +2,7 @@ package com.sist.web.domain.enrollment.restcontroller;
 
 import com.sist.web.domain.enrollment.service.VideoProgressService;
 import com.sist.web.domain.enrollment.vo.CourseVideoProgressVO;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +17,10 @@ public class VideoProgressRestController {
     private final VideoProgressService pService;
 
     @PostMapping
-    public ResponseEntity<Void> videoProgressSave(@RequestBody CourseVideoProgressVO vo){
+    public ResponseEntity<Void> videoProgressSave(@RequestBody CourseVideoProgressVO vo, HttpSession session){
         try{
-            pService.saveProgress(vo);
+            Integer member_id=(Integer)session.getAttribute("member_id");
+            pService.saveProgress(vo,member_id);
             return ResponseEntity.ok().build();
         }catch(Exception ex){
             ex.printStackTrace();
@@ -28,9 +30,10 @@ public class VideoProgressRestController {
     }
 
     @GetMapping("/{enrollment_no}")
-    public ResponseEntity<List<CourseVideoProgressVO>> videoProgressList(@PathVariable("enrollment_no")Integer enrollmetn_no){
+    public ResponseEntity<List<CourseVideoProgressVO>> videoProgressList(@PathVariable("enrollment_no")Integer enrollment_no,HttpSession session){
         try{
-            List<CourseVideoProgressVO> list=pService.progressList(enrollmetn_no);
+            Integer member_id=(Integer)session.getAttribute("member_id");
+            List<CourseVideoProgressVO> list=pService.progressList(enrollment_no,member_id);
             return ResponseEntity.ok(list);
         }catch(Exception ex){
             ex.printStackTrace();
