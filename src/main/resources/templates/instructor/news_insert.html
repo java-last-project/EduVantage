@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<div class="layout">
+<main class="main">
+
+    <a href="javascript:history.back()" class="back-link"><i class="fa-solid fa-arrow-left"></i> 새소식 목록으로</a>
+
+    <div class="page-header">
+        <h1 class="page-title">새소식 등록</h1>
+    </div>
+
+    <form th:action="@{/instructor/news_insert}" method="post">
+        <input type="hidden" name="courseId" th:value="${courseId}">
+
+        <div class="section-card">
+            <div class="section-card-body">
+                <div class="form-row">
+                    <label>제목</label>
+                    <input type="text" class="form-input" name="subject" required>
+                </div>
+                <div class="form-row">
+                    <label>내용</label>
+                    <textarea class="form-textarea" name="content" required></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a class="btn btn-outline" href="javascript:history.back()">취소</a>
+            <button class="btn-primary" type="submit">등록</button>
+        </div>
+    </form>
+
+</main>
+</div>
+
+</html>

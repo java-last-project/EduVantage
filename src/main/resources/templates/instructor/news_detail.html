@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<div class="layout">
+<main class="main">
+
+    <a href="javascript:history.back()" class="back-link"><i class="fa-solid fa-arrow-left"></i> 새소식 목록으로</a>
+
+    <div class="page-header">
+        <h1 class="page-title">[[${vo.SUBJECT}]]</h1>
+        <p class="page-desc">조회 [[${vo.HIT}]] · [[${vo.REGDATE}]]</p>
+    </div>
+
+    <div class="section-card">
+        <div class="section-card-body">
+            <p style="white-space: pre-wrap;">[[${vo.CONTENT}]]</p>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-outline" href="javascript:history.back()">목록으로</a>
+    </div>
+
+</main>
+</div>
+
+</html>

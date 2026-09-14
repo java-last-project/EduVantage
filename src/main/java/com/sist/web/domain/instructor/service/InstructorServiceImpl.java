@@ -124,4 +124,48 @@ public class InstructorServiceImpl implements InstructorService
 		
 	}
 
+	@Override
+	public void instCourseNewsInsert(int course_id, String subject, String content) {
+		// TODO Auto-generated method stub
+		Map<String, Object> map = new HashMap<>();
+		map.put("course_id", course_id);
+		map.put("subject", subject);
+		map.put("content", content);
+		
+		iMapper.instCourseNewsInsert(map);
+	}
+
+	@Override
+	public List<Map<String, Object>> instCourseNewsListData(int course_id) {
+		// TODO Auto-generated method stub
+		return iMapper.instCourseNewsListData(course_id);
+	}
+
+	@Override
+	public Map<String, Object> instCourseNewsDetail(int no) {
+		// TODO Auto-generated method stub
+		return iMapper.instCourseNewsDetail(no);
+	}
+
+	@Override
+	public void instCourseNewsHitUp(int no) {
+		// TODO Auto-generated method stub
+		iMapper.instCourseNewsHitUp(no);
+	}
+
+	@Override
+	@Transactional
+	public void instProfileUpdate(MemberVO vo) {
+		// TODO Auto-generated method stub
+		iMapper.instProfileUpdate(vo);
+		
+		if(vo.getPassword()!=null && !vo.getPassword().isEmpty())
+		{
+			// 비밀번호 업데이트 문장 실행
+			iMapper.instProfilePwdUpdate(vo);
+		}
+	}
+	
+	
+
 }

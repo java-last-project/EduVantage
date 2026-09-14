@@ -16,7 +16,8 @@ import java.util.*;
 public interface InstructorMapper {
 	
 	// 프로필 내용 조회
-	@Select("SELECT member_id,username,name,TO_CHAR(regdate,'yyyy.mm.dd') as dbday,TO_CHAR(profile_desc) as profile_desc "
+	@Select("SELECT member_id,username,name,TO_CHAR(regdate,'yyyy.mm.dd') as dbday,TO_CHAR(profile_desc) as profile_desc, "
+			+ "sex, TO_CHAR(birthdate,'YYYY-MM-DD') AS BIRTHDATE, phone, email, post, addr1, addr2 "
 			+ "FROM member "
 			+ "WHERE member_id=#{member_id}")
 	public MemberVO InstProfileData(int member_id);
@@ -149,4 +150,67 @@ public interface InstructorMapper {
 	 */
 	public void instQnaUpdateStatus(int no);
 	
+	// 강의관리 - 새소식 Insert
+	/*
+	 * 	<insert id="instCourseNewsInsert" parameterType="hashmap">
+			INSERT INTO COURSE_NOTICE
+			(NO,COURSE_ID,SUBJECT,CONTETN)
+			VALUES
+			(COURSE_NOTICE_NO_SEQ.NEXTVAL,#{course_id},#{subject},#{content},#{hit})
+		</insert>
+	 */
+	public void instCourseNewsInsert(Map<String, Object> map);
+	
+	// 강의관리 - 새소식 List
+	/*
+	 * 	<select id="instCourseNewsListData" parameterType="int" resultType="hashmap">
+		    SELECT NO, SUBJECT, FILENAME, HIT, TO_CHAR(REGDATE,'yyyy-mm-dd') AS REGDATE
+		    FROM COURSE_NOTICE
+		    WHERE COURSE_ID = #{course_id}
+		    ORDER BY REGDATE DESC
+		</select>
+	 */
+	public List<Map<String, Object>> instCourseNewsListData(int course_id);
+	
+	// 강의관리 - 새소식 detail
+	/*
+		<select id="instCourseNewsDetail" parameterType="int" resultType="hashmap">
+		    SELECT NO, COURSE_ID, SUBJECT, CONTENT, FILENAME, HIT, TO_CHAR(REGDATE,'yyyy-mm-dd') AS REGDATE
+		    FROM COURSE_NOTICE
+		    WHERE NO = #{no}
+		</select>
+	*/
+	public Map<String, Object> instCourseNewsDetail(int no);
+	
+	// 강의관리 - 새소식 update 조회수
+	/*
+		<update id="instCourseNewsHitUp" parameterType="int">
+		    UPDATE COURSE_NOTICE
+		    SET HIT = HIT + 1
+		    WHERE NO = #{no}
+		</update>
+	 */
+	public void instCourseNewsHitUp(int no);
+	
+	// 프로필 정보 update
+	/*
+	 * 	<update id="instProfileUpdate" parameterType="com.sist.web.domain.member.vo.MemberVO">
+			UPDATE member
+			SET
+			name=#{name},
+			sex=#{sex},
+			birthdate=TO_DATE(#{birthdate}, 'yyyy-mm-dd'),
+			phone=#{phone},
+			post=#{post},
+			addr1=#{addr1},
+			addr2=#{addr2},
+			email=#{email},
+			profile_desc=#{profile_desc}
+			WHERE member_id=#{member_id}
+		</update>
+	 */
+	public void instProfileUpdate(MemberVO vo);
+	
+	// String password 받는 비밀번호 update 문
+	public void instProfilePwdUpdate(MemberVO vo);
 }
