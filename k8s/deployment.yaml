@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eduvantage
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: eduvantage
+  template:
+    metadata:
+      labels:
+        app: eduvantage
+    spec:
+      containers:
+        - name: eduvantage
+          image: kisd09/eduvantage:latest
+          ports:
+            - containerPort: 9090
+
+          envFrom:
+            - secretRef:
+                name: eduvantage-secret
+
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "EC2_PRIVATE_IP:29092"
+
+            - name: REDIS_HOST
+              value: "EC2_PRIVATE_IP"
+
+            - name: REDIS_PORT
+              value: "6379"
+
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 9090
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 6
+
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 9090
+            initialDelaySeconds: 40
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
