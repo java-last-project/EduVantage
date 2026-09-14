@@ -22,8 +22,9 @@ dependencies {
 	implementation 'org.postgresql:postgresql'
 	implementation 'com.pgvector:pgvector:0.1.6'
 	// Spirng AI
-	implementation platform('org.springframework.ai:spring-ai-bom:2.0.0-M5')
-	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
+	implementation platform('org.springframework.ai:spring-ai-bom:2.0.1')
+	implementation 'org.springframework.ai:spring-ai-starter-model-google-genai'
+	implementation 'org.springframework.ai:spring-ai-starter-model-google-genai-embedding'
 	//kafka
 	implementation 'org.springframework.boot:spring-boot-starter-kafka'
 

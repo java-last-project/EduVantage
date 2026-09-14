@@ -10,6 +10,6 @@ import lombok.Data;
 //OPTION4              VARCHAR2(2000) 
 @Data
 public class ExamOptionVO {
-	private int no,question_no;
+	private Integer no,question_no;
 	private String option1,option2,option3,option4;
 }

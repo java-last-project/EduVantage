@@ -40,11 +40,23 @@ spring:
     mode: HTML
   # spring AI
   ai:
-    openai:
-      api-key: ${OPENAI_API_KEY}
-      embedding:
-        options:
-            model: text-embedding-3-small
+    model:
+      chat: google-genai
+
+    google:
+      genai:
+        api-key: ${GENAI_API_KEY}
+
+        chat:
+          model: gemini-3.5-flash
+          temperature: 0.4
+
+        embedding:
+          api-key: ${GENAI_API_KEY}
+          project-id: ${GENAI_PROJECT_ID}
+          text:
+            model: gemini-embedding-001
+            dimensions: 768
   # kafka
   kafka:
     # 카프카 브로커 위치

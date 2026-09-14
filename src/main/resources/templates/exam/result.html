@@ -142,14 +142,18 @@
                                                 {{course.title}}
                                             </h6>
 
-                                            <div class="small text-muted mt-3">
+											<div v-if="!isAiExam" class="small text-muted mt-3">
                                                 관련 오답 {{course.matched_count}}문항
                                             </div>
 
-                                            <div class="small text-muted">
+											<div v-if="!isAiExam" class="small text-muted">
                                                 평균 연관도
                                                 {{Math.round(course.avg_similarity*100)}}%
                                             </div>
+
+											<div v-else class="small text-muted mt-3">
+												검색 연관도 {{Math.round(course.similarity*100)}}%
+											</div>
                                         </div>
                                     </div>
                                 </div>
@@ -179,6 +183,7 @@ const resultApp=createApp({
         const examTitle=ref('')
         const loading = ref(true)
         const recommendCourses=ref([])
+		const isAiExam=ref(false)
 
         const sanitizeLatex=(text)=>{
             if (!text) return ''
@@ -202,6 +207,7 @@ const resultApp=createApp({
             try {
                 const res=await (typeof api!=='undefined'?api:axios).get('/exam/result_vue?no='+enrollmentNo)
                 master.value=res.data.master || {}
+				isAiExam.value=master.value.EXAM_NO==null && master.value.THEME==null
                 examTitle.value=res.data.examTitle || '시험 결과'
                 const rawDetails=res.data.details || []
                 details.value=rawDetails.map(item=>{
@@ -213,7 +219,7 @@ const resultApp=createApp({
                         description: fixedDesc
                     }
                 })
-                await loadRecommendCourses()
+				await loadRecommendCourses(enrollmentNo)
 
                 nextTick(()=>{
                     if (window.MathJax && window.MathJax.typesetPromise) {
@@ -226,7 +232,7 @@ const resultApp=createApp({
             }
         }
 
-        const loadRecommendCourses=async()=>{
+		const loadRecommendCourses=async(enrollmentNo)=>{
             const wrongQuestionNos=[
                 ...new Set(
                     details.value
@@ -241,11 +247,13 @@ const resultApp=createApp({
             }
 
             try{
-                const res=await (typeof api!=='undefined'?api:axios).post('/exam/result/recommend',
-                    {
-                        question_nos:wrongQuestionNos
-                    }
-                )
+				const endpoint=isAiExam.value
+					?'/exam/result/ai-recommend'
+					:'/exam/result/recommend'
+				const payload=isAiExam.value
+					?{enrollmentNo:Number(enrollmentNo)}
+					:{question_nos:wrongQuestionNos}
+				const res=await (typeof api!=='undefined'?api:axios).post(endpoint,payload)
 
                 recommendCourses.value=res.data || []
             }catch(err){
@@ -267,6 +275,7 @@ const resultApp=createApp({
             loading,
             getOptionText,
             recommendCourses,
+			isAiExam,
             goToCourse
         }
     }

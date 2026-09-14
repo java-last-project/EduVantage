@@ -9,4 +9,5 @@ import java.util.List;
 @Mapper
 public interface ExamPGMapper {
     public List<RecommendCourseVO> findRecommendedCourses(@Param("questionNos") List<Integer> questionNos);
+	public List<RecommendCourseVO> findAiRecommendedCourses(@Param("queryVector") String queryVector);
 }
