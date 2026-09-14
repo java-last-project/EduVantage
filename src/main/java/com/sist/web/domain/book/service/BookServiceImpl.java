@@ -186,8 +186,24 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public void bookCommentReplyInsert(BookCommentVO vo) {
-		// TODO Auto-generated method stub
-		bMapper.bookCommentReplyInsert(vo);
+	    // 부모 댓글의 정보 조회
+	    BookCommentVO parent = bMapper.bookCommentParentInfoData(vo.getRoot());
+	    
+	    // 부모의 그룹 ID 대댓글에 세팅
+	    vo.setGroup_id(parent.getGroup_id());
+	    
+	    // 같은 그룹 내에서 부모의 group_step보다 큰 step들을 +1 
+	    bMapper.bookCommentStepIncrement(parent);
+	    
+	    // 부모의 step과 tab 값을 그대로 전달
+	    vo.setGroup_step(parent.getGroup_step());
+	    vo.setGroup_tab(parent.getGroup_tab());
+	    
+	    // 대댓글을 최종 등록
+	    bMapper.bookCommentReplyInsert(vo);
+	    
+	    // 부모 댓글의 depth를 1 증가
+	    bMapper.bookCommentDepthIncrement(vo.getRoot());
 	}
 
 	@Override

@@ -68,19 +68,14 @@
 				<!-- 구매 버튼 -->
 				<div class="action-pannel">
 					<div class="action-btn-wrap">
-						<!-- <button class="btn-custom btn-like" @click="store.likeClick'">
-							<i class="fa-regular fa-heart"></i> {{ store.vo.like_count }}
-						</button> -->
 						<button class="btn-custom btn-like" @click="store.toggleLike">
 							<i
 								:class="store.isLiked ? 'fa-solid fa-heart text-danger' : 'fa-regular fa-heart'"></i>
 							<span :class="{'text-danger fw-bold': store.isLiked}">{{
 								store.likeCount }}</span>
 						</button>
-						<button class="btn-custom btn-cart" @click="store.addToCart">장바구니
-							담기</button>
-						<button class="btn-custom btn-buy" @click="store.goToOrder">바로
-							구매하기</button>
+						<button class="btn-custom btn-cart" @click="store.addToCart">장바구니 담기</button>
+						<button class="btn-custom btn-buy" @click="store.goToOrder">바로 구매하기</button>
 					</div>
 
 					<ul class="perk-list">
@@ -108,7 +103,7 @@
 				<h3 class="tab-content-title">책 소개</h3>
 				<p v-html="store.vo.book_desc"></p>
 				<div class="desc-image" v-if="store.vo.desc_img">
-					<img :src="store.vo.desc_img" style="width: 100%;" alt="도서 상세 이미지">
+					<img :src="store.vo.desc_img" alt="도서 상세 이미지">
 				</div>
 			</div>
 
@@ -131,6 +126,7 @@
 			<h5 class="fw-bold mb-4" style="color: #1e293b;">
 				교재 댓글 및 리뷰 <span class="text-danger">{{ commentStore.count }}</span>
 			</h5>
+			
 			<!-- 댓글창  -->
 			<div class="mb-5 bg-white p-3 rounded-3 border">
 				<!-- 로그인 상태 -->
@@ -145,6 +141,7 @@
 							style="background-color: #212529;" @click="writeComment">등록</button>
 					</div>
 				</template>
+				
 				<!-- 비로그인 상태 -->
 				<template v-else>
 					<div class="text-center py-4 text-muted">
@@ -194,9 +191,8 @@
 					</div>
 
 					<div v-if="editReplyNo !== reply.no" class="text-dark mb-2"
-						style="font-size: 15px; white-space: pre-wrap;">
-						{{ reply.msg}}
-					</div>
+						style="font-size: 15px; white-space: pre-wrap;">{{
+						reply.msg}}</div>
 
 					<!-- 수정 폼 -->
 					<div v-else-if="editReplyNo === reply.no"
