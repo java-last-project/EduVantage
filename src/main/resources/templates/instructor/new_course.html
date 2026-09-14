@@ -2,12 +2,65 @@
 <html>
 
 <style>
-	.section-card-body{ padding:24px; }
-
 	@media (max-width:900px){
 		.price-row{ flex-direction:column; }
 	}
 </style>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+$(function(){
+    $('#thumbnailFile').on('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('key', '32b008a176792bfe995aebee18a27788');
+
+        axios.post('https://api.imgbb.com/1/upload', formData)
+            .then(function(response) {
+                const url = response.data.data.url;
+                $('#thumbnailUrl').val(url);
+                $('#preview').attr('src', url).show();
+                $('#thumbPlaceholder').hide();
+            })
+            .catch(function(error) {
+                console.error('업로드 실패:', error);
+                alert('썸네일 업로드에 실패했습니다.');
+            });
+    });
+
+    // 상세 커리큘럼/안내 이미지 - 여러 장 업로드
+    let detailImageUrls = [];
+
+    $('#detailImageFile').on('change', function(e) {
+        const files = Array.from(e.target.files);
+        if (!files.length) return;
+
+        files.forEach(function(file) {
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('key', '32b008a176792bfe995aebee18a27788');
+
+            axios.post('https://api.imgbb.com/1/upload', formData)
+                .then(function(response) {
+                    const url = response.data.data.url;
+                    detailImageUrls.push(url);
+                    $('#imagesUrl').val(detailImageUrls.join('^'));
+
+                    const $slot = $('<div class="image-slot"></div>');
+                    $slot.append($('<img>').attr('src', url));
+                    $('#detailImageSlots').append($slot);
+                })
+                .catch(function(error) {
+                    console.error('업로드 실패:', error);
+                    alert('이미지 업로드에 실패했습니다.');
+                });
+        });
+    });
+});
+</script>
 
 <div class="layout">
 <main class="main">
@@ -19,15 +72,22 @@
 	</div>
 
 	<form th:action="@{/instructor/new_course_insert}" method="post">
-	<!-- <div class="section-card">
+	<div class="section-card">
 		<div class="section-card-header">썸네일</div>
 		<div class="section-card-body">
 			<div class="thumb-upload">
-				<i class="fa-solid fa-image fa-lg"></i>
-				<span>클릭해서 썸네일 업로드</span>
+			    <div id="thumbPlaceholder">
+			        <i class="fa-solid fa-image fa-lg"></i>
+			        <span>클릭해서 썸네일 업로드</span>
+			    </div>
+			    <img id="preview" style="display:none;">
+			    <input type="file" id="thumbnailFile" accept="image/*">
+			    <input type="hidden" name="thumbnail" id="thumbnailUrl">
 			</div>
 		</div>
-	</div> -->
+	</div>
+
+
 
 	<div class="section-card">
 		<div class="section-card-header">기본 정보</div>
@@ -35,7 +95,7 @@
 			<div class="form-row">
 				<label>강의명</label>
 				<!-- <input type="hidden" th:value="${vo.no}" name="no"> -->
-				
+
 				<input type="text" class="form-input" name="title" required>
 			</div>
 			<div class="price-row">
@@ -55,6 +115,17 @@
 		<div class="section-card-header">강의 소개</div>
 		<div class="section-card-body">
 			<textarea class="form-textarea" placeholder="html 형식으로 입력..." name="content" required></textarea>
+		</div>
+	</div>
+
+	<div class="section-card">
+		<div class="section-card-header">상세 커리큘럼 및 안내 이미지</div>
+		<div class="section-card-body">
+			<input type="file" id="detailImageFile" accept="image/*" multiple>
+			<input type="hidden" name="images" id="imagesUrl">
+			<div class="image-slots" id="detailImageSlots" style="margin-top:12px;">
+				<!-- 업로드한 이미지가 여기 쌓임 -->
+			</div>
 		</div>
 	</div>
 

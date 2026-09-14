@@ -3,10 +3,12 @@ package com.sist.web.domain.instructor.controller;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.sist.web.domain.course.vo.CourseVO;
@@ -15,8 +17,15 @@ import com.sist.web.domain.enrollment.vo.CourseQnaVO;
 import com.sist.web.domain.instructor.service.InstructorService;
 import com.sist.web.domain.member.vo.MemberVO;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.util.*;
 
 @Controller
@@ -57,7 +66,22 @@ public class InstructorController {
 	@GetMapping("/instructor/news")
 	public String instructor_news(@RequestParam("courseId") int courseId, Model model)
 	{
-	    List<Map<String, Object>> list = iService.instCourseNewsListData(courseId); // 목록 조회 (별도로 이미 있으면 그거 쓰시고, 없으면 이 메소드도 만드셔야 해요)
+	    List<Map<String, Object>> list = iService.instCourseNewsListData(courseId);
+	    
+	    // 첨부파일 구별용 문자 제거해서 화면에 출력
+	    for(Map<String, Object> map : list)
+	    {
+	    	Object obj = map.get("FILENAME");
+	    	
+	    	if(obj != null)
+	    	{
+	    		String filename = obj.toString();
+	    		
+	    		String originalFilename = filename.substring(filename.indexOf("_") + 1);
+	    		
+	    		map.put("filename", originalFilename);
+	    	}
+	    }
 	    
 	    model.addAttribute("list", list);
 	    model.addAttribute("courseId", courseId);
@@ -79,9 +103,46 @@ public class InstructorController {
 	public String instructor_news_insert(
 	        @RequestParam("courseId") int courseId,
 	        @RequestParam("subject") String subject,
-	        @RequestParam("content") String content)
+	        @RequestParam("content") String content,
+	        @RequestParam(value="file", required = false) MultipartFile file)
 	{
-	    iService.instCourseNewsInsert(courseId, subject, content);
+		String filename = null;
+		Long filesize = null;
+		
+		// 파일이 업로드 될 경우 파일 이름과 파일 사이즈를 받아옴
+		if(file!=null && !file.isEmpty())
+		{
+			// 파일이름 : currentTimeMillis() 는 이름 중복 방지용
+			filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+			filesize = file.getSize();
+			
+			// 파일 업로드 경로 지정
+			String uploadDir = System.getProperty("user.dir") + File.separator + "uploads" + File.separator + "courseNews" + File.separator;
+			
+			File dir = new File(uploadDir);
+			
+			if(!dir.exists()) 
+				dir.mkdirs();
+			
+			try {
+				File dest = new File(uploadDir + filename);
+				file.transferTo(dest);
+				
+			} catch (Exception ex) {
+				// TODO: handle exception
+				ex.printStackTrace();
+				filename = null;
+				filesize = null;
+			}
+			
+			iService.instCourseNewsInsert(courseId, subject, content, filename, filesize);
+		}
+		else
+		{
+			
+			iService.instCourseNewsInsert(courseId, subject, content);	// filename, filesize 추가해서 보내주는거 만들어야함
+		}
+		
 	    return "redirect:/instructor/news?courseId=" + courseId;
 	}
 	
@@ -91,10 +152,49 @@ public class InstructorController {
 	    iService.instCourseNewsHitUp(no);
 	    Map<String, Object> vo = iService.instCourseNewsDetail(no);
 	    
+	 // 첨부파일 구별용 문자 제거해서 화면에 출력
+	    Object obj = vo.get("FILENAME");
+	    
+	    if(obj != null)
+	    {
+	    	String filename = obj.toString();
+	    	
+	    	String originalFilename = filename.substring(filename.indexOf("_") + 1);
+	    	
+	    	vo.put("filename", originalFilename);
+	    }
+	    
 	    model.addAttribute("vo", vo);
 	    model.addAttribute("instructor_html", "instructor/news_detail");
 	    model.addAttribute("main_html", "instructor/main");
 	    return "main/main";
+	}
+	
+	@GetMapping("/instructor/news_download")
+	public void instructor_news_download(@RequestParam("filename") String filename, HttpServletResponse response) throws IOException
+	{
+		String uploadDir = System.getProperty("user.dir") + File.separator + "uploads" + File.separator + "courseNews" + File.separator;
+		File file = new File(uploadDir + filename);
+		
+		if(!file.exists())
+		{
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
+		
+		// 원본 파일명 복원
+		String originalFilename = filename.substring(filename.indexOf("_") + 1);
+		String encodeFilename = URLEncoder.encode(originalFilename, "UTF-8").replaceAll("\\+", "%20");
+		
+		response.setContentType("application/octet-stream");
+		response.setHeader("Content-Disposition", "attachment; filename=\"" + encodeFilename + "\"");
+		response.setContentLengthLong(file.length());
+		
+		try (FileInputStream fis = new FileInputStream(file);
+		         OutputStream os = response.getOutputStream()) 
+			{
+		        FileCopyUtils.copy(fis, os);
+		    }
 	}
 	
 	@GetMapping("/instructor/course_edit")
@@ -113,7 +213,6 @@ public class InstructorController {
 	public String instructor_course_edit_update(@ModelAttribute("vo") CourseVO vo, Model model)
 	{
 		iService.instUpdateCourseData(vo);
-		
 		return "redirect:/instructor/course_detail?course_no="+vo.getNo();
 	}
 	

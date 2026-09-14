@@ -687,6 +687,49 @@ pre {
 	flex: 1;
 }
 
+.card-horizontal .img-placeholder {
+	width: 200px;
+	height: auto;
+	aspect-ratio: 16/9;
+	flex-shrink: 0;
+	align-self: flex-start; /* ← 추가: stretch 안 받고 자기 비율대로만 */
+	overflow: hidden; /* ← 추가: 혹시 넘치는 부분 확실히 잘라내기 */
+}
+
+.thumb-upload {
+	width: 280px;
+	aspect-ratio: 16/9;
+	border: 1px dashed var(--border-color);
+	border-radius: 8px;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	background: #f9fafb;
+	color: var(--text-muted);
+	font-size: 13px;
+	position: relative;
+}
+
+.thumb-upload img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.thumb-upload input[type="file"] {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	cursor: pointer;
+}
+
+.section-card-body{ padding:24px; }
+
 @media ( max-width :900px) {
 	.main {
 		padding: 20px;
