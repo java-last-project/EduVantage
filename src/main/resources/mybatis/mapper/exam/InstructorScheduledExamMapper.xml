@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.web.domain.exam.mapper.InstructorScheduledExamMapper">
+
+	<select id="selectInstructorScheduledExamList" parameterType="int" resultType="com.sist.web.domain.exam.vo.ScheduledExamVO">
+		SELECT e.no,e.title,e.open_date,e.close_date,e.instructor_id,
+		       NVL(e.time_limit,120) AS time_limit,
+		       (SELECT COUNT(*) FROM scheduled_exam_map WHERE exam_no=e.no) AS question_count
+		FROM scheduled_exam e
+		WHERE e.instructor_id=#{instructorId}
+		ORDER BY e.open_date DESC
+	</select>
+
+	<select id="selectInstructorScheduledExamDetail" parameterType="hashmap" resultType="com.sist.web.domain.exam.vo.ScheduledExamVO">
+		SELECT e.no,e.title,e.open_date,e.close_date,e.instructor_id,
+		       NVL(e.time_limit,120) AS time_limit,
+		       (SELECT COUNT(*) FROM scheduled_exam_map WHERE exam_no=e.no) AS question_count
+		FROM scheduled_exam e
+		WHERE e.no=#{examNo}
+		  AND e.instructor_id=#{instructorId}
+	</select>
+
+	<select id="selectScheduledQuestionNos" parameterType="hashmap" resultType="int">
+		SELECT m.question_no
+		FROM scheduled_exam_map m
+			JOIN scheduled_exam e ON m.exam_no=e.no
+		WHERE m.exam_no=#{examNo}
+		  AND e.instructor_id=#{instructorId}
+		ORDER BY m.no
+	</select>
+
+	<select id="selectQuestionBank" parameterType="hashmap" resultType="com.sist.web.domain.exam.vo.ExamQuestionVO">
+		SELECT no,title,score,type,theme
+		FROM exam_question
+		<if test="theme!=null and theme!=0">
+			WHERE theme=#{theme}
+		</if>
+		ORDER BY theme,no
+	</select>
+
+	<select id="selectQuestionsByNos" parameterType="list" resultType="com.sist.web.domain.exam.vo.ExamQuestionVO">
+		SELECT no,title,score,type,theme
+		FROM exam_question
+		WHERE no IN
+		<foreach item="questionNo" collection="list" open="(" separator="," close=")">
+			#{questionNo}
+		</foreach>
+	</select>
+
+	<insert id="insertScheduledExam" parameterType="com.sist.web.domain.exam.vo.ScheduledExamVO"
+			useGeneratedKeys="true" keyProperty="no" keyColumn="no">
+		INSERT INTO scheduled_exam(title,open_date,close_date,instructor_id,time_limit)
+		VALUES(#{title},#{open_date},#{close_date},#{instructor_id},#{time_limit})
+	</insert>
+
+	<insert id="insertScheduledExamMaps" parameterType="list">
+		INSERT INTO scheduled_exam_map(exam_no,question_no)
+		SELECT data.* FROM (
+		<foreach collection="list" item="item" separator=" UNION ALL ">
+			SELECT #{item.exam_no},#{item.question_no}
+			FROM dual
+		</foreach>
+		) data
+	</insert>
+
+	<update id="updateScheduledExam" parameterType="com.sist.web.domain.exam.vo.ScheduledExamVO">
+		UPDATE scheduled_exam
+		SET title=#{title},
+		    open_date=#{open_date},
+		    close_date=#{close_date},
+		    time_limit=#{time_limit}
+		WHERE no=#{no}
+		  AND instructor_id=#{instructor_id}
+		  AND open_date&gt;SYSDATE
+	</update>
+
+	<update id="updateStartedExamCloseDate" parameterType="com.sist.web.domain.exam.vo.ScheduledExamVO">
+		UPDATE scheduled_exam
+		SET close_date=#{close_date}
+		WHERE no=#{no}
+		  AND instructor_id=#{instructor_id}
+		  AND open_date&lt;=SYSDATE
+		  AND close_date&gt;SYSDATE
+	</update>
+
+	<delete id="deleteScheduledExamMaps" parameterType="int">
+		DELETE FROM scheduled_exam_map
+		WHERE exam_no=#{examNo}
+	</delete>
+
+	<delete id="deleteScheduledExamSubscriptions" parameterType="int">
+		DELETE FROM exam_subscription
+		WHERE exam_no=#{examNo}
+	</delete>
+
+	<select id="countScheduledExamEnrollments" parameterType="int" resultType="int">
+		SELECT COUNT(*)
+		FROM exam_enrollment
+		WHERE exam_no=#{examNo}
+	</select>
+
+	<delete id="deleteScheduledExam" parameterType="hashmap">
+		DELETE FROM scheduled_exam
+		WHERE no=#{examNo}
+		  AND instructor_id=#{instructorId}
+		  AND open_date&gt;SYSDATE
+	</delete>
+
+</mapper>
