@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.sist.web.domain.exam.vo.ExamEnrollmentVO;
 import com.sist.web.domain.exam.vo.ExamQuestionVO;
+import com.sist.web.domain.exam.vo.ScheduledExamVO;
 
 @Mapper
 @Repository
@@ -17,11 +18,15 @@ public interface ExamMapper {
 	public List<ExamQuestionVO> examDetailData(Map<String,Object> map);
 	public void insertEnrollment(ExamEnrollmentVO vo);
 	public String getScheduledExamTitle(Integer examNo);
+	public ScheduledExamVO getScheduledExam(Integer examNo);
+	public int countScheduledExamQuestions(Integer examNo);
 	public ExamEnrollmentVO findActiveEnrollment(Map<String,Object> map);
-	public List<ExamQuestionVO> getQuestionForGrading(List<Integer> qno);
+	public ExamEnrollmentVO findCompletedEnrollment(Map<String,Object> map);
+	public ExamEnrollmentVO getEnrollmentForMember(Map<String,Object> map);
+	public List<ExamQuestionVO> getQuestionForGrading(Map<String,Object> map);
 	public void insertUserAnswers(List<ExamUserAnswerVO> answers);
-	public void updateEnrollmentFinish(ExamEnrollmentVO vo);
-	public Map<String, Object> selectExamResultMaster(int enrollmentNo);
+	public int updateEnrollmentFinish(ExamEnrollmentVO vo);
+	public Map<String, Object> selectExamResultMaster(Map<String,Object> map);
 	public List<Map<String, Object>> selectExamResultDetails(int enrollmentNo);
 	public List<Map<String, Object>> selectMyExamList(int memberId);
 }

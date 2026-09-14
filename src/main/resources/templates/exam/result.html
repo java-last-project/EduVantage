@@ -67,7 +67,8 @@
                                     <span v-if="q.QUESTION_TYPE===1" class="badge bg-light text-secondary border me-2">객관식</span>
                                     <span v-else class="badge border me-2" style="background-color: #fffbeb; color: #d97706; border-color: #fde68a;">주관식</span>
 
-                                    <span v-if="q.IS_CORRECT==='Y'" class="badge bg-success">정답 (+{{ q.SCORE }}점)</span>
+									<span v-if="q.QUESTION_TYPE!==1 && q.SCORE>0 && q.SCORE<q.MAX_SCORE" class="badge bg-primary">부분 점수 (+{{ q.SCORE }}점)</span>
+									<span v-else-if="q.IS_CORRECT==='Y'" class="badge bg-success">정답 (+{{ q.SCORE }}점)</span>
                                     <span v-else-if="q.IS_CORRECT==='N'" class="badge bg-danger">오답 (0점)</span>
                                     <span v-else-if="q.IS_CORRECT==='W'" class="badge bg-warning text-dark">채점 대기</span>
                                 </div>

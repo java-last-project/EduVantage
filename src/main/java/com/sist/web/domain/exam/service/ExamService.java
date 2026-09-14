@@ -9,7 +9,9 @@ public interface ExamService {
 	public List<ExamQuestionVO> examDetailData(Integer examNo,Integer theme,int count);
 	public ExamEnrollmentVO getOrCreateEnrollment(int memberId, Integer examNo, Integer theme);
 	public String getExamTitle(Integer examNo);
-	public Map<String, Object> submitExam(Map<String, Object> params);
-	public Map<String, Object> getExamResultData(int enrollmentNo);
+	public int getExamLimitMinutes(Integer examNo);
+	public Map<String, Object> submitExam(int memberId,Map<String, Object> params);
+	public Map<String, Object> getExamResultData(int memberId,int enrollmentNo);
+	public Integer getScheduledExamResult(int memberId,int examNo);
 	public List<Map<String, Object>> getMyExamList(int memberId);
 }

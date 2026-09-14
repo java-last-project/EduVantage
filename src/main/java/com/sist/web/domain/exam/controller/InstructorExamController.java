@@ -10,6 +10,13 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class InstructorExamController {
+	@GetMapping("/instructor/exam/scheduled")
+	public String scheduledExamPage(HttpSession session,Model model){
+		requireInstructor(session);
+		model.addAttribute("instructor_html","instructor/exam/scheduled");
+		model.addAttribute("main_html","instructor/main");
+		return "main/main";
+	}
 
     @GetMapping("/instructor/exam/grading")
     public String gradingPage(HttpSession session, Model model) {

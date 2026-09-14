@@ -17,19 +17,23 @@ public class VideoProgressServiceImpl implements VideoProgressService{
     @Override
     @Transactional
     public void saveProgress(CourseVideoProgressVO vo,Integer member_id) {
+        // enrollment_no·video_no 변조 방지를 위한 수강 영상 권한 확인
         int check=pMapper.videoAccessCheck(vo.getEnrollment_no(),vo.getVideo_no(),member_id);
         if(check==0){
             throw new IllegalArgumentException("잘못된 접근입니다.");
         }
 
+        // 재생 종료 오차를 고려한 완료 기준 90%
         String completed=vo.getProgress()>=90?"Y":"N";
         vo.setCompleted(completed);
 
+        // 영상 진도 + 강좌 진도 함께 반영
         pMapper.videoProgressSave(vo);
         int totalCount=pMapper.videoTotalCount(vo.getEnrollment_no());
         int completedCount=pMapper.videoCompletedCount(vo.getEnrollment_no());
         int progress=0;
         if(totalCount>0){
+            // 전체 진도는 완료 영상 수 기준
             progress=(int)Math.round((double)completedCount/totalCount*100);
         }
         String isCompleted=progress>=100?"Y":"N";

@@ -61,6 +61,7 @@ public class InstructorExamRestController {
     private int requireInstructorId(HttpSession session) {
         Object memberId = session.getAttribute("member_id");
         Object role = session.getAttribute("role");
+        // 비로그인(401)과 권한 부족(403) 구분
         if (memberId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
