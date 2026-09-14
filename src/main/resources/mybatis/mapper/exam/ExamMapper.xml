@@ -160,21 +160,42 @@
 	</select>
 
 <!-- 채점 -->
-	<select id="getQuestionForGrading" parameterType="hashmap" resultType="com.sist.web.domain.exam.vo.ExamQuestionVO">
-		SELECT no, title, answer, score, type
-		FROM exam_question
+	<select id="getQuestionForGrading" resultType="com.sist.web.domain.exam.vo.ExamQuestionVO" parameterType="hashmap">
+		SELECT
+		no,
+		title,
+		answer,
+		score,
+		type
+		FROM EXAM_QUESTION
 		<choose>
-			<when test="exam_no!=null and exam_no!=0">
+			<!-- AI 시험 -->
+			<when test="enrollment_no!=null">
 				WHERE no IN(
-					SELECT question_no
-					FROM scheduled_exam_map
-					WHERE exam_no=#{exam_no}
+				SELECT question_no
+				FROM EXAM_USER_ANSWER
+				WHERE enrollment_no=#{enrollment_no}
 				)
 			</when>
+
+			<!-- 정기시험 -->
+			<when test="exam_no!=null and exam_no!=0">
+				WHERE no IN(
+				SELECT question_no
+				FROM SCHEDULED_EXAM_MAP
+				WHERE exam_no=#{exam_no}
+				)
+			</when>
+
+			<!-- 상시시험 -->
 			<otherwise>
 				WHERE theme=#{theme}
-				  AND no IN
-				<foreach item="qNo" collection="qno" open="(" separator="," close=")">
+				AND no IN
+				<foreach collection="qno"
+				         item="qNo"
+				         open="("
+				         separator=","
+				         close=")">
 					#{qNo}
 				</foreach>
 			</otherwise>
@@ -219,7 +240,7 @@
 	</update>
 
 	<!-- 결과 화면용 응시 결과 + 주관식 채점 현황 집계 -->
-	<select id="selectExamResultMaster" parameterType="hashmap" resultType="hashmap">
+	<select id="selectExamResultMaster" resultType="hashmap" parameterType="hashmap">
 		SELECT e.no AS enrollment_no,
 		       e.member_id AS member_id,
 		       e.exam_no AS exam_no,
@@ -243,7 +264,7 @@
 		  AND e.member_id=#{memberId}
 	</select>
 
-	<select id="selectExamResultDetails" parameterType="int" resultType="hashmap">
+	<select id="selectExamResultDetails" resultType="hashmap" parameterType="int">
 		SELECT a.no AS answer_no,
 		       a.question_no AS question_no,
 		       a.user_answer AS user_answer,
@@ -267,7 +288,7 @@
 		ORDER BY a.question_no ASC
 	</select>
 
-	<select id="selectMyExamList" parameterType="int" resultType="hashmap">
+	<select id="selectMyExamList" resultType="hashmap" parameterType="int">
 		SELECT e.no AS enrollment_no,
 		       e.exam_no AS exam_no,
 		       e.theme AS theme,
@@ -277,12 +298,79 @@
 		       TO_CHAR(e.endtime, 'YYYY-MM-DD HH24:MI') AS end_time,
 		       CASE
 				   WHEN e.exam_no IS NOT NULL THEN (SELECT title FROM scheduled_exam WHERE no = e.exam_no)
+				   WHEN e.theme IS NULL THEN 'AI 맞춤시험'
 			       ELSE '상시 모의고사'
 				   END AS exam_title
 		FROM exam_enrollment e
 		WHERE e.member_id = #{memberId}
 		  AND e.endtime IS NOT NULL
 		ORDER BY e.no DESC
+	</select>
+
+	<insert id="insertAiExamQuestions" parameterType="hashmap">
+		INSERT INTO exam_user_answer(
+			enrollment_no,
+			question_no,
+			score
+		)
+		SELECT sub.* FROM (
+		<foreach collection="questionNos" item="questionNo" separator=" UNION ALL ">
+			SELECT
+				#{enrollmentNo},
+				#{questionNo},
+				0
+			FROM DUAL
+		</foreach>
+		) sub
+	</insert>
+
+	<select id="examDetailDataByEnrollment" resultMap="questionMap">
+		SELECT
+			q.no,
+			q.title,
+			q.image,
+			q.answer,
+			q.score,
+			q.type,
+			q.theme,
+			q.difficulty,
+			o.no AS option_no,
+			o.question_no,
+			o.option1,
+			o.option2,
+			o.option3,
+			o.option4
+		FROM EXAM_USER_ANSWER a
+			JOIN EXAM_QUESTION q ON q.no=a.question_no
+			LEFT JOIN EXAM_OPTION o ON o.question_no=q.no
+			JOIN EXAM_ENROLLMENT e ON e.no=a.enrollment_no
+		WHERE a.enrollment_no=#{enrollmentNo}
+			AND e.member_id=#{memberId}
+		ORDER BY a.no
+	</select>
+
+	<delete id="deleteUserAnswers" parameterType="int">
+		DELETE FROM EXAM_USER_ANSWER
+		WHERE enrollment_no=#{enrollmentNo}
+	</delete>
+
+	<select id="selectAiWrongQuestionMetadata" parameterType="hashmap"
+			resultType="com.sist.web.domain.exam.vo.ExamQuestionVO">
+		SELECT
+			q.no,
+			q.title,
+			q.description,
+			q.ai_topic,
+			q.ai_keywords
+		FROM exam_enrollment e
+			JOIN exam_user_answer a ON a.enrollment_no=e.no
+			JOIN exam_question q ON q.no=a.question_no
+		WHERE e.no=#{enrollmentNo}
+			AND e.member_id=#{memberId}
+			AND e.exam_no IS NULL
+			AND e.theme IS NULL
+			AND a.is_correct='N'
+		ORDER BY a.no
 	</select>
 
 </mapper>

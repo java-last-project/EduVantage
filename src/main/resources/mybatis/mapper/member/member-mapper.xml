@@ -1,30 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sist.web.domain.member.mapper.MemberMapper">
+	
 	<!-- 회원가입 아이디 중복검사 -->
 	<select id="memberIdCheck" resultType="int" parameterType="string">
 		SELECT count(*)
 		FROM member
 		WHERE  username=#{username}
 	</select>
-	<!-- 새로 가입해서 DB에 데이터 추가 INSERT -->
+	
+	<!-- 새로가입 DB INSERT -->
 	<insert id="memberInsertData" parameterType="com.sist.web.domain.member.vo.MemberVO">
 	    INSERT INTO member (
-	    	member_id, username, password, name, sex, birthdate, 
-	    	phone, post, addr1, addr2, profile_desc
+	    	member_id, username, password, name, sex, birthdate, phone, post, addr1, addr2, profile_desc
 	    ) 
 	    VALUES (
-	   	 	MEM_MID_SEQ.NEXTVAL, #{username}, #{password}, #{name}, #{sex}, 
-	    	TO_DATE(#{birthdate}, 'YYYYMMDD'), #{phone}, #{post}, #{addr1}, #{addr2}, #{profile_desc}
+	   	 	mem_mid_seq.nextval, 
+	   	 	#{username}, 
+	   	 	#{password}, 
+	   	 	#{name}, 
+	   	 	#{sex}, 
+	    	TO_DATE(#{birthdate}, 'YYYYMMDD'), 
+	    	#{phone}, 
+	    	#{post}, 
+	    	#{addr1}, 
+	    	#{addr2}, 
+	    	#{profile_desc}
 	    )
 	</insert>
+	
+	<!-- 회원 권한 추가 -->
 	<insert id="memberAuthInsert" parameterType="string">
 	    INSERT INTO authority (no, member_id, authority) 
 	    VALUES (
-	        AUTH_ANO_SEQ.NEXTVAL, 
-	        (SELECT member_id FROM member WHERE username = #{username}), 'ROLE_USER'
+	        auth_ano_seq.nextval, 
+	        (SELECT member_id FROM member WHERE username = #{username}), 
+	        'ROLE_USER'
 	    )
 	</insert>
+	
+	<!-- 회원 상세 정보 -->
 	<select id="memberDetailData" resultType="com.sist.web.domain.member.vo.MemberVO" parameterType="int">
 		SELECT * 
 		FROM member

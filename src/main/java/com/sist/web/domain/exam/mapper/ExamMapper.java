@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.sist.web.domain.exam.vo.ExamUserAnswerVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
@@ -29,4 +30,8 @@ public interface ExamMapper {
 	public Map<String, Object> selectExamResultMaster(Map<String,Object> map);
 	public List<Map<String, Object>> selectExamResultDetails(int enrollmentNo);
 	public List<Map<String, Object>> selectMyExamList(int memberId);
+	public void insertAiExamQuestions(Map<String,Object> map);
+	public List<ExamQuestionVO> examDetailDataByEnrollment(Map<String,Object> map);
+	public void deleteUserAnswers(Integer enrollmentNo);
+	public List<ExamQuestionVO> selectAiWrongQuestionMetadata(Map<String,Object> map);
 }

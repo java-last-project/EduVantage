@@ -6,6 +6,8 @@ const SESSION_NAME = /*[[${session.name}]]*/ ''
 const EXAM_THEME = /*[[${theme}]]*/ 0
 const EXAM_COUNT = /*[[${count}]]*/ 20
 const EXAM_NO = /*[[${examNo}]]*/ null
+const ENROLLMENT_NO = /*[[${enrollmentNo}]]*/ null
+const AI_EXAM=/*[[${ai}]]*/ false
 </script>
 	<div class="exam-layout">
 		<th:block th:replace="~{exam/sidebar::sidebar('examing')}"></th:block>
@@ -216,6 +218,12 @@ const examApp=createApp({
 				theme:EXAM_THEME,
 				count:EXAM_COUNT,
 				examNo:EXAM_NO
+			}
+			if(AI_EXAM){
+				const aiExam=JSON.parse(sessionStorage.getItem('aiExam') || '{}')
+				requestParams.ai=true
+				requestParams.enrollmentNo=ENROLLMENT_NO
+				requestParams.examName=aiExam.examName
 			}
 			try{
 				await store.examDetailData(requestParams)

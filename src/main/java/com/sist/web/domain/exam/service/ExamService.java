@@ -14,4 +14,6 @@ public interface ExamService {
 	public Map<String, Object> getExamResultData(int memberId,int enrollmentNo);
 	public Integer getScheduledExamResult(int memberId,int examNo);
 	public List<Map<String, Object>> getMyExamList(int memberId);
+	public ExamEnrollmentVO createAiEnrollment(Integer memberId, List<Integer> questionNos);
+	public Map<String,Object> getAiExamDetailData(int memberId,int enrollmentNo);
 }
