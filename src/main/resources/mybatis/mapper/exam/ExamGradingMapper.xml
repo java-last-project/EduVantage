@@ -17,6 +17,15 @@
                  JOIN exam_question q ON a.question_no=q.no
                  JOIN exam_enrollment e ON a.enrollment_no=e.no
         WHERE a.is_correct='W'
+		  AND (
+			  e.exam_no IS NULL
+			  OR EXISTS(
+				  SELECT 1
+				  FROM scheduled_exam se
+				  WHERE se.no=e.exam_no
+				    AND se.instructor_id=#{graderId}
+			  )
+		  )
           AND (a.grader_id IS NULL OR a.grader_id=#{graderId})
         ORDER BY a.no
     </select>
@@ -25,9 +34,23 @@
     <update id="claimGradingTask" parameterType="hashmap">
         UPDATE exam_user_answer
         SET grader_id=#{graderId}
-        WHERE no=#{answerNo}
-          AND is_correct='W'
-          AND grader_id IS NULL
+		WHERE no=#{answerNo}
+		  AND is_correct='W'
+		  AND grader_id IS NULL
+		  AND EXISTS(
+			  SELECT 1
+			  FROM exam_enrollment e
+			  WHERE e.no=exam_user_answer.enrollment_no
+			    AND (
+				    e.exam_no IS NULL
+				    OR EXISTS(
+					    SELECT 1
+					    FROM scheduled_exam se
+					    WHERE se.no=e.exam_no
+					      AND se.instructor_id=#{graderId}
+				    )
+			    )
+		  )
     </update>
 
     <update id="releaseGradingClaim" parameterType="hashmap">
@@ -36,25 +59,65 @@
         WHERE no=#{answerNo}
           AND grader_id=#{graderId}
           AND is_correct='W'
+		  AND EXISTS(
+			  SELECT 1
+			  FROM exam_enrollment e
+			  WHERE e.no=exam_user_answer.enrollment_no
+			    AND (
+				    e.exam_no IS NULL
+				    OR EXISTS(
+					    SELECT 1
+					    FROM scheduled_exam se
+					    WHERE se.no=e.exam_no
+					      AND se.instructor_id=#{graderId}
+				    )
+			    )
+		  )
     </update>
 
     <!-- 본인이 선점한 채점 대기 답안만 허용 -->
-    <select id="selectClaimedEnrollmentNo" parameterType="hashmap" resultType="int">
-        SELECT enrollment_no
-        FROM exam_user_answer
-        WHERE no=#{answerNo}
-          AND grader_id=#{graderId}
-          AND is_correct='W'
+    <select id="selectClaimedAnswer" parameterType="hashmap" resultType="hashmap">
+        SELECT a.enrollment_no AS enrollment_no,
+               q.score AS max_score
+        FROM exam_user_answer a
+                 JOIN exam_question q ON a.question_no=q.no
+				 JOIN exam_enrollment e ON a.enrollment_no=e.no
+        WHERE a.no=#{answerNo}
+          AND a.grader_id=#{graderId}
+          AND a.is_correct='W'
+		  AND (
+			  e.exam_no IS NULL
+			  OR EXISTS(
+				  SELECT 1
+				  FROM scheduled_exam se
+				  WHERE se.no=e.exam_no
+				    AND se.instructor_id=#{graderId}
+			  )
+		  )
     </select>
 
     <update id="gradeSubjectiveAnswer" parameterType="hashmap">
         UPDATE exam_user_answer
         SET score=#{score},
-            is_correct=CASE WHEN #{score} &gt; 0 THEN 'Y' ELSE 'N' END,
+			is_correct=CASE WHEN #{score} &gt; 0 THEN 'Y' ELSE 'N' END,
             graded_at=SYSDATE
         WHERE no=#{answerNo}
           AND grader_id=#{graderId}
           AND is_correct='W'
+		  AND EXISTS(
+			  SELECT 1
+			  FROM exam_enrollment e
+			  WHERE e.no=exam_user_answer.enrollment_no
+			    AND (
+				    e.exam_no IS NULL
+				    OR EXISTS(
+					    SELECT 1
+					    FROM scheduled_exam se
+					    WHERE se.no=e.exam_no
+					      AND se.instructor_id=#{graderId}
+				    )
+			    )
+		  )
     </update>
 
     <select id="countRemainingPending" parameterType="int" resultType="int">

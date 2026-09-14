@@ -12,6 +12,7 @@ import java.util.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequiredArgsConstructor
@@ -48,6 +49,9 @@ public class ExamRestController {
             map.put("title",title);
             map.put("count",count);
             map.put("list",list);
+			map.put("timeLimitMinutes",eService.getExamLimitMinutes(examNo));
+		}catch(ResponseStatusException ex){
+			throw ex;
         }catch(Exception ex){
             ex.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -62,8 +66,11 @@ public class ExamRestController {
             if(sessionMid==null){
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
-            Map<String,Object> map=eService.submitExam(params);
+			int mid=Integer.parseInt(String.valueOf(sessionMid));
+            Map<String,Object> map=eService.submitExam(mid,params);
             return ResponseEntity.ok(map);
+		}catch(ResponseStatusException ex){
+			throw ex;
         }catch(Exception ex){
             ex.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -77,13 +84,30 @@ public class ExamRestController {
             if (sessionMid==null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
-            Map<String, Object> resultData=eService.getExamResultData(enrollmentNo);
+			int mid=Integer.parseInt(String.valueOf(sessionMid));
+            Map<String, Object> resultData=eService.getExamResultData(mid,enrollmentNo);
             return ResponseEntity.ok(resultData);
+		} catch(ResponseStatusException ex) {
+			throw ex;
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+	@GetMapping("/exam/scheduled_result_vue")
+	public ResponseEntity<?> scheduledExamResult(@RequestParam("examNo") int examNo,HttpSession session){
+		Object sessionMid=session.getAttribute("member_id");
+		if(sessionMid==null){
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+		int memberId=Integer.parseInt(String.valueOf(sessionMid));
+		Integer enrollmentNo=eService.getScheduledExamResult(memberId,examNo);
+		if(enrollmentNo==null){
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(Map.of("enrollmentNo",enrollmentNo));
+	}
 
     @GetMapping("/exam/my_result_list_vue")
     public ResponseEntity<?> myResultList(HttpSession session) {

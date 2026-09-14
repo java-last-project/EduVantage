@@ -26,7 +26,7 @@ const EXAM_NO = /*[[${examNo}]]*/ null
 						<div class="d-flex align-items-center gap-4 fw-medium">
 							<span class="text-muted"><i class="fa-regular fa-clock"></i> 경과시간: {{fElapsedTime}}</span>
 							<span class="text-danger"><i class="fa-solid fa-stopwatch"></i> 남은시간: {{fRemainingTime}}</span>
-							<button class="btn text-white px-4" style="background-color: var(--main-color);" @click="submitExam">제출하기</button>
+							<button class="btn text-white px-4" style="background-color: var(--main-color);" @click="submitExam" :disabled="submitting">제출하기</button>
 						</div>
 					</div>
 
@@ -105,7 +105,7 @@ const EXAM_NO = /*[[${examNo}]]*/ null
 						</div>
 						<button class="btn w-100 py-3 text-white fw-bold shadow-sm"
 						        style="background-color: var(--main-color); border-radius: 8px; font-size: 15px;"
-						        @click="submitExam">
+						        @click="submitExam" :disabled="submitting">
 							<i class="fa-solid fa-paper-plane me-1"></i> 제출하기
 						</button>
 					</div>
@@ -121,9 +121,11 @@ const examApp=createApp({
     setup(){
         const store=useExamStore()
         const userAnswers=ref({})
-		const totalLimitSeconds=ref(60 * 60)
+		const totalLimitSeconds=ref(120 * 60)
 		const elapsedSeconds=ref(0)
+		const submitting=ref(false)
 		let timerInterval=null
+		let examStartedAt=0
 		const examTitleMap = {
 			1: '정보처리기사 기출문제 모의고사',
 			2: '정보보안기사 기출문제 모의고사',
@@ -164,19 +166,24 @@ const examApp=createApp({
 			return formatTime(remaining)
 		})
 		const startTimer=()=>{
+			if(timerInterval) clearInterval(timerInterval)
 			timerInterval=setInterval(()=>{
-				elapsedSeconds.value++
+				elapsedSeconds.value=Math.max(0,Math.floor((Date.now()-examStartedAt)/1000))
 
 				if (elapsedSeconds.value>=totalLimitSeconds.value) {
 					clearInterval(timerInterval)
+					timerInterval=null
 					alert('시험 제한 시간이 종료되었습니다. 답안이 자동으로 제출됩니다.')
 					submitExam(true)
 				}
 			}, 1000)
 		}
 		const submitExam=async (isAuto=false)=>{
+			if(submitting.value) return
 			if (!isAuto && !confirm('시험을 최종 제출하시겠습니까?')) return
 			if (timerInterval) clearInterval(timerInterval)
+			timerInterval=null
+			submitting.value=true
 			const payload={
 				enrollmentNo: store.enrollmentNo,
 				answers: userAnswers.value,
@@ -189,11 +196,16 @@ const examApp=createApp({
 				location.href='/exam/result?no='+store.enrollmentNo
 			}catch(err){
 				console.error(err)
-				alert('제출처리에 실패했습니다. 다시 시도해주세요.')
+				const message=err.response?.data?.detail || err.response?.data?.message || '제출처리에 실패했습니다. 다시 시도해주세요.'
+				alert(message)
+				if(elapsedSeconds.value<totalLimitSeconds.value){
+					startTimer()
+				}
+			}finally{
+				submitting.value=false
 			}
 		}
 		watch(userAnswers,(newVal)=>{
-			// 응시 기록별 임시 답안 저장
 			if(store.enrollmentNo){
 				localStorage.setItem(`exam_ans_${store.enrollmentNo}`,JSON.stringify(newVal))
 			}
@@ -205,9 +217,19 @@ const examApp=createApp({
 				count:EXAM_COUNT,
 				examNo:EXAM_NO
 			}
-			await store.examDetailData(requestParams)
+			try{
+				await store.examDetailData(requestParams)
+			}catch(error){
+				const message=error.response?.data?.detail || error.response?.data?.message || '시험 정보를 불러오지 못했습니다.'
+				alert(message)
+				location.href='/exam/list'
+				return
+			}
 			if(store.enrollmentNo){
-				// 서버에서 받은 enrollmentNo 기준으로 임시 답안 복원
+				const initializedAnswers={}
+				store.list.forEach(q=>{
+					initializedAnswers[q.no]=''
+				})
 				const savedAnswers=localStorage.getItem(`exam_ans_${store.enrollmentNo}`)
 				if(savedAnswers){
 					const parsedAnswers=JSON.parse(savedAnswers)
@@ -220,6 +242,17 @@ const examApp=createApp({
 				userAnswers.value=initializedAnswers
 			}
 
+			totalLimitSeconds.value=store.timeLimitMinutes*60
+			examStartedAt=new Date(store.startTime).getTime()
+			if(!Number.isFinite(examStartedAt)){
+				examStartedAt=Date.now()
+			}
+			elapsedSeconds.value=Math.max(0,Math.floor((Date.now()-examStartedAt)/1000))
+			if(elapsedSeconds.value>=totalLimitSeconds.value){
+				alert('시험 제한 시간이 종료되었습니다. 답안이 자동으로 제출됩니다.')
+				await submitExam(true)
+				return
+			}
 			startTimer()
         })
 		onUnmounted(()=>{
@@ -233,6 +266,7 @@ const examApp=createApp({
             userAnswers,
 			fElapsedTime,
 			fRemainingTime,
+			submitting,
 			startTimer,
             scrollToQuestion,
 			submitExam

@@ -39,7 +39,8 @@ public class ScheduledExamController {
             @RequestParam(defaultValue = "0", required = false) int page){
 
         Integer memberId = null;
-        if(authentication != null) {
+        if(authentication != null && authentication.isAuthenticated()
+				&& !"anonymousUser".equals(authentication.getName())) {
             String username = authentication.getName();
             memberId = memberMapper.memberInfoData(username).getMember_id();
         }
