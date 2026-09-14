@@ -13,7 +13,7 @@ import java.util.*;
 //IMAGES                 CLOB   
 @Data
 public class CourseVO {
-	private int no,instructor_no,student_count,pay_price,regular_price;
+	private Integer no,instructor_no,student_count,pay_price,regular_price;
 	private double star;
 	private String title,thumbnail,instructor,content,images;
 	private List<TechStackVO> techList;

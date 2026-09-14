@@ -2,6 +2,7 @@ package com.sist.web.domain.course.mapper;
 
 import java.util.*;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import com.sist.web.domain.course.vo.CourseVO;
@@ -15,4 +16,5 @@ public interface CourseMapper {
 	public int courseCount(Map<String,Object> map);
 	public List<TechStackVO> courseCategoryList();
 	public CourseVO courseDetail(int no);
+	public List<CourseVO> selectCoursesByNos(@Param("courseNos") List<Integer> courseNos);
 }
