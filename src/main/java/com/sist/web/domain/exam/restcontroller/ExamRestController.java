@@ -1,8 +1,10 @@
 package com.sist.web.domain.exam.restcontroller;
 
 import com.sist.web.domain.exam.service.ExamService;
+import com.sist.web.domain.exam.service.RecommendCoursesService;
 import com.sist.web.domain.exam.vo.ExamEnrollmentVO;
 import com.sist.web.domain.exam.vo.ExamQuestionVO;
+import com.sist.web.domain.exam.vo.RecommendCourseVO;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class ExamRestController {
     private final ExamService eService;
+    private final RecommendCoursesService rService;
 
     @PostMapping("/exam/detail_vue")
     public ResponseEntity<Map<String,Object>> exam_detail_vue(@RequestBody Map<String,Object> params, HttpSession session){
@@ -117,5 +120,17 @@ public class ExamRestController {
         }
         int memberId = Integer.parseInt(String.valueOf(sessionMid));
         return ResponseEntity.ok(eService.getMyExamList(memberId));
+    }
+
+    @PostMapping("/exam/result/recommend")
+    public ResponseEntity<List<RecommendCourseVO>> recommendCourses(@RequestBody Map<String,List<Integer>> map){
+        try{
+            List<Integer> questionNos=map.get("question_nos");
+            List<RecommendCourseVO> list=rService.getRecommentCourses(questionNos);
+            return ResponseEntity.ok(list);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

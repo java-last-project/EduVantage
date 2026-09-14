@@ -121,4 +121,18 @@
     	LEFT JOIN tech_stack t ON ctm.tech_no=t.no
     	WHERE c.no=#{no}
 	</select>
+
+	<select id="selectCoursesByNos" resultType="com.sist.web.domain.course.vo.CourseVO">
+		SELECT no,title,thumbnail
+		FROM COURSE
+		WHERE no IN
+		<foreach collection="courseNos"
+		         item="courseNo"
+		         open="("
+		         separator=","
+		         close=")">
+			#{courseNo}
+		</foreach>
+	</select>
+
 </mapper>

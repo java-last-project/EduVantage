@@ -224,10 +224,10 @@ public class ExamServiceImpl implements ExamService{
 		}
 		List<Map<String,Object>> details=eMapper.selectExamResultDetails(enrollmentNo);
 		// MyBatis Map key 대소문자 차이 대응
-		Object rawExamNo = map.get("EXAM_NO") != null ? map.get("EXAM_NO") : map.get("exam_no");
-		Integer examNo = null;
-		if (rawExamNo != null && !String.valueOf(rawExamNo).isEmpty()) {
-			examNo = Integer.parseInt(String.valueOf(rawExamNo));
+		Object rawExamNo=map.get("EXAM_NO")!=null ? map.get("EXAM_NO") : map.get("exam_no");
+		Integer examNo=null;
+		if (rawExamNo!=null && !String.valueOf(rawExamNo).isEmpty()) {
+			examNo=Integer.parseInt(String.valueOf(rawExamNo));
 		}
 
 		String examTitle="상시 모의고사";
@@ -235,7 +235,7 @@ public class ExamServiceImpl implements ExamService{
 			String sTitle=eMapper.getScheduledExamTitle(examNo);
 			if (sTitle!=null) examTitle=sTitle;
 		}
-		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> response=new HashMap<>();
 		response.put("master", map);
 		response.put("examTitle", examTitle);
 		response.put("details", details);

@@ -219,7 +219,7 @@
 	</update>
 
 	<!-- 결과 화면용 응시 결과 + 주관식 채점 현황 집계 -->
-	<select id="selectExamResultMaster" parameterType="hashmap" resultType="hashmap">
+	<select id="selectExamResultMaster" resultType="hashmap" parameterType="hashmap">
 		SELECT e.no AS enrollment_no,
 		       e.member_id AS member_id,
 		       e.exam_no AS exam_no,
@@ -243,7 +243,7 @@
 		  AND e.member_id=#{memberId}
 	</select>
 
-	<select id="selectExamResultDetails" parameterType="int" resultType="hashmap">
+	<select id="selectExamResultDetails" resultType="hashmap" parameterType="int">
 		SELECT a.no AS answer_no,
 		       a.question_no AS question_no,
 		       a.user_answer AS user_answer,
@@ -267,7 +267,7 @@
 		ORDER BY a.question_no ASC
 	</select>
 
-	<select id="selectMyExamList" parameterType="int" resultType="hashmap">
+	<select id="selectMyExamList" resultType="hashmap" parameterType="int">
 		SELECT e.no AS enrollment_no,
 		       e.exam_no AS exam_no,
 		       e.theme AS theme,
