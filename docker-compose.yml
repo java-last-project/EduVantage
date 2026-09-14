@@ -48,7 +48,7 @@ services:
     environment:
       POSTGRES_USER: sist1
       POSTGRES_PASSWORD: happy
-      POSTGRES_DB: ragdb
+      POSTGRES_DB: edu
     ports:
       - "5432:5432"
     volumes:
