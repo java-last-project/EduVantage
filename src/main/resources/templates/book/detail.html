@@ -194,8 +194,9 @@
 					</div>
 
 					<div v-if="editReplyNo !== reply.no" class="text-dark mb-2"
-						style="font-size: 15px; white-space: pre-wrap;">{{ reply.msg
-						}}</div>
+						style="font-size: 15px; white-space: pre-wrap;">
+						{{ reply.msg}}
+					</div>
 
 					<!-- 수정 폼 -->
 					<div v-else-if="editReplyNo === reply.no"
@@ -238,9 +239,9 @@
 	</div>
 	<script src="/vue/book/bookDetailStore.js"></script>
 	<script src="/vue/book/bookCommentStore.js"></script>
-    
-    
-    <script>
+
+
+	<script>
     const { createApp, onMounted, computed, ref } = Vue; 
     const { createPinia } = Pinia;
     
