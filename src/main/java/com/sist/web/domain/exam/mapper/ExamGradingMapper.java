@@ -12,7 +12,7 @@ public interface ExamGradingMapper {
     List<Map<String, Object>> selectPendingSubjectiveList(int graderId);
     int claimGradingTask(Map<String, Object> params);
     int releaseGradingClaim(Map<String, Object> params);
-    Integer selectClaimedEnrollmentNo(Map<String, Object> params);
+    Map<String,Object> selectClaimedAnswer(Map<String, Object> params);
     int gradeSubjectiveAnswer(Map<String, Object> params);
     int countRemainingPending(int enrollmentNo);
     int finalizeEnrollmentScore(int enrollmentNo);

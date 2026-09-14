@@ -67,22 +67,52 @@
 	
 	<!-- 제한 시간 내 미완료 응시 기록 재사용 -->
 	<select id="findActiveEnrollment" parameterType="hashmap" resultType="com.sist.web.domain.exam.vo.ExamEnrollmentVO">
-		SELECT no, member_id, exam_no, theme, starttime
-		FROM EXAM_ENROLLMENT
-		WHERE member_id=#{member_id}
-		AND endtime IS NULL
-		<choose>
-			<when test="exam_no!=null and exam_no!=0">
-				AND exam_no=#{exam_no}
-			</when>
-			<otherwise>
-				AND theme=#{theme}
-				AND exam_no IS NULL
-			</otherwise>
-		</choose>
-		AND starttime&gt;=SYSDATE-(120/(24*60))
-		AND ROWNUM=1
-		ORDER BY starttime DESC
+		SELECT no,member_id,exam_no,theme,starttime
+		FROM (
+			SELECT no,member_id,exam_no,theme,starttime
+			FROM exam_enrollment
+			WHERE member_id=#{member_id}
+			  AND endtime IS NULL
+			<choose>
+				<when test="exam_no!=null and exam_no!=0">
+					AND exam_no=#{exam_no}
+				</when>
+				<otherwise>
+					AND theme=#{theme}
+					AND exam_no IS NULL
+				</otherwise>
+			</choose>
+			<choose>
+				<when test="exam_no!=null and exam_no!=0">
+					AND starttime&gt;=SYSDATE-(NVL((SELECT time_limit FROM scheduled_exam WHERE no=#{exam_no}),120)/(24*60))
+				</when>
+				<otherwise>
+					AND starttime&gt;=SYSDATE-(120/(24*60))
+				</otherwise>
+			</choose>
+			ORDER BY starttime DESC
+		)
+		WHERE ROWNUM=1
+	</select>
+
+	<select id="findCompletedEnrollment" parameterType="hashmap" resultType="com.sist.web.domain.exam.vo.ExamEnrollmentVO">
+		SELECT no,member_id,exam_no,theme,starttime,endtime,totalscore,status
+		FROM (
+			SELECT no,member_id,exam_no,theme,starttime,endtime,totalscore,status
+			FROM exam_enrollment
+			WHERE member_id=#{member_id}
+			  AND exam_no=#{exam_no}
+			  AND endtime IS NOT NULL
+			ORDER BY endtime DESC
+		)
+		WHERE ROWNUM=1
+	</select>
+
+	<select id="getEnrollmentForMember" parameterType="hashmap" resultType="com.sist.web.domain.exam.vo.ExamEnrollmentVO">
+		SELECT no,member_id,exam_no,theme,starttime,endtime,totalscore,status
+		FROM exam_enrollment
+		WHERE no=#{enrollmentNo}
+		  AND member_id=#{memberId}
 	</select>
 	
 	<insert id="insertEnrollment" parameterType="com.sist.web.domain.exam.vo.ExamEnrollmentVO"
@@ -116,14 +146,40 @@
 		WHERE no=#{examNo}
 	</select>
 
+	<select id="getScheduledExam" parameterType="int" resultType="com.sist.web.domain.exam.vo.ScheduledExamVO">
+		SELECT no,title,open_date,close_date,NVL(time_limit,120) AS time_limit,instructor_id
+		FROM scheduled_exam
+		WHERE no=#{examNo}
+	</select>
+
+	<select id="countScheduledExamQuestions" parameterType="int" resultType="int">
+		SELECT COUNT(*)
+		FROM scheduled_exam_map m
+			JOIN exam_question q ON m.question_no=q.no
+		WHERE m.exam_no=#{examNo}
+	</select>
+
 <!-- 채점 -->
-	<select id="getQuestionForGrading" parameterType="list" resultType="com.sist.web.domain.exam.vo.ExamQuestionVO">
+	<select id="getQuestionForGrading" parameterType="hashmap" resultType="com.sist.web.domain.exam.vo.ExamQuestionVO">
 		SELECT no, title, answer, score, type
 		FROM exam_question
-		WHERE no IN
-		<foreach item="qNo" collection="list" open="(" separator="," close=")">
-			#{qNo}
-		</foreach>
+		<choose>
+			<when test="exam_no!=null and exam_no!=0">
+				WHERE no IN(
+					SELECT question_no
+					FROM scheduled_exam_map
+					WHERE exam_no=#{exam_no}
+				)
+			</when>
+			<otherwise>
+				WHERE theme=#{theme}
+				  AND no IN
+				<foreach item="qNo" collection="qno" open="(" separator="," close=")">
+					#{qNo}
+				</foreach>
+			</otherwise>
+		</choose>
+		ORDER BY no
 	</select>
 
 	<!-- 답안 일괄 INSERT로 제출 단위 유지 -->
@@ -158,10 +214,12 @@
 		    totalscore=#{totalscore},
 		    status=#{status}
 		WHERE no=#{no}
+		  AND member_id=#{member_id}
+		  AND endtime IS NULL
 	</update>
 
 	<!-- 결과 화면용 응시 결과 + 주관식 채점 현황 집계 -->
-	<select id="selectExamResultMaster" parameterType="int" resultType="hashmap">
+	<select id="selectExamResultMaster" parameterType="hashmap" resultType="hashmap">
 		SELECT e.no AS enrollment_no,
 		       e.member_id AS member_id,
 		       e.exam_no AS exam_no,
@@ -182,6 +240,7 @@
 		        WHERE a.enrollment_no=e.no AND q.type NOT IN (1) AND a.is_correct!='W') AS subjective_graded
 		FROM exam_enrollment e
 		WHERE e.no=#{enrollmentNo}
+		  AND e.member_id=#{memberId}
 	</select>
 
 	<select id="selectExamResultDetails" parameterType="int" resultType="hashmap">
@@ -196,11 +255,13 @@
 		       o.option2 AS option2,
 		       o.option3 AS option3,
 		       o.option4 AS option4,
-		       q.answer AS standard_answer,
-		       TO_CHAR(q.description) AS description,
-		       q.type AS question_type
+		       CASE WHEN e.status='COMPLETE' OR q.type=1 THEN q.answer END AS standard_answer,
+		       CASE WHEN e.status='COMPLETE' OR q.type=1 THEN TO_CHAR(q.description) END AS description,
+		       q.type AS question_type,
+		       q.score AS max_score
 		FROM EXAM_USER_ANSWER a
 			JOIN EXAM_QUESTION q ON a.question_no=q.no
+			JOIN EXAM_ENROLLMENT e ON a.enrollment_no=e.no
 			LEFT JOIN EXAM_OPTION o ON q.no=o.question_no
 		WHERE a.enrollment_no = #{enrollmentNo}
 		ORDER BY a.question_no ASC

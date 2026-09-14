@@ -7,6 +7,20 @@
         se.title,
         se.open_date,
         se.close_date,
+		NVL(se.time_limit,120) AS time_limit,
+		(SELECT COUNT(*) FROM scheduled_exam_map sem WHERE sem.exam_no=se.no) AS question_count,
+		<if test="memberId != null">
+			CASE WHEN EXISTS(
+				SELECT 1
+				FROM exam_enrollment ee
+				WHERE ee.exam_no=se.no
+				  AND ee.member_id=#{memberId}
+				  AND ee.endtime IS NOT NULL
+			) THEN 1 ELSE 0 END AS has_result,
+		</if>
+		<if test="memberId == null">
+			0 AS has_result,
+		</if>
         <if test="memberId != null">
             CASE WHEN es.no IS NOT NULL THEN 1 ELSE 0 END AS subscribed
         </if>

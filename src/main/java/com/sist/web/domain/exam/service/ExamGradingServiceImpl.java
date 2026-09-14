@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.sist.web.domain.exam.mapper.ExamGradingMapper;
 
@@ -38,13 +40,24 @@ public class ExamGradingServiceImpl implements ExamGradingService {
     @Transactional
     public void gradeSubjective(int answerNo, int graderId, int score) {
         Map<String, Object> params = gradingParams(answerNo, graderId);
-        params.put("score", score);
 
         // 선점 여부와 채점자 일치 여부 DB 재검증
-        Integer enrollmentNo = gradingMapper.selectClaimedEnrollmentNo(params);
-        if (enrollmentNo == null) {
+        Map<String,Object> claimedAnswer=gradingMapper.selectClaimedAnswer(params);
+        if (claimedAnswer == null) {
             throw new IllegalStateException("선점하지 않았거나 이미 처리된 답안입니다.");
         }
+
+		Object rawEnrollmentNo=claimedAnswer.get("ENROLLMENT_NO")!=null
+				?claimedAnswer.get("ENROLLMENT_NO"):claimedAnswer.get("enrollment_no");
+		Object rawMaxScore=claimedAnswer.get("MAX_SCORE")!=null
+				?claimedAnswer.get("MAX_SCORE"):claimedAnswer.get("max_score");
+		int enrollmentNo=Integer.parseInt(String.valueOf(rawEnrollmentNo));
+		int maxScore=Integer.parseInt(String.valueOf(rawMaxScore));
+		if(score<0 || score>maxScore){
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"문항 배점 범위를 벗어났습니다.");
+		}
+		params.put("score",score);
+		params.put("maxScore",maxScore);
 
         if (gradingMapper.gradeSubjectiveAnswer(params) == 0) {
             throw new IllegalStateException("선점하지 않았거나 이미 처리된 답안입니다.");
