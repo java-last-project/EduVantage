@@ -19,7 +19,7 @@
 	</div>
 
 	<form th:action="@{/instructor/new_course_insert}" method="post">
-	<div class="section-card">
+	<!-- <div class="section-card">
 		<div class="section-card-header">썸네일</div>
 		<div class="section-card-body">
 			<div class="thumb-upload">
@@ -27,7 +27,7 @@
 				<span>클릭해서 썸네일 업로드</span>
 			</div>
 		</div>
-	</div>
+	</div> -->
 
 	<div class="section-card">
 		<div class="section-card-header">기본 정보</div>
@@ -36,16 +36,16 @@
 				<label>강의명</label>
 				<!-- <input type="hidden" th:value="${vo.no}" name="no"> -->
 				
-				<input type="text" class="form-input" name="title">
+				<input type="text" class="form-input" name="title" required>
 			</div>
 			<div class="price-row">
 				<div class="form-row">
 					<label>정가</label>
-					<input type="number" class="form-input" name="regular_price">
+					<input type="number" class="form-input" name="regular_price" required>
 				</div>
 				<div class="form-row">
 					<label>판매가</label>
-					<input type="number" class="form-input" name="pay_price">
+					<input type="number" class="form-input" name="pay_price" required>
 				</div>
 			</div>
 		</div>
@@ -54,7 +54,7 @@
 	<div class="section-card">
 		<div class="section-card-header">강의 소개</div>
 		<div class="section-card-body">
-			<textarea class="form-textarea" placeholder="html 형식으로 입력..." name="content"></textarea>
+			<textarea class="form-textarea" placeholder="html 형식으로 입력..." name="content" required></textarea>
 		</div>
 	</div>
 

@@ -132,4 +132,57 @@
 		WHERE NO=#{no}
 	</update>
 	
+	<!-- 강의관리 - 새소식 Insert -->
+	<insert id="instCourseNewsInsert" parameterType="hashmap">
+		INSERT INTO COURSE_NOTICE
+		(NO,COURSE_ID,SUBJECT,CONTENT)
+		VALUES
+		(COURSE_NOTICE_NO_SEQ.NEXTVAL,#{course_id},#{subject},#{content})
+	</insert>
+	
+	<!-- 강의관리 - 새소식 List -->
+	<select id="instCourseNewsListData" parameterType="int" resultType="hashmap">
+	    SELECT NO, SUBJECT, FILENAME, HIT, TO_CHAR(REGDATE,'yyyy-mm-dd') AS REGDATE
+	    FROM COURSE_NOTICE
+	    WHERE COURSE_ID = #{course_id}
+	    ORDER BY REGDATE DESC
+	</select>
+	
+	<!-- 강의관리 - 새소식 detail -->
+	<select id="instCourseNewsDetail" parameterType="int" resultType="hashmap">
+	    SELECT NO, COURSE_ID, SUBJECT, TO_CHAR(CONTENT) AS CONTENT, FILENAME, HIT, TO_CHAR(REGDATE,'yyyy-mm-dd') AS REGDATE
+	    FROM COURSE_NOTICE
+	    WHERE NO = #{no}
+	</select>
+	
+	<!-- 강의관리 - 새소식 update 조회수 -->
+	<update id="instCourseNewsHitUp" parameterType="int">
+	    UPDATE COURSE_NOTICE
+	    SET HIT = HIT + 1
+	    WHERE NO = #{no}
+	</update>
+	
+	<!-- 회원정보수정 -->
+	<update id="instProfileUpdate" parameterType="com.sist.web.domain.member.vo.MemberVO">
+		UPDATE member
+		SET
+		name=#{name},
+		sex=#{sex},
+		birthdate=TO_DATE(#{birthdate}, 'yyyy-mm-dd'),
+		phone=#{phone},
+		post=#{post},
+		addr1=#{addr1},
+		addr2=#{addr2},
+		email=#{email},
+		profile_desc=#{profile_desc}
+		WHERE member_id=#{member_id}
+	</update>
+	
+	<!-- 비밀번호 수정 -->
+	<update id="instProfilePwdUpdate" parameterType="com.sist.web.domain.member.vo.MemberVO">
+		UPDATE member 
+		SET password=#{password}
+	    WHERE member_id=#{member_id}
+	</update>
+	
 </mapper>

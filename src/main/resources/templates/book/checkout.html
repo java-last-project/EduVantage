@@ -30,7 +30,7 @@
                         <div class="text-secondary small mb-2">{{ store.book.author }} 저 · {{ store.book.publisher }}</div>
                         <div class="text-muted small">수량: {{ store.quantity }}개</div>
                     </div>
-                    <div class="fw-bold fs-4">{{ (store.book.price * store.quantity).toLocaleString() || 0 }}원</div>
+                    <div class="fw-bold fs-4 text-nowrap flex-shrink-0">{{ (store.book.price * store.quantity).toLocaleString() || 0 }}원</div>
                 </div>
             </div>
 

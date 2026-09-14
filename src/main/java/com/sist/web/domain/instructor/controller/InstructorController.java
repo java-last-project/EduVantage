@@ -1,11 +1,13 @@
 package com.sist.web.domain.instructor.controller;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.sist.web.domain.course.vo.CourseVO;
 import com.sist.web.domain.enrollment.vo.CourseQnaReplyVO;
@@ -21,6 +23,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class InstructorController {
 	private final InstructorService iService;
+	private final PasswordEncoder passwordEncoder;
 	
 	@GetMapping("/instructor/course")
 	public String instructor_course(HttpSession session, Model model)
@@ -49,6 +52,49 @@ public class InstructorController {
 		model.addAttribute("instructor_html", "instructor/course_detail");
 		model.addAttribute("main_html", "instructor/main");
 		return "main/main";
+	}
+	
+	@GetMapping("/instructor/news")
+	public String instructor_news(@RequestParam("courseId") int courseId, Model model)
+	{
+	    List<Map<String, Object>> list = iService.instCourseNewsListData(courseId); // 목록 조회 (별도로 이미 있으면 그거 쓰시고, 없으면 이 메소드도 만드셔야 해요)
+	    
+	    model.addAttribute("list", list);
+	    model.addAttribute("courseId", courseId);
+	    model.addAttribute("instructor_html", "instructor/news");
+	    model.addAttribute("main_html", "instructor/main");
+	    return "main/main";
+	}
+
+	@GetMapping("/instructor/news_insert")
+	public String instructor_news_insert_form(@RequestParam("courseId") int courseId, Model model)
+	{
+	    model.addAttribute("courseId", courseId);
+	    model.addAttribute("instructor_html", "instructor/news_insert");
+	    model.addAttribute("main_html", "instructor/main");
+	    return "main/main";
+	}
+
+	@PostMapping("/instructor/news_insert")
+	public String instructor_news_insert(
+	        @RequestParam("courseId") int courseId,
+	        @RequestParam("subject") String subject,
+	        @RequestParam("content") String content)
+	{
+	    iService.instCourseNewsInsert(courseId, subject, content);
+	    return "redirect:/instructor/news?courseId=" + courseId;
+	}
+	
+	@GetMapping("/instructor/news_detail")
+	public String instructor_news_detail(@RequestParam("no") int no, Model model)
+	{
+	    iService.instCourseNewsHitUp(no);
+	    Map<String, Object> vo = iService.instCourseNewsDetail(no);
+	    
+	    model.addAttribute("vo", vo);
+	    model.addAttribute("instructor_html", "instructor/news_detail");
+	    model.addAttribute("main_html", "instructor/main");
+	    return "main/main";
 	}
 	
 	@GetMapping("/instructor/course_edit")
@@ -100,6 +146,74 @@ public class InstructorController {
 		model.addAttribute("instructor_html", "instructor/profile");
 		model.addAttribute("main_html", "instructor/main");
 		return "main/main";
+	}
+	
+	@GetMapping("/instructor/profile_edit")
+	public String instructor_profile_edit(HttpSession session, Model model)
+	{
+		int member_id=(int)session.getAttribute("member_id");
+		MemberVO vo = iService.InstProfileData(member_id);
+		
+		model.addAttribute("vo", vo);
+		
+		model.addAttribute("instructor_html", "instructor/profile_edit");
+		model.addAttribute("main_html", "instructor/main");
+		return "main/main";
+	}
+	
+	@PostMapping("/instructor/profile_edit_ok")
+	public String instructor_profile_edit_ok(HttpSession session,
+					RedirectAttributes redirectAttributes,
+					@RequestParam(value = "password", required = false) String password,
+					@RequestParam(value = "password_confirm", required = false) String password_confirm,
+					@RequestParam("name") String name,
+					@RequestParam("sex") String sex,
+					@RequestParam("birthdate") String birthdate,
+					@RequestParam("phone") String phone,
+					@RequestParam("email") String email,
+					@RequestParam("post") String post,
+					@RequestParam("addr1") String addr1,
+					@RequestParam("addr2") String addr2,
+					@RequestParam("profile_desc") String profile_desc
+					)
+	{
+		int member_id = (int)session.getAttribute("member_id");
+		MemberVO vo = new MemberVO();
+		
+		vo.setMember_id(member_id);
+		vo.setName(name);
+		vo.setSex(sex);
+		vo.setBirthdate(birthdate);
+		vo.setPhone(phone);
+		vo.setEmail(email);
+		vo.setPost(post);
+		vo.setAddr1(addr1);
+		vo.setAddr2(addr2);
+		vo.setProfile_desc(profile_desc);
+		vo.setPassword(null);
+		
+		// password가 들어오는 경우 비밀번호 변경
+		if(password != null && !password.isEmpty() && password.equals(password_confirm))
+		{
+			// 비밀번호 암호화
+			String encodePwd = passwordEncoder.encode(password);
+			vo.setPassword(encodePwd);	// 암호화 시킨 비밀번호를 vo에 저장
+		}
+		else if(password != null && !password.isEmpty() && !password.equals(password_confirm))
+		{
+			// 비밀번호가 틀림
+			vo.setPassword(null);
+			redirectAttributes.addFlashAttribute("error", "비밀번호가 일치하지 않습니다.");
+			return "redirect:/instructor/profile_edit";
+		}
+		else if(password == null || password.isEmpty())	// password가 들어오지 않는 경우 null을 넣고 기본 정보만 update
+		{
+			vo.setPassword(null);
+		}
+		
+		iService.instProfileUpdate(vo);
+		
+		return "redirect:/instructor/profile";
 	}
 	
 	@GetMapping("/instructor/qna")
@@ -203,4 +317,6 @@ public class InstructorController {
 		
 		return "redirect:/instructor/qna_detail?no="+no;
 	}
+	
+	
 }
