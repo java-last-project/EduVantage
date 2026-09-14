@@ -25,4 +25,13 @@ public interface InstructorService {
 	public CourseQnaReplyVO instQnaAnswerData(int no);
 	
 	public void instQnaAnswerInsert(CourseQnaReplyVO vo, int no);
+	
+	public void instCourseNewsInsert(int course_id, String subject, String content);
+	public List<Map<String, Object>> instCourseNewsListData(int course_id);
+	
+	public Map<String, Object> instCourseNewsDetail(int no);
+	public void instCourseNewsHitUp(int no);
+	
+	public void instProfileUpdate(MemberVO vo);
+	
 }
