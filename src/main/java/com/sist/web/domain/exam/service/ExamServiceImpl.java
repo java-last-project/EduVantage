@@ -143,6 +143,10 @@ public class ExamServiceImpl implements ExamService{
 		questionParams.put("exam_no",enrollment.getExam_no());
 		questionParams.put("theme",enrollment.getTheme());
 		questionParams.put("qno",qno);
+		boolean aiExam=enrollment.getExam_no()==null && enrollment.getTheme()==null;
+		if(aiExam){
+			questionParams.put("enrollment_no",enrollmentNo);
+		}
 		List<ExamQuestionVO> questions=eMapper.getQuestionForGrading(questionParams);
 		if(questions.isEmpty()){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"채점할 시험 문제가 없습니다.");
@@ -192,6 +196,9 @@ public class ExamServiceImpl implements ExamService{
 
 		// 답안 저장 + 응시 상태 함께 반영
 		if(!answers.isEmpty()){
+			if(aiExam){
+				eMapper.deleteUserAnswers(enrollmentNo);
+			}
 			eMapper.insertUserAnswers(answers);
 		}
 
@@ -230,7 +237,8 @@ public class ExamServiceImpl implements ExamService{
 			examNo=Integer.parseInt(String.valueOf(rawExamNo));
 		}
 
-		String examTitle="상시 모의고사";
+		Object rawTheme=map.get("THEME")!=null ? map.get("THEME") : map.get("theme");
+		String examTitle=rawTheme==null?"AI 맞춤시험":"상시 모의고사";
 		if (examNo!=null && examNo>0) {
 			String sTitle=eMapper.getScheduledExamTitle(examNo);
 			if (sTitle!=null) examTitle=sTitle;
@@ -254,6 +262,52 @@ public class ExamServiceImpl implements ExamService{
 	@Override
 	public List<Map<String, Object>> getMyExamList(int memberId) {
 		return eMapper.selectMyExamList(memberId);
+	}
+
+	@Override
+	@Transactional
+	public ExamEnrollmentVO createAiEnrollment(Integer memberId, List<Integer> questionNos) {
+		if(memberId==null || questionNos==null || questionNos.isEmpty()){
+			throw new IllegalArgumentException("AI 시험 응시정보가 올바르지 않습니다.");
+		}
+		ExamEnrollmentVO vo=new ExamEnrollmentVO();
+		vo.setMember_id(memberId);
+		vo.setStarttime(LocalDateTime.now());
+		eMapper.insertEnrollment(vo);
+
+		Map<String,Object> map=new HashMap<>();
+		map.put("enrollmentNo",vo.getNo());
+		map.put("questionNos",questionNos);
+		eMapper.insertAiExamQuestions(map);
+		return vo;
+	}
+
+	@Override
+	public Map<String,Object> getAiExamDetailData(int memberId,int enrollmentNo) {
+		Map<String,Object> params=new HashMap<>();
+		params.put("memberId",memberId);
+		params.put("enrollmentNo",enrollmentNo);
+
+		ExamEnrollmentVO enrollment=eMapper.getEnrollmentForMember(params);
+		if(enrollment==null || enrollment.getExam_no()!=null || enrollment.getTheme()!=null){
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND,"존재하지 않는 AI 시험입니다.");
+		}
+		if(enrollment.getEndtime()!=null){
+			throw new ResponseStatusException(HttpStatus.CONFLICT,"이미 제출이 완료된 시험입니다.");
+		}
+
+		List<ExamQuestionVO> questions=eMapper.examDetailDataByEnrollment(params);
+		if(questions.isEmpty()){
+			throw new ResponseStatusException(HttpStatus.CONFLICT,"AI 시험에 연결된 문제가 없습니다.");
+		}
+
+		Map<String,Object> result=new HashMap<>();
+		result.put("enrollmentNo",enrollment.getNo());
+		result.put("startTime",enrollment.getStarttime());
+		result.put("timeLimitMinutes",EXAM_LIMIT_MINUTES);
+		result.put("count",questions.size());
+		result.put("list",questions);
+		return result;
 	}
 
 }

@@ -21,4 +21,21 @@
         LIMIT 3
     </select>
 
+	<select id="findAiRecommendedCourses" resultType="com.sist.web.domain.exam.vo.RecommendCourseVO">
+		WITH course_scores AS (
+			SELECT
+				course_no,
+				MAX(1-(embedding &lt;=&gt; CAST(#{queryVector} AS vector))) AS similarity
+		FROM course_vector
+			GROUP BY course_no
+		)
+		SELECT
+			course_no,
+			similarity,
+			similarity AS recommendation_score
+		FROM course_scores
+		ORDER BY similarity DESC
+		LIMIT 3
+	</select>
+
 </mapper>

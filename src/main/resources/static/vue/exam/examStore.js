@@ -24,7 +24,10 @@ const useExamStore=defineStore('exam_store',{
 	            const res=await api.post('/exam/detail_vue', {
 	                theme: this.theme,
 	                count: this.count,
-					examNo: this.examNo
+					examNo: this.examNo,
+					ai: params?.ai ?? false,
+					enrollmentNo: params?.enrollmentNo ?? null,
+					examName: params?.examName ?? null
 	            })
 	            this.enrollmentNo=res.data.enrollmentNo
 				this.title=res.data.title
