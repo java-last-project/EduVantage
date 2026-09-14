@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.web.domain.enrollment.mapper.CourseVideoProgressMapper">
+
+	<select id="videoProgressList" resultType="com.sist.web.domain.enrollment.vo.CourseVideoProgressVO">
+		SELECT no,
+			enrollment_no,
+			video_no,
+			current_time AS currentTime,
+			duration,
+			progress,
+			completed,
+			updated_at AS updatedAt
+		FROM course_video_progress
+		WHERE enrollment_no=#{enrollment_no}
+	</select>
+
+	<update id="videoProgressSave" parameterType="com.sist.web.domain.enrollment.vo.CourseVideoProgressVO">
+		<!-- 최초 INSERT와 이후 UPDATE를 한 MERGE로 처리 -->
+		MERGE INTO course_video_progress p
+		USING(
+			SELECT
+				#{enrollment_no} AS enrollment_no,
+				#{video_no} AS video_no
+			FROM dual
+		) s
+		ON(
+			p.enrollment_no=s.enrollment_no
+			AND p.video_no=s.video_no
+		)
+		WHEN MATCHED THEN
+			UPDATE SET
+				<!-- current_time은 마지막 위치, progress는 최고 도달률 유지 -->
+				p.current_time=#{currentTime},
+				p.duration=#{duration},
+				p.progress=GREATEST(
+					NVL(p.progress,0),
+					#{progress}
+				),
+				<!-- 완료 상태 역행 방지 -->
+				p.completed=
+					CASE
+						WHEN p.completed='Y' OR #{completed}='Y'
+						THEN 'Y'
+						ELSE 'N'
+					END,
+				p.updated_at=SYSDATE
+		WHEN NOT MATCHED THEN
+			INSERT(
+				enrollment_no,
+				video_no,
+				current_time,
+				duration,
+				progress,
+				completed,
+				updated_at
+			)
+			VALUES(
+				#{enrollment_no},
+				#{video_no},
+				#{currentTime},
+				#{duration},
+				#{progress},
+				#{completed},
+				SYSDATE
+			)
+	</update>
+
+	<select id="videoTotalCount" resultType="int" parameterType="int">
+		SELECT COUNT(*)
+		FROM course_video cv
+		JOIN course_enrollment ce
+			ON cv.course_no=ce.course_no
+		WHERE ce.no=#{enrollment_no}
+	</select>
+
+	<select id="videoCompletedCount" resultType="int" parameterType="int">
+		SELECT COUNT(*)
+		FROM course_video_progress
+		WHERE enrollment_no=#{enrollment_no}
+		AND completed='Y'
+	</select>
+
+	<select id="videoAccessCheck" resultType="int">
+		<!-- 수강 강좌와 영상 소속 강좌를 함께 검증 -->
+		SELECT COUNT(*)
+		FROM course_enrollment e
+		JOIN course_video v
+		ON e.course_no=v.course_no
+		WHERE e.no=#{enrollment_no}
+		AND e.member_id=#{member_id}
+		AND v.no=#{video_no}
+	</select>
+
+	<select id="enrollmentAccessCheck" resultType="int">
+		SELECT COUNT(*)
+		FROM course_enrollment
+		WHERE no=#{enrollment_no}
+		AND member_id=#{member_id}
+	</select>
+
+</mapper>

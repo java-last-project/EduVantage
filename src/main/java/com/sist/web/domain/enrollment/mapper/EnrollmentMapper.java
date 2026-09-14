@@ -57,5 +57,8 @@ public interface EnrollmentMapper {
 			@Param("course_no") int course_no,
 			@Param("member_id") int member_id
 		);
+
+	public void videoProgressUpdate(@Param("enrollment_no")Integer enrollment_no,@Param("progress")Integer progress,@Param("isCompleted")String isCompleted);
+	public Integer enrollmentNoData(@Param("member_id")Integer member_id,@Param("course_no")Integer course_no);
 	
 }

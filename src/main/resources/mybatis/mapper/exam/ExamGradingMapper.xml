@@ -21,6 +21,7 @@
         ORDER BY a.no
     </select>
 
+    <!-- 조건부 UPDATE로 동시 선점 방지 -->
     <update id="claimGradingTask" parameterType="hashmap">
         UPDATE exam_user_answer
         SET grader_id=#{graderId}
@@ -37,6 +38,7 @@
           AND is_correct='W'
     </update>
 
+    <!-- 본인이 선점한 채점 대기 답안만 허용 -->
     <select id="selectClaimedEnrollmentNo" parameterType="hashmap" resultType="int">
         SELECT enrollment_no
         FROM exam_user_answer
@@ -62,6 +64,7 @@
           AND is_correct='W'
     </select>
 
+    <!-- 전체 답안 점수 재합산 후 최종 점수 확정 -->
     <update id="finalizeEnrollmentScore" parameterType="int">
         UPDATE exam_enrollment
         SET totalscore=(

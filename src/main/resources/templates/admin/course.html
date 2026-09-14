@@ -1,22 +1,5 @@
 <!DOCTYPE html>
 <html>
-<style>
-	/* 강의 등록 - primary 버튼 (강의관리 전용) */
-	.btn-primary{
-		display:flex;
-		align-items:center;
-		gap:6px;
-		padding:10px 16px;
-		background:var(--main-color);
-		border:1px solid var(--main-color);
-		border-radius:8px;
-		font-size:14px;
-		font-weight:500;
-		color:#ffffff;
-		cursor:pointer;
-		white-space:nowrap;
-	}
-</style>
 
 <div class="layout">
 <main class="main">
@@ -46,7 +29,6 @@
 					<th>강의</th>
 					<th>강사</th>
 					<th>가격</th>
-					<th style="text-align:right;">관리&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
 				</tr>
 			</thead>
 			<tbody id="course-table-body">
@@ -65,9 +47,6 @@
 					</td>
 					<td>[[${c.NAME}]]</td>
 					<td class="price-text">[[${c.PAYPRICE}]]원</td>
-					<td style="text-align:right;">
-						<button class="btn-detail">강의삭제</button>
-					</td>
 				</tr>
 				
 			</tbody>
@@ -77,7 +56,7 @@
 		
 			<div>전체 <b>[[${count}]]</b>개 중 <b>[[${startNum}]]-[[${endNum}]]</b> 표시</div>
 			
-			<div class="page-controls">
+			<div class="page-controls" th:if="${count>10}">
 				<button th:if="${startPage > 1}" class="page-btn nav"><a th:href="@{/admin/course(page=${startPage-1},title=${title})}"><i class="fa-solid fa-chevron-left"></i></a></button>
 				<button th:each="i:${#numbers.sequence(startPage,endPage)}" th:class="${curpage==i}?'page-btn active':'page-btn'"><a th:href="@{/admin/course(page=${i},title=${title})}">[[${i}]]</a></button>
 				<button th:if="${endPage < totalpage}" class="page-btn nav"><a th:href="@{/admin/course(page=${endPage+1},title=${title})}"><i class="fa-solid fa-chevron-right"></i></a></button>

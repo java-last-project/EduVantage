@@ -38,6 +38,7 @@ public class CourseServiceImpl implements CourseService {
 		List<CourseVO> list = cMapper.courseListData(map);
 		for (CourseVO vo : list) {
 	        if (vo.getTechList()!=null) {
+	            // 기술 스택별 중복 분류 제거
 	            List<String> uniqueCategories=vo.getTechList().stream()
 	                .map(TechStackVO::getCategory)
 	                .filter(cat->cat!=null && !cat.isEmpty() && !"Unclassified".equals(cat))
@@ -63,6 +64,7 @@ public class CourseServiceImpl implements CourseService {
 		map.put("start", start);
 		int count=cMapper.courseCount(map);
 		
+		// 10페이지 단위 페이지 블록 계산
 		int totalpage=(int)Math.ceil(count/(double)ROW);
 		int startPage=((page-1)/BLOCK*BLOCK)+1;
 		int endPage=((page-1)/BLOCK*BLOCK)+BLOCK;
@@ -85,8 +87,10 @@ public class CourseServiceImpl implements CourseService {
 
 	@Override
 	public CourseVO courseDetail(int no) {
-		CourseVO vo=cMapper.courseDetail(no);
+		CourseVO vo=new CourseVO();
+		vo=cMapper.courseDetail(no);
 		if (vo != null && vo.getTechList()!=null) {
+	        // 상세 화면용 분류명 변환 + 중복 제거
 	        List<String> uniqueCategories = vo.getTechList().stream()
 	            .map(TechStackVO::getCategory)
 	            .filter(cat -> cat != null && !cat.isEmpty())

@@ -50,6 +50,10 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 		int[] pages= {page,totalpage,startpage,endpage,count};
 		return pages;
 	}
+	@Override
+	public Integer enrollmentNoData(Integer member_id,Integer course_no){
+		return eMapper.enrollmentNoData(member_id,course_no);
+	}
 	
 	@Override
 	@Transactional
