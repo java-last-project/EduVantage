@@ -91,7 +91,7 @@
 		<div class="pagination">
 			<div>전체 <b>[[${count}]]</b>개 중 <b>[[${startNum}]]-[[${endNum}]]</b> 표시</div>
 			
-			<div class="page-controls">
+			<div class="page-controls" th:if="${count>10}">
 				<a th:if="${startPage > 1}" class="btn page-btn nav" th:href="@{/instructor/qna(page=${startPage-1},title=${title},status=${status})}"><i class="fa-solid fa-chevron-left"></i></a>
 				<a th:each="i:${#numbers.sequence(startPage,endPage)}" th:class="${curpage==i}?'btn page-btn active':'btn page-btn'" th:href="@{/instructor/qna(page=${i},title=${title},status=${status})}">[[${i}]]</a>
 				<a th:if="${endPage < totalpage}" class="btn page-btn nav" th:href="@{/instructor/qna(page=${endPage+1},title=${title},status=${status})}"><i class="fa-solid fa-chevron-right"></i></a>

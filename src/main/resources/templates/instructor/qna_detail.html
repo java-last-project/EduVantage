@@ -46,7 +46,7 @@
 		</div>
 		<form method="post" action="/instructor/qna_answer">
 		<div class="section-card-body">
-			<textarea class="form-textarea" placeholder="답변을 입력하세요" style="min-height:160px;" name="answer"></textarea>
+			<textarea class="form-textarea" placeholder="답변을 입력하세요" style="min-height:160px;" name="answer" required></textarea>
 			<input type="hidden" th:value="${vo.NO}" name="no">
 			<div class="form-actions" style="margin-top:12px;">
 				<button class="btn-primary">답변 등록</button>
