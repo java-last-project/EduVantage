@@ -48,7 +48,7 @@ public class InstructorServiceImpl implements InstructorService
 		// TODO Auto-generated method stub
 		iMapper.instUpdateCourseData(vo);
 	}
-
+	
 	@Override
 	public void instInsertNewCourse(CourseVO vo) {
 		// TODO Auto-generated method stub
@@ -136,6 +136,20 @@ public class InstructorServiceImpl implements InstructorService
 	}
 
 	@Override
+	public void instCourseNewsInsert(int course_id, String subject, String content, String filename,
+			long filesize) {
+		// TODO Auto-generated method stub
+		Map<String, Object> map = new HashMap<>();
+		map.put("course_id", course_id);
+		map.put("subject", subject);
+		map.put("content", content);
+		map.put("filename", filename);
+		map.put("filesize", filesize);
+		
+		iMapper.instCourseNewsInsertFile(map);
+	}
+
+	@Override
 	public List<Map<String, Object>> instCourseNewsListData(int course_id) {
 		// TODO Auto-generated method stub
 		return iMapper.instCourseNewsListData(course_id);
@@ -165,6 +179,7 @@ public class InstructorServiceImpl implements InstructorService
 			iMapper.instProfilePwdUpdate(vo);
 		}
 	}
+
 	
 	
 

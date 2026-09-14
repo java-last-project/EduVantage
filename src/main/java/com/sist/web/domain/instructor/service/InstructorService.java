@@ -27,6 +27,7 @@ public interface InstructorService {
 	public void instQnaAnswerInsert(CourseQnaReplyVO vo, int no);
 	
 	public void instCourseNewsInsert(int course_id, String subject, String content);
+	public void instCourseNewsInsert(int course_id, String subject, String content, String filename, long filesize);
 	public List<Map<String, Object>> instCourseNewsListData(int course_id);
 	
 	public Map<String, Object> instCourseNewsDetail(int no);

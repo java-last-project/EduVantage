@@ -57,8 +57,14 @@ public interface InstructorMapper {
 	/*
 	 * 	<update id="instUpdateCourseData" parameterType="com.sist.web.domain.course.vo.CourseVO">
 			UPDATE course 
-			SET title=#{title}, pay_price=#{pay_price}, regular_price=#{regular_price}, content=#{content}, thumbnail=#{thumbnail}
-			WHERE no=#{no}
+		    SET title=#{title}, pay_price=#{pay_price}, regular_price=#{regular_price}, content=#{content}
+			    <if test="thumbnail != null and thumbnail != ''">
+			        , thumbnail=#{thumbnail}
+			    </if>
+			    <if test="images != null and images != ''">
+			        , images=#{images}
+			    </if>
+		    WHERE no=#{no}
 		</update>
 	 */
 	public void instUpdateCourseData(CourseVO vo);
@@ -160,6 +166,7 @@ public interface InstructorMapper {
 		</insert>
 	 */
 	public void instCourseNewsInsert(Map<String, Object> map);
+	public void instCourseNewsInsertFile(Map<String, Object> map);
 	
 	// 강의관리 - 새소식 List
 	/*

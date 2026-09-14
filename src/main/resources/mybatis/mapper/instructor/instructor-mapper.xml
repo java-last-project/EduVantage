@@ -24,31 +24,25 @@
 	<!-- 담당 강의 내용 수정 -->
 	<update id="instUpdateCourseData" parameterType="com.sist.web.domain.course.vo.CourseVO">
 		UPDATE course 
-		SET title=#{title}, pay_price=#{pay_price}, regular_price=#{regular_price}, content=#{content}
-		WHERE no=#{no}
+	    SET title=#{title}, pay_price=#{pay_price}, regular_price=#{regular_price}, content=#{content}
+		    <if test="thumbnail != null and thumbnail != ''">
+		        , thumbnail=#{thumbnail}
+		    </if>
+		    <if test="images != null and images != ''">
+		        , images=#{images}
+		    </if>
+	    WHERE no=#{no}
 	</update>
 	
 	<!-- 새 강의 등록 -->
 	<insert id="instInsertNewCourse" parameterType="com.sist.web.domain.course.vo.CourseVO">
 		INSERT INTO course(
-			title,
-			instructor_no,
-			star,
-			student_count,
-			pay_price,
-			regular_price,
-			content
-		)
-		VALUES 
-		(
-			#{title},
-			#{instructor_no},
-			5,
-			0,
-			#{pay_price},
-			#{regular_price},
-			#{content}
-		)
+	        title, instructor_no, star, student_count, pay_price, regular_price, content, thumbnail, images
+	    )
+	    VALUES 
+	    (
+	        #{title}, #{instructor_no}, 5, 0, #{pay_price}, #{regular_price}, #{content}, #{thumbnail}, #{images}
+	    )
 	</insert>
 	
 	<!-- 강사페이지 수강생 QnA 목록 출력 -->
@@ -140,12 +134,20 @@
 		(COURSE_NOTICE_NO_SEQ.NEXTVAL,#{course_id},#{subject},#{content})
 	</insert>
 	
+	<!-- 강의관리 - 새소식 Insert 파일업로드시 -->
+	<insert id="instCourseNewsInsertFile" parameterType="hashmap">
+		INSERT INTO COURSE_NOTICE
+		(NO,COURSE_ID,SUBJECT,CONTENT,filename,filesize)
+		VALUES
+		(COURSE_NOTICE_NO_SEQ.NEXTVAL,#{course_id},#{subject},#{content},#{filename},#{filesize})
+	</insert>
+	
 	<!-- 강의관리 - 새소식 List -->
 	<select id="instCourseNewsListData" parameterType="int" resultType="hashmap">
 	    SELECT NO, SUBJECT, FILENAME, HIT, TO_CHAR(REGDATE,'yyyy-mm-dd') AS REGDATE
 	    FROM COURSE_NOTICE
 	    WHERE COURSE_ID = #{course_id}
-	    ORDER BY REGDATE DESC
+	    ORDER BY REGDATE DESC, no desc
 	</select>
 	
 	<!-- 강의관리 - 새소식 detail -->

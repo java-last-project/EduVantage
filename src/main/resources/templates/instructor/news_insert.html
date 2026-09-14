@@ -10,7 +10,7 @@
         <h1 class="page-title">새소식 등록</h1>
     </div>
 
-    <form th:action="@{/instructor/news_insert}" method="post">
+    <form th:action="@{/instructor/news_insert}" method="post" enctype="multipart/form-data">
         <input type="hidden" name="courseId" th:value="${courseId}">
 
         <div class="section-card">
@@ -23,6 +23,10 @@
                     <label>내용</label>
                     <textarea class="form-textarea" name="content" required></textarea>
                 </div>
+                <div class="form-row">
+			        <label>첨부파일</label>
+			        <input type="file" name="file">
+			    </div>
             </div>
         </div>
 
