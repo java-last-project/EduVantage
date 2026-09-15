@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sist.web.domain.course.mapper.CourseMapper;
 import com.sist.web.domain.course.vo.CourseVO;
