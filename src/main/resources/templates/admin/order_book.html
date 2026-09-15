@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<div class="layout">
+<main class="main">
+
+	<div class="page-header">
+		<div>
+			<h1 class="page-title">도서 결제/주문 관리</h1>
+			<p class="page-desc">도서 결제 및 주문 내역을 조회합니다.</p>
+		</div>
+	</div>
+
+	<div class="filters">
+		<form th:action="@{/admin/order_book}" method="get" style="display: contents;">
+		<div class="select-box">
+		상태:  
+			<select class="native-select" name="order_status" onchange="this.form.submit()">
+				<option value="all" th:selected="${order_status==null or order_status=='all'}">전체 상태</option>
+				<option value="결제완료" th:selected="${order_status=='결제완료'}">결제완료</option>
+				<option value="환불대기" th:selected="${order_status=='환불대기'}">환불대기</option>
+				<option value="환불완료" th:selected="${order_status=='환불완료'}">환불완료</option>
+			</select>
+			<i class="fa-solid fa-chevron-down"></i>
+		</div>
+			</form>
+	</div>
+
+	<div class="table-card">
+		<table>
+			<thead>
+				<tr>
+					<th style="width:60px;">No</th>
+					<th>회원</th>
+					<th>총 결제금액</th>
+					<th>주문일시</th>
+					<th>상태</th>
+					<th style="text-align:right;">관리</th>
+				</tr>
+			</thead>
+			<tbody>
+
+				<!-- 반복 -->
+				<tr th:each="vo:${list}">
+					<td>[[${vo.NO}]]</td>
+					<td>[[${vo.NAME}]]</td>
+					<td>[[${vo.TOTAL_PRICE}]]원</td>
+					<td><a class="plain-link" style="text-decoration: underline;" th:href="@{/admin/order_book_detail(no=${vo.NO})}">[[${vo.REGDATE}]]</a></td>
+					<td>
+						<span th:if="${vo.ORDER_STATUS == '결제완료'}" class="badge badge-active">결제완료</span>
+						<span th:if="${vo.ORDER_STATUS == '환불완료'}" class="badge badge-suspended">환불완료</span>
+						<span th:if="${vo.ORDER_STATUS == '환불대기'}" class="badge badge-pending">환불대기</span>
+					</td>
+					<td style="text-align:right;">
+						
+						<form th:if="${vo.ORDER_STATUS == '환불대기'}" method="post" th:action="@{/admin/order_book_cancel}" style="display:inline;">
+							<input type="hidden" name="no" th:value="${vo.NO}">
+							<button type="submit" class="btn-detail">환불처리</button>
+						</form>
+					</td>
+				</tr>
+
+			</tbody>
+		</table>
+
+		<div class="pagination">
+			<div>전체 <b>[[${count}]]</b>건 중 <b>[[${startNum}]]-[[${endNum}]]</b> 표시</div>
+
+			<div class="page-controls" th:if="${count>10}">
+				<button th:if="${startPage > 1}" class="page-btn nav"><a th:href="@{/admin/order_book(page=${startPage-1},order_status=${order_status})}"><i class="fa-solid fa-chevron-left"></i></a></button>
+				<button th:each="i:${#numbers.sequence(startPage,endPage)}" th:class="${curpage==i}?'page-btn active':'page-btn'"><a th:href="@{/admin/order_book(page=${i},order_status=${order_status})}">[[${i}]]</a></button>
+				<button th:if="${endPage < totalpage}" class="page-btn nav"><a th:href="@{/admin/order_book(page=${endPage+1},order_status=${order_status})}"><i class="fa-solid fa-chevron-right"></i></a></button>
+			</div>
+		</div>
+	</div>
+
+</main>
+</div>
+
+</html>

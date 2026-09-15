@@ -174,22 +174,22 @@ public class AdminController
 		return "main/main";
 	}
 	
-	@GetMapping("/admin/order")
-	public String admin_order(@RequestParam(value="page", required = false) String page, Model model)
+	@GetMapping("/admin/order_course")
+	public String admin_order_course(@RequestParam(value="page", required = false) String page,
+							@RequestParam(value="order_status", required = false) String order_status,
+							Model model)
 	{
 		if(page==null) page="1";
 		
 		int curpage = Integer.parseInt(page);
-		int count = aService.adminCountCoursePayment();
+		int count = aService.adminCountCoursePayment(order_status);
 		
 		int totalpage = (int)(Math.ceil(count/10.0));
 		final int BLOCK = 10;
 		int startPage = ((curpage-1)/BLOCK*BLOCK)+1;
 		int endPage = ((curpage-1)/BLOCK*BLOCK)+BLOCK;
 		
-		// TODO: 상태(결제완료,취소,환불)에 따른 처리 로직 추가
-		
-		List<Map<String,Object>> list = aService.adminCoursePaymentListData(curpage);
+		List<Map<String,Object>> list = aService.adminCoursePaymentListData(curpage, order_status);
 		
 		if(endPage>totalpage)
 			endPage = totalpage;
@@ -207,9 +207,79 @@ public class AdminController
 		model.addAttribute("startPage", startPage);
 		model.addAttribute("endPage", endPage);
 		
-		model.addAttribute("admin_html", "admin/order");
+		model.addAttribute("order_status", order_status);
+		
+		model.addAttribute("admin_html", "admin/order_course");
 		model.addAttribute("main_html", "admin/main");
 		return "main/main";
+	}
+	
+	@PostMapping("/admin/order_course_cancel")
+	public String admin_order_course_cancle(@RequestParam("no") int no, Model model)
+	{
+		aService.adminPaymentCancleCourse(no);
+		
+		return "redirect:/admin/order_course";
+	}
+	
+	@GetMapping("/admin/order_book")
+	public String admin_order_book(@RequestParam(value="page", required = false) String page,
+							@RequestParam(value="order_status", required = false) String order_status,
+							Model model)
+	{
+		if(page==null) page="1";
+		
+		int curpage = Integer.parseInt(page);
+		int count = aService.adminOrderBookCount(order_status);
+		
+		int totalpage = (int)(Math.ceil(count/10.0));
+		final int BLOCK = 10;
+		int startPage = ((curpage-1)/BLOCK*BLOCK)+1;
+		int endPage = ((curpage-1)/BLOCK*BLOCK)+BLOCK;
+		
+		List<Map<String,Object>> list = aService.adminOrderBookListData(curpage, order_status);
+		
+		if(endPage>totalpage)
+			endPage = totalpage;
+		
+		int startNum = (curpage-1) * 10 + 1;
+		int endNum = curpage * 10 > count ? count : curpage * 10;
+		
+		model.addAttribute("startNum", startNum);
+		model.addAttribute("endNum", endNum);
+		model.addAttribute("count", count);
+		
+		model.addAttribute("list", list);
+		model.addAttribute("curpage", curpage);
+		model.addAttribute("totalpage", totalpage);
+		model.addAttribute("startPage", startPage);
+		model.addAttribute("endPage", endPage);
+		
+		model.addAttribute("order_status", order_status);
+		
+		model.addAttribute("admin_html", "admin/order_book");
+		model.addAttribute("main_html", "admin/main");
+		return "main/main";
+	}
+	
+	@GetMapping("/admin/order_book_detail")
+	public String admin_order_book_detail(@RequestParam("no") int no, Model model)
+	{
+		List<Map<String, Object>> list = aService.adminPaymentDetailListData(no);
+		
+		model.addAttribute("list", list);
+		
+		model.addAttribute("admin_html", "admin/order_book_detail");
+		model.addAttribute("main_html", "admin/main");
+		return "main/main";
+	}
+	
+	@PostMapping("/admin/order_book_cancel")
+	public String admin_order_book_cancle(@RequestParam("no") int no, Model model)
+	{
+		aService.adminPaymentCancleBook(no);
+		
+		return "redirect:/admin/order_book";
 	}
 	
 	@GetMapping("/admin/notice")

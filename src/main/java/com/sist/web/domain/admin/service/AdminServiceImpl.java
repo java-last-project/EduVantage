@@ -158,16 +158,19 @@ public class AdminServiceImpl implements AdminService
 	}
 
 	@Override
-	public List<Map<String, Object>> adminCoursePaymentListData(int page) {
+	public List<Map<String, Object>> adminCoursePaymentListData(int page, String order_status) {
 		
+		Map<String, Object> map = new HashMap<>();
 		int start = (page*10)-10;
-		return aMapper.adminCoursePaymentListData(start);
+		map.put("start", start);
+		map.put("order_status", order_status);
+		return aMapper.adminCoursePaymentListData(map);
 	}
 
 	@Override
-	public int adminCountCoursePayment() {
+	public int adminCountCoursePayment(String order_status) {
 		
-		return aMapper.adminCountCoursePayment();
+		return aMapper.adminCountCoursePayment(order_status);
 	}
 
 	@Override
@@ -224,6 +227,42 @@ public class AdminServiceImpl implements AdminService
 		
 		aMapper.adminQnaAnswerInsert(map);
 		aMapper.adminQnaStatusUpdate(no);
+	}
+
+	@Override
+	public void adminPaymentCancleCourse(int no) {
+		
+		aMapper.adminPaymentCancleCourse(no);
+	}
+
+	@Override
+	public List<Map<String, Object>> adminOrderBookListData(int page, String order_status) {
+		
+		
+		Map<String, Object> map = new HashMap<>();
+		int start = (page*10)-10;
+		map.put("start", start);
+		map.put("order_status", order_status);
+		
+		return aMapper.adminOrderBookListData(map);
+	}
+
+	@Override
+	public int adminOrderBookCount(String order_status) {
+		
+		return aMapper.adminOrderBookCount(order_status);
+	}
+
+	@Override
+	public void adminPaymentCancleBook(int no) {
+		
+		aMapper.adminPaymentCancleBook(no);
+	}
+
+	@Override
+	public List<Map<String, Object>> adminPaymentDetailListData(int no) {
+		
+		return aMapper.adminPaymentDetailListData(no);
 	}
 
 	
