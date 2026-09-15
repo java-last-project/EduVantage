@@ -42,8 +42,14 @@ public class SecurityConfig {
 	    .authorizeHttpRequests(auth-> auth
 	          .requestMatchers("/","/member/**").permitAll()
 	          // 로그인 없이 접근 가능
+	          .requestMatchers("/mypage/**").hasRole("USER")
+	          // USER 권한이 있는 사람만 접근 가능
 	          .requestMatchers("/admin/**").hasRole("ADMIN")
 	          // ADMIN 권한이 있는 사람만 접근이 가능
+	          .requestMatchers("/instructor/**").hasRole("INSTRUCTOR")
+	          // INSTRUCTOR 권한이 있는 사람만 접근이 가능
+	          .requestMatchers("/book/checkout", "/mypage/**", "/qna/insert/**", "/exam/**").authenticated()
+	          // 로그인 필수 경로 추가
 	          .anyRequest().permitAll()
 	          // 지정이 안된 URL 주소
 	    )
@@ -83,6 +89,10 @@ public class SecurityConfig {
 	          .logoutSuccessUrl("/")
 	          .invalidateHttpSession(true)
 	          .deleteCookies("remember-me","JSESSIONID")
+	    )
+	   	// 403 권한 없음 예외 처리 추가
+	    .exceptionHandling(exception -> exception
+	          .accessDeniedPage("/error/access-denied")
 	    );
 	    // remember-me
 	    return http.build();

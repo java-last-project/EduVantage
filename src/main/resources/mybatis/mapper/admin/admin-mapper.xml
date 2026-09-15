@@ -202,7 +202,7 @@
 		(#{member_id},#{no},#{content})
 	 </insert>
 	 
-	 <!-- 동시에 QnA 당변 상태를 Update -->
+	 <!-- 동시에 QnA 답변 상태를 Update -->
 	 <update id="adminQnaStatusUpdate" parameterType="int">
 	 	UPDATE QNABOARD
 		SET STATUS='Y'

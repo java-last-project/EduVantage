@@ -26,22 +26,21 @@ spec:
           envFrom:
             - secretRef:
                 name: eduvantage-secret
+            - configMapRef:
+                name: eduvantage-config
 
-          env:
-            - name: KAFKA_BOOTSTRAP_SERVERS
-              value: "EC2_PRIVATE_IP:29092"
-
-            - name: REDIS_HOST
-              value: "EC2_PRIVATE_IP"
-
-            - name: REDIS_PORT
-              value: "6379"
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 9090
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 18
 
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
               port: 9090
-            initialDelaySeconds: 20
             periodSeconds: 5
             timeoutSeconds: 3
             failureThreshold: 6
@@ -50,7 +49,6 @@ spec:
             httpGet:
               path: /actuator/health/liveness
               port: 9090
-            initialDelaySeconds: 40
             periodSeconds: 10
             timeoutSeconds: 3
             failureThreshold: 3

@@ -12,7 +12,7 @@
 			<div class="header-area">
 				<div class="system-badge">EduVantage 교육 센터</div>
 				<h2 class="join-title">회원가입</h2>
-				<p class="join-subtitle">평가 시스템 이용을 위해 계정을 생성해 주세요.</p>
+				<p class="join-subtitle">교육센터 시스템 이용을 위해 계정을 생성해 주세요.</p>
 			</div>
 			<form id="joinForm" action="/member/join_process" method="post" @submit.prevent="store.submitForm">
 			    <div class="section-title">계정 정보</div>
@@ -83,7 +83,10 @@
 			        <textarea name="profile_desc" v-model="store.formData.profile_desc" class="form-control" placeholder="간단한 본인 소개 및 학습 목적 등을 기술해 주세요."></textarea>
 			    </div>
 			
-			    <button type="submit" class="btn-submit">가입하기</button>
+			    <div class="button-group">
+			   		<button type="button" class="btn-cancel" onclick="javascirpt:history.back()">취소</button>
+				    <button type="submit" class="btn-submit">가입하기</button>
+				</div>
 			</form>
 		</div>
 	</div>
@@ -98,7 +101,7 @@
 
     const app = createApp({
         setup() {
-            // memberStore.js에 정의된 useMemberStore 호출
+            // memberStore에 정의된 useMemberStore 호출
             const store = useMemberStore(); 
             return { store };
         }

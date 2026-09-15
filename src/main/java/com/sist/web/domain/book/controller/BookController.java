@@ -30,5 +30,4 @@ public class BookController {
         model.addAttribute("main_html", "book/checkout");
         return "main/main";
     }
-    
 }
