@@ -1,6 +1,7 @@
 services:
   kafka:
     image: confluentinc/cp-kafka
+    restart: unless-stopped
     ports:
       - "29092:29092"
     environment:
@@ -30,6 +31,7 @@ services:
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
   kafka-ui:
     image: provectuslabs/kafka-ui
+    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
