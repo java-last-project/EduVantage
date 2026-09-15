@@ -230,9 +230,17 @@ public class AdminServiceImpl implements AdminService
 	}
 
 	@Override
-	public void adminPaymentCancleCourse(int no) {
+	@Transactional
+	public void adminPaymentCancleCourse(int no, int member_id, int course_no) {
+		
+		Map<String, Object> map = new HashMap<>();
+		//member_id, course_no
+		// 매개변수 no : course 주문내역 no
+		map.put("member_id", member_id);
+		map.put("course_no", course_no);
 		
 		aMapper.adminPaymentCancleCourse(no);
+		aMapper.adminDeleteEnrollment(map);
 	}
 
 	@Override

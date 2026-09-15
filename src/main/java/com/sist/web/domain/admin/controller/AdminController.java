@@ -215,9 +215,10 @@ public class AdminController
 	}
 	
 	@PostMapping("/admin/order_course_cancel")
-	public String admin_order_course_cancle(@RequestParam("no") int no, Model model)
+	public String admin_order_course_cancle(@RequestParam("no") int no,@RequestParam("course_no") int course_no,
+			@RequestParam("member_id") int member_id, Model model)
 	{
-		aService.adminPaymentCancleCourse(no);
+		aService.adminPaymentCancleCourse(no, member_id, course_no);
 		
 		return "redirect:/admin/order_course";
 	}

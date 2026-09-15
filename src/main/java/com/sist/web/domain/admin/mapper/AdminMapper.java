@@ -228,6 +228,15 @@ public interface AdminMapper
 	public void adminPaymentCancleCourse(int no);
 	
 	/*
+	 * 	<!-- 강의 결제 내역 환불 시 동시에 수강하는 과목도 취소 처리 -->
+		<delete id="adminDeleteEnrollment" parameterType="hashmap">
+			DELETE FROM course_enrollment 
+			WHERE member_id=#{member_id} and course_no=#{course_no}
+		</delete>
+	 */
+	public void adminDeleteEnrollment(Map<String, Object> map);
+	
+	/*
 	 * <!-- 도서 주문 목록 조회 -->
 		<select id="adminOrderBookListData" parameterType="hashmap" resultType="hashmap">
 			SELECT o.no,
