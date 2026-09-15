@@ -77,17 +77,18 @@
 					style="text-align: center; padding: 50px 0; color: #777;">
 					<i class="fa-solid fa-circle-exclamation"
 						style="font-size: 32px; margin-bottom: 10px;"></i>
-					<p>검색 결과가 없습니다.</p>
+					<p>
+						<span class="fw-bold text-dark">'{{ store.keyword }}' </span>에 대한
+						검색 결과가 없습니다.
+					</p>
 				</div>
 
 				<!-- 페이지네이션 -->
 				<div class="pagination">
-					<span v-if="store.startPage > 1"
-						@click="store.move(store.startPage - 1)">&laquo;</span> <span
-						v-for="i in store.range" :key="i"
-						:class="{ active: i === store.curpage }" @click="store.move(i)">
-						{{ i }} </span> <span v-if="store.endPage < store.totalpage"
-						@click="store.move(store.endPage + 1)">&raquo;</span>
+					<span v-if="store.startPage > 1" @click="store.move(store.startPage - 1)">&laquo;</span> 
+					<span v-for="i in store.range" :key="i" :class="{ active: i === store.curpage }" 
+						@click="store.move(i)"> {{ i }} </span> 
+					<span v-if="store.endPage < store.totalpage" @click="store.move(store.endPage + 1)">&raquo;</span>
 				</div>
 			</main>
 

@@ -1,6 +1,7 @@
 services:
   kafka:
     image: confluentinc/cp-kafka
+    restart: unless-stopped
     ports:
       - "29092:29092"
     environment:
@@ -13,7 +14,7 @@ services:
       # 카프카가 수신할 주소와 포트 설정
       KAFKA_LISTENERS: 'PLAINTEXT://kafka:9092,CONTROLLER://kafka:29093,PLAINTEXT_HOST://0.0.0.0:29092'
       # 클라이언트에게 공개할 리스너 주소
-      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092,PLAINTEXT_HOST://${KAFKA_HOST}:29092'
       # 리스너별 보안 프로토콜 매핑
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
       # 컨트롤러 리스너 이름
@@ -30,6 +31,7 @@ services:
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
   kafka-ui:
     image: provectuslabs/kafka-ui
+    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
@@ -40,6 +42,14 @@ services:
     depends_on:
       - kafka
 
+  # Redis (세션 유지용)
+  redis:
+    image: redis:7-alpine
+    container_name: eduvantage-redis
+    restart: unless-stopped
+    ports:
+      - "7000:6379"
+
   #벡터 DB
   postgres:
     image: pgvector/pgvector:pg16
@@ -48,11 +58,12 @@ services:
     environment:
       POSTGRES_USER: sist1
       POSTGRES_PASSWORD: happy
-      POSTGRES_DB: ragdb
+      POSTGRES_DB: edu
     ports:
       - "5432:5432"
     volumes:
       - pgvector-data:/var/lib/postgresql/data
-      - ./init:/docker-entrypoint-initdb.d
+      - ./init:/docker-entrypoint-initdb.d:ro
+      - ./seed:/seed-data:ro
 volumes:
   pgvector-data:

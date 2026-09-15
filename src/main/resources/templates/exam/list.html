@@ -1,14 +1,10 @@
 <style>
-    .exam-card {
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
-    .exam-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.06) !important;
-    }
     .badge-regular { background-color: #e0f2fe; color: #0284c7; }
     .badge-always  { background-color: #fef3c7; color: #d97706; }
 </style>
+<script th:inline="javascript">
+    const EXAM_LOGGED_IN = /*[[${session.member_id != null}]]*/ false
+</script>
 <div class="app-wrapper">
 <th:block th:replace="~{exam/sidebar::sidebar('examList')}"></th:block>
 
@@ -34,7 +30,7 @@
                 <div class="row g-4">
 
                     <div class="col-md-6">
-                        <div class="card-vertical exam-card shadow-sm border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
+                        <div class="card-vertical exam-card border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
                             <div class="exam-front">
                                 <div class="mb-3">
                                     <i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
@@ -64,7 +60,7 @@
 
 
                     <div class="col-md-6">
-                        <div class="card-vertical exam-card shadow-sm border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
+                        <div class="card-vertical exam-card border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
                             <div class="exam-front">
                                 <div class="mb-3">
                                     <i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
@@ -93,7 +89,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <div class="card-vertical exam-card shadow-sm border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
+                        <div class="card-vertical exam-card border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
                             <div class="exam-front">
                                 <div class="mb-3">
                                     <i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
@@ -122,7 +118,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <div class="card-vertical exam-card shadow-sm border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
+                        <div class="card-vertical exam-card border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
                             <div class="exam-front">
                                 <div class="mb-3">
                                     <i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
@@ -151,7 +147,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <div class="card-vertical exam-card shadow-sm border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
+                        <div class="card-vertical exam-card border rounded-4 p-4 text-center h-100 d-flex flex-column justify-content-center bg-white" style="min-height: 230px;">
                             <div class="exam-front">
                                 <div class="mb-3">
                                     <i class="fa-solid fa-laptop-code fa-3x" style="color: var(--main-color, #0d6efd);"></i>
@@ -182,6 +178,61 @@
                 </div>
             </section>
 
+            <!-- AI 맞춤시험 -->
+            <section class="mb-5">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge px-2 py-1" style="font-size:11px; background-color:#eef2ff; color:#4f46e5;">
+                            AI
+                        </span>
+                        <h5 class="fw-bold mb-0 text-dark">AI 맞춤시험</h5>
+                        <span class="text-muted small ps-2 border-start d-none d-md-inline">
+                            원하는 주제와 키워드로 나만의 시험을 생성할 수 있습니다.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="exam-card border rounded-4 p-4 bg-white d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4">
+                            <div class="d-flex align-items-center gap-4">
+                                <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                                        style="width:70px; height:70px; background-color:#eef2ff;">
+                                    <i class="fa-solid fa-wand-magic-sparkles" style="font-size:28px; color:#4f46e5;"></i>
+                                </div>
+
+                                <div>
+                                    <h5 class="fw-bold text-dark mb-2">
+                                        AI로 원하는 시험을 만들어보세요
+                                    </h5>
+                                    <p class="text-muted small mb-3">
+                                        시험 주제, 세부 키워드, 난이도와 문제 수를 직접 설정할 수 있습니다.
+                                    </p>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="badge bg-light text-secondary border fw-normal px-3 py-2">
+                                            주제 직접 입력
+                                        </span>
+                                        <span class="badge bg-light text-secondary border fw-normal px-3 py-2">
+                                            난이도 선택
+                                        </span>
+                                        <span class="badge bg-light text-secondary border fw-normal px-3 py-2">
+                                            10 · 20 · 30문제
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex-shrink-0">
+                                <a href="/exam/ai/create" class="btn btn-primary fw-bold px-4 py-2 rounded-3">
+                                    <i class="fa-solid fa-wand-magic-sparkles me-1"></i>
+                                    시험 만들기
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- 정기시험 -->
             <section id="scheduled-exam-list">
                 <div class="d-flex align-items-center justify-content-between mb-3">
@@ -191,7 +242,7 @@
                         <span class="text-muted small ps-2 border-start d-none d-md-inline">정해진 접수 및 응시 기간에만 참여 가능한 정기 평가입니다.</span>
                     </div>
 
-                    <div class="d-flex align-items-center gap-2 bg-white px-3 py-1 border rounded-pill shadow-sm">
+                    <div class="d-flex align-items-center gap-2 bg-white px-3 py-1 border rounded-pill">
                         <button type="button" class="btn btn-sm btn-light rounded-circle p-0 d-flex align-items-center justify-content-center"
                                 style="width: 24px; height: 24px;" @click="prevMonth()">
                             <i class="fa-solid fa-chevron-left small" style="font-size: 11px;"></i>
@@ -204,7 +255,7 @@
                     </div>
                 </div>
 
-                <div class="card border shadow-sm rounded-4 overflow-hidden bg-white">
+                <div class="card border rounded-4 overflow-hidden bg-white">
                     <table class="table table-hover align-middle mb-0 text-center">
                         <thead class="table-light border-bottom">
                         <tr class="text-secondary small">
@@ -222,7 +273,7 @@
                             </td>
                             <td class="text-start ps-4 py-3">
                                 <div class="fw-bold text-dark fs-6">{{ exam.title }}</div>
-                                <div class="text-muted small">제한시간 {{ exam.time_limit || 120 }}분 | 100문항</div>
+                                <div class="text-muted small">제한시간 {{ exam.time_limit || 120 }}분 | {{ exam.question_count || 0 }}문항</div>
                             </td>
                             <td class="small text-muted">
                                 <div>{{ exam.open_date.split('T')[0] }}</div>
@@ -235,20 +286,25 @@
                                 </a>
                             </td>
                             <td>
-                                <button v-if="exam.status==='OPEN'"
+								<button v-if="exam.status==='OPEN' && loggedIn"
                                         class="btn btn-sm btn-primary fw-bold px-3 py-1 rounded-2"
                                         @click="takeRegularExam(exam.no)">
                                     응시하기
                                 </button>
+								<button v-else-if="exam.status==='OPEN'"
+								        class="btn btn-sm btn-light border fw-bold px-3 py-1 rounded-2 text-muted" disabled>
+									로그인 필요
+								</button>
                                 <button v-else-if="exam.status==='READY'"
                                         class="btn btn-sm btn-light border fw-bold px-3 py-1 rounded-2 text-muted" disabled>
                                     접수대기
                                 </button>
-                                <button v-else
+								<button v-else-if="exam.has_result"
                                         class="btn btn-sm btn-outline-secondary fw-bold px-3 py-1 rounded-2"
                                         @click="viewResult(exam.no)">
                                     결과확인
                                 </button>
+								<span v-else class="text-muted small">미응시</span>
                             </td>
                         </tr>
 
@@ -298,16 +354,5 @@
         }
     }
 
-    function takeRegularExam(button) {
-        const examNo = button.getAttribute('data-no');
-        if (confirm('정기 시험에 응시하시겠습니까? 바로 시험이 시작됩니다.')) {
-            location.href = `/exam/take?examNo=${examNo}`;
-        }
-    }
-
-    function viewResult(button) {
-        const examNo = button.getAttribute('data-no');
-        location.href = `/exam/result?examNo=${examNo}`;
-    }
 </script>
 <script src="/vue/exam/scheduledExamList.js"></script>

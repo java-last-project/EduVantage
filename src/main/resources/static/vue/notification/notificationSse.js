@@ -43,12 +43,19 @@ function showToast(type, title, content, related_id) {
         badgeEl.classList.add("text-info", "bg-info-subtle")
         iconEl.className = "fa-solid fa-calendar-check"
     }
-    if (type === "POST_COMMENTED") {
+    if (type === "POST_COMMENTED" || type === "COMMENT_REPLIED") {
         toast.addEventListener("click",()=>{
             window.location.href="/freeboard/detail?no="+related_id
         })
         badgeEl.classList.add("text-primary", "bg-primary-subtle")
         iconEl.className = "fa-solid fa-bell"
+    }
+    if (type === "NOTICE_UPLOAD"){
+        toast.addEventListener("click", ()=>{
+            window.location.href="/notice/detail?no="+related_id
+        })
+        badgeEl.classList.add("text-danger", "bg-danger-subtle")
+        iconEl.className = "fa-solid fa-bullhorn";
     }
 
 

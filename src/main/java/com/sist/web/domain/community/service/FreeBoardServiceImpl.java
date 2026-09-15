@@ -55,6 +55,7 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	@Override
 	@Transactional
 	public FreeBoardVO freeBoardDetail(int no) {
+		// 조회수 증가 + 상세 조회 함께 반영
 		fMapper.freeBoardHitIncrement(no);
 		return fMapper.freeBoardDetail(no);
 	}
@@ -62,6 +63,7 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	@Override
 	public void freeBoardInsert(FreeBoardVO vo, HttpSession session) {
 		Integer memberId=(Integer)session.getAttribute("member_id");
+		// 회원 글은 session 식별자 사용, 비회원 글만 수정·삭제 비밀번호 해시
 		if(memberId!=null){
 			vo.setMember_id(memberId);
 			vo.setName(null);
@@ -87,6 +89,7 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	@Override
 	@Transactional
 	public void freeBoardDelete(int no) {
+		// 댓글 선삭제 후 게시글 삭제, FK 정합성 유지
 		cMapper.freeBoardCommentDeleteForBoardDelete(no);
 		fMapper.freeBoardDelete(no);
 	}
@@ -121,7 +124,20 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 		cMapper.freeBoardCommentInsert(vo);
 		FreeBoardVO parentFreeBoard = fMapper.freeBoardInfo(vo.getBoard_no());
 		//이벤트 발행
-		notificationProducer.publishPostCommented(parentFreeBoard.getMember_id(), vo.getBoard_no(), parentFreeBoard.getSubject());
+		if(vo.getParent_no() == 0){
+			notificationProducer.publishPostCommented(parentFreeBoard.getMember_id(), vo.getBoard_no(), parentFreeBoard.getSubject());
+		}else{
+			//본인 게시글에 본인이 단 경우 제외
+			if(parentFreeBoard.getMember_id()!=vo.getMember_id()){
+				notificationProducer.publishPostCommented(parentFreeBoard.getMember_id(), vo.getBoard_no(), parentFreeBoard.getSubject());
+			}
+			//부모댓글 정보
+			FreeCommentVO pvo = cMapper.parentFeeBoardCommentInfo(vo.getParent_no());
+			//본인댓글에 본인이 단 경우 제외
+			if(pvo.getMember_id() != vo.getMember_id()){
+				notificationProducer.publishCommentReplied(pvo.getMember_id(), vo.getBoard_no(), parentFreeBoard.getSubject());
+			}
+		}
 	}
 
 	@Override
@@ -137,6 +153,7 @@ public class FreeBoardServiceImpl implements FreeBoardService {
 	public void freeBoardCommentDelete(int no) {
 		int childCount=cMapper.freeBoardCommentDeleteCount(no);
 		if(childCount>0){
+			// 자식 답글이 있으면 계층 유지를 위해 soft delete
 			cMapper.freeBoardCommentSoftDelete(no);
 		}else{
 			cMapper.freeBoardCommentHardDelete(no);

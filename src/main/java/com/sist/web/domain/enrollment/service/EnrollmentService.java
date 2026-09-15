@@ -24,7 +24,8 @@ public interface EnrollmentService {
 	public CourseVO courseData(int course_no);
 	public double courseStarData(int course_no);
 	public CourseEvaluationVO evaluationMyData(int course_no,int member_id);
-	
+	public Integer enrollmentNoData(Integer member_id,Integer course_no);
+
 	// Qna
 	public List<CourseQnaVO> courseQnaListData(int course_no,int page);
 	//public CourseQnaVO courseQnaRowCount(int course_no);

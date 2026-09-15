@@ -1,5 +1,13 @@
 <!DOCTYPE html>
 <html>
+<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+<script th:inline="javascript">
+	const IMP_CODE = /*[[${impCode}]]*/ 0
+    const SESSION_ID = /*[[${session.member_id}]]*/ 0
+    const COURSE_NO = /*[[${course.no}]]*/ ''
+    const COURSE_TITLE = /*[[${course.title}]]*/ ''
+    const PRICE = /*[[${course.pay_price}]]*/ 0
+</script>
 	<main class="container py-5" style="max-width: 1300px;">
 	    
 	    <div class="mb-4">
@@ -52,8 +60,8 @@
 	                </div>
 	
 	                <div class="d-grid gap-2 mb-4">
-	                    <button type="button" class="btn text-white fw-bold py-3 rounded-3" style="background-color: #212529;">수강 신청하기</button>
-	                    <button type="button" class="btn btn-light fw-bold py-3 rounded-3 border text-dark">장바구니 담기</button>
+	                    <button type="button" class="btn text-white fw-bold py-3 rounded-3" style="background-color: #212529;" id="enrollBtn">수강 신청하기</button>
+	                    <button type="button" class="btn btn-light fw-bold py-3 rounded-3 border text-dark" id="cartBtn">장바구니 담기</button>
 	                </div>
 	
 	                <hr class="text-muted mb-3">
@@ -68,4 +76,100 @@
 	
 	    </div>
 	</main>
+	<script th:inline="javascript">
+		document.getElementById('enrollBtn').addEventListener('click',async()=>{
+			if(!SESSION_ID) {
+				alert("로그인이 필요한 서비스입니다.")
+				return
+			}
+			
+			const enrolledData=await axios.get("/course/enrollment_already",{
+				params:{
+					member_id: SESSION_ID,
+					course_no: COURSE_NO
+				}
+			})
+			if(enrolledData.data.enrolled){
+				if(confirm('이미 수강중인 강의입니다. 마이페이지로 이동하시겠습니까?')){
+					location.href="/mypage/orders?tab=course"
+				}
+				return
+			}
+			
+			const memberData=await axios.get("/member/info_vue")
+			//console.log(memberData)
+			
+			const IMP=window.IMP
+			IMP.init(IMP_CODE)
+			
+			IMP.request_pay({
+				pg: "html5_inicis.INIpayTest",
+	            pay_method: "card",
+	            merchant_uid: "COURSE_"+new Date().getTime(),
+	            name: COURSE_TITLE,
+	            amount: PRICE,
+	            buyer_email: memberData.data.email,
+	            buyer_name: memberData.data.name,
+	            buyer_tel: memberData.data.phone
+			}, async(rsp)=>{
+/* 				if(rsp.success){
+					alert("결제가 성공했습니다")
+				} else {
+					alert("결제가 취소되었습니다")
+				} */
+				const res=await axios.post("/course/enrollment_insert",null,{
+					params:{
+						member_id: SESSION_ID,
+						course_no: COURSE_NO,
+						price: PRICE							
+					}
+
+				})
+				if(confirm('수강 신청이 완료되었습니다! 마이페이지로 이동하시겠습니까?')){
+					location.href="/mypage/orders?tab=course"
+				}
+			})
+		})
+		document.getElementById('cartBtn').addEventListener('click',async()=>{
+			if(!SESSION_ID) {
+				alert("로그인이 필요한 서비스입니다.")
+				return
+			}
+			const enrolledData=await axios.get("/course/enrollment_already",{
+				params:{
+					member_id: SESSION_ID,
+					course_no: COURSE_NO
+				}
+			})
+			if(enrolledData.data.enrolled){
+				if(confirm('이미 수강중인 강의입니다. 마이페이지로 이동하시겠습니까?')){
+					location.href="/mypage/orders?tab=course"
+				}
+				return
+			}
+			const cartData=await axios.get("/course/cart_already",{
+				params:{
+					member_id: SESSION_ID,
+					course_no: COURSE_NO
+				}
+			})
+			if(cartData.data.cart){
+				if(confirm('이미 장바구니에 해당 강의가 있습니다. 마이페이지로 이동하시겠습니까?')){
+					location.href="/mypage/carts?tab=course"
+				}
+				return
+			}
+ 			const res=await axios.post("/course/cart_insert",null,{
+				params:{
+					member_id: SESSION_ID,
+					course_no: COURSE_NO,
+					price: PRICE							
+				}
+
+			})
+			if(confirm('장바구니에 저장되었습니다! 마이페이지로 이동하시겠습니까?')){
+				location.href="/mypage/carts?tab=course"
+			}
+		})
+	</script>
 </html>

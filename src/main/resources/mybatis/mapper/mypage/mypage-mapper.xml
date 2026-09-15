@@ -4,10 +4,12 @@
   <select id="mypageCourseListData" resultType="com.sist.web.domain.enrollment.vo.CourseEnrollmentVO"
   		parameterType="int"
   >
-  	SELECT course_no,is_completed,progress,TO_CHAR(e.regdate,'yyyy-mm-dd') as dbday,title,m.name as instructor,thumbnail
+  	SELECT e.course_no,is_completed,progress,TO_CHAR(e.regdate,'yyyy-mm-dd') as dbday,title,m.name as instructor,thumbnail
 	FROM course_enrollment e JOIN course c ON e.course_no=c.no
 	JOIN member m ON c.instructor_no=m.member_id
+	JOIN course_payment p ON p.member_id=e.member_id AND p.course_no=e.course_no
 	WHERE e.member_id=#{member_id}
+	AND order_status='결제완료'
 	ORDER BY e.regdate DESC
   </select>
   <select id="lastAccessedCourse" resultType="com.sist.web.domain.enrollment.vo.CourseEnrollmentVO"
@@ -37,25 +39,7 @@
 	    	profile_desc=#{profile_desc}
 	    WHERE member_id=#{member_id}
   </update>
+ 
   
-  <select id="coursePaymentListData" resultType="com.sist.web.domain.mypage.vo.CoursePaymentVO" parameterType="int">
-		SELECT p.no,course_no,title,thumbnail,m.name as instructor,price,
-		TO_CHAR(p.regdate,'yyyy-mm-dd hh24:mi:ss') as dbday 
-		FROM course_payment p
-		JOIN course c ON p.course_no=c.no
-		JOIN member m ON c.instructor_no=m.member_id
-		WHERE p.member_id=#{member_id}
-		ORDER BY p.regdate DESC
-		OFFSET #{start} ROWS FETCH NEXT 3 ROWS ONLY
-  </select>
-  
-  <select id="courseCartListData" resultType="com.sist.web.domain.mypage.vo.CourseCartVO" parameterType="int">
-		SELECT a.no,course_no,title,thumbnail,m.name as instructor,pay_price,regular_price
-		FROM course_cart a
-		JOIN course c ON a.course_no=c.no
-		JOIN member m ON c.instructor_no=m.member_id
-		WHERE a.member_id=#{member_id}
-		ORDER BY a.regdate DESC
-		OFFSET #{start} ROWS FETCH NEXT 3 ROWS ONLY
-  </select>
+
 </mapper>

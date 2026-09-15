@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.web.domain.enrollment.mapper.CourseVideoMapper">
+
+    <select id="courseVideoList" resultType="com.sist.web.domain.enrollment.vo.CourseVideoVO" parameterType="int">
+        SELECT no,
+            course_no,
+            vid AS videoId,
+            title,
+            thumbnail,
+            v_order AS vOrder
+        FROM course_video
+        WHERE course_no=#{course_no}
+        ORDER BY v_order
+    </select>
+
+    <insert id="courseVideoInsert" parameterType="com.sist.web.domain.enrollment.vo.CourseVideoVO">
+        INSERT INTO course_video(
+            course_no,
+            vid,
+            title,
+            thumbnail,
+            v_order)
+        VALUES(
+            #{course_no},
+            #{videoId},
+            #{title},
+            #{thumbnail},
+            #{vOrder})
+    </insert>
+
+</mapper>

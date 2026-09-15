@@ -2,6 +2,7 @@ package com.sist.web.domain.mypage.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MyPageController {
 	private final MyPageService mService;
+	
+	@Value("${portone.imp-code}")
+	private String impCode;
 	
 	@GetMapping("/mypage")
 	public String mypage_profile(HttpSession session, Model model) {
@@ -58,6 +62,7 @@ public class MyPageController {
 	public String mypage_carts(HttpSession session, Model model) {
 		int member_id=(int)session.getAttribute("member_id");
 		model.addAttribute("active","carts");
+		model.addAttribute("impCode",impCode);
 		model.addAttribute("main_html","mypage/layout/main");
 		model.addAttribute("mypage_html","mypage/carts");
 		return "main/main";

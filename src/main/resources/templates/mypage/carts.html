@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
 <script th:inline="javascript">
 const SESSION_ID = /*[[${session.member_id}]]*/ 0
+const IMP_CODE = /*[[${impCode}]]*/ 0
 </script>
 </head>
 <body>
@@ -23,22 +25,21 @@ const SESSION_ID = /*[[${session.member_id}]]*/ 0
     </li>
   </ul>
  
-  <div class="card border border-top-0 rounded-top-0" v-if="store.activeTab==='course'">
+  <div class="card border border-top-0 rounded-top-0" v-if="store.activeTab==='course' && store.cCount>0">
     <div class="card-body p-4">
 
       <div class="d-flex justify-content-between align-items-center pb-3 border-bottom">
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="checkAll" checked>
-          <label class="form-check-label" for="checkAll">전체선택 (0/{{store.cCount}})</label>
+          <input class="form-check-input" type="checkbox" :checked="store.isAllSelected" @change="store.toggleCourseAll($event.target.checked)">
+          <label class="form-check-label" for="checkAll">전체선택 ({{store.selectedCount}}/{{store.cCount}})</label>
         </div>
         <div class="d-flex gap-2">
-          <button class="btn btn-outline-secondary btn-sm px-3">선택삭제</button>
-          <button class="btn btn-outline-secondary btn-sm px-3">전체삭제</button>
+          <button class="btn btn-outline-secondary btn-sm px-3" :disabled="store.selectedCount===0" @click="store.deleteSelectedCourse">선택삭제</button>
         </div>
       </div>
 
-      <div class="d-flex align-items-center gap-3 py-3 border-bottom" v-for="(cvo,i) in store.cList" :key="index">
-        <input class="form-check-input flex-shrink-0" type="checkbox" checked>
+      <div class="d-flex align-items-center gap-3 py-3 border-bottom" v-for="(cvo,i) in store.cList" :key="cvo.no">
+        <input class="form-check-input flex-shrink-0" type="checkbox" v-model="cvo.selected">
         <div class="bg-light rounded-2 flex-shrink-0" style="width: 150px; height: 100px;">
         	<img :src="cvo.thumbnail" style="width: 100%">
         </div>
@@ -55,23 +56,82 @@ const SESSION_ID = /*[[${session.member_id}]]*/ 0
             <span class="fw-bold">{{cvo.pay_price}}원</span>
           </div>
         </div>
-        <button class="btn btn-sm text-secondary flex-shrink-0" aria-label="삭제">
+<!--         <button class="btn btn-sm text-secondary flex-shrink-0" aria-label="삭제">
           <i class="bi bi-x-lg"></i>
-        </button>
+        </button> -->
       </div>
  
     <div class="card-footer bg-white d-flex justify-content-between align-items-center p-4">
-      <span class="text-secondary">선택 상품 <span class="fw-bold text-dark">3개</span></span>
+      <span class="text-secondary">선택 상품 <span class="fw-bold text-dark">{{store.selectedCount}}개</span></span>
       <div class="d-flex align-items-center gap-3">
         <div class="text-end">
           <div class="text-secondary" style="font-size: 12px">총 결제금액</div>
-          <div class="fw-bold fs-5">원</div>
+          <div class="fw-bold fs-5">{{store.selectedTotal.toLocaleString()}}원</div>
         </div>
-        <button class="btn btn-dark px-4">선택상품 결제하기</button>
+        <button class="btn btn-dark px-4" :disabled="store.selectedCount===0" @click="store.requestPay">결제하기</button>
       </div>
     </div>
    </div>
   </div>
+<div class="text-center py-5" v-if="store.activeTab==='course' && store.cCount===0">
+  <i class="bi bi-cart-x" style="font-size: 48px; color: #ced4da;"></i>
+  <p class="fw-bold mt-3 mb-1">장바구니가 비어있습니다</p>
+  <p class="text-secondary small mb-4">관심있는 강의를 담아보세요</p>
+  <a href="/course/list" class="btn btn-dark px-4">강의 둘러보기</a>
+</div>
+
+  <div class="card border border-top-0 rounded-top-0" v-if="store.activeTab==='book' && store.bCount>0">
+    <div class="card-body p-4">
+
+      <div class="d-flex justify-content-between align-items-center pb-3 border-bottom">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" :checked="store.isAllSelected" @change="store.toggleBookAll($event.target.checked)">
+          <label class="form-check-label" for="checkAll">전체선택 ({{store.selectedCount}}/{{store.bCount}})</label>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary btn-sm px-3" :disabled="store.selectedCount===0" @click="store.deleteSelectedBook">선택삭제</button>
+        </div>
+      </div>
+
+<div class="d-grid align-items-center gap-3 py-3 border-bottom"
+     style="grid-template-columns: auto 150px 1fr 90px 100px 100px;"
+     v-for="(bvo,i) in store.bList" :key="bvo.no">
+  <input class="form-check-input" type="checkbox" v-model="bvo.selected">
+  <div class="bg-light rounded-2" style="width: 150px; height: 200px; overflow: hidden;">
+    <img :src="bvo.poster" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+  </div>
+  <div style="min-width: 0">
+    <div class="fw-bold text-truncate">{{bvo.title}}</div>
+    <div class="text-secondary small mt-1">{{bvo.publisher}}</div>
+  </div>
+  <div class="text-center">
+    <span class="text-secondary small">수량: </span>
+    <span class="fw-bold">{{bvo.quantity}}</span>
+  </div>
+  <div class="fw-bold text-end">{{bvo.price.toLocaleString()}}원</div>
+  <button class="btn btn-dark btn-sm" @click="store.goToBookCheckout(bvo)">구매하기</button>
+</div>
+ 
+<!--     <div class="card-footer bg-white d-flex justify-content-between align-items-center p-4">
+      <span class="text-secondary">선택 상품 <span class="fw-bold text-dark">{{store.selectedCount}}개</span></span>
+      <div class="d-flex align-items-center gap-3">
+        <div class="text-end">
+          <div class="text-secondary" style="font-size: 12px">총 결제금액</div>
+          <div class="fw-bold fs-5">{{store.selectedTotal.toLocaleString()}}원</div>
+        </div>
+        <button class="btn btn-dark px-4" :disabled="store.selectedCount===0" @click="store.requestPay">결제하기</button>
+      </div>
+    </div> -->
+   </div>
+  </div>
+
+<div class="text-center py-5" v-if="store.activeTab==='book' && store.bCount===0">
+  <i class="bi bi-cart-x" style="font-size: 48px; color: #ced4da;"></i>
+  <p class="fw-bold mt-3 mb-1">장바구니가 비어있습니다</p>
+  <p class="text-secondary small mb-4">관심있는 도서를 담아보세요</p>
+  <a href="/book/list" class="btn btn-dark px-4">도서 둘러보기</a>
+</div>
+  
 </div>
 <script src="/vue/mypage/carts/cartsStore.js"></script>
 <script>
@@ -82,7 +142,9 @@ const SESSION_ID = /*[[${session.member_id}]]*/ 0
     setup(){
       const store=useCartsStore()
       onMounted(()=>{
+    	store.impCode=IMP_CODE
         store.courseCartListData(SESSION_ID)
+        store.booksCartListData(SESSION_ID)
       })
       return {
         store

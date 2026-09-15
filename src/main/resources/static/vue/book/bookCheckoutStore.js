@@ -74,6 +74,7 @@ const useCheckoutStore = defineStore('checkoutStore', {
                 const res = await axios.post('/order/save', orderData);
                 if (res.data.status === 'success') {
                     alert("결제가 완료되었습니다!");
+					await axios.delete('/mypage/book_cart/delete', { params: { book_list: [this.book.no] } });
                     location.href = '/mypage/orders?tab=book';
                 }
             } catch (error) {

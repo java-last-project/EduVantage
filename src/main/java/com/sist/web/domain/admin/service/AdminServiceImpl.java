@@ -4,6 +4,7 @@ import java.util.*;
 import com.sist.web.domain.member.vo.*;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sist.web.domain.admin.mapper.AdminMapper;
 import com.sist.web.domain.course.vo.CourseVO;
@@ -18,7 +19,7 @@ public class AdminServiceImpl implements AdminService
 
 	@Override
 	public int[] getPageData(int page) {
-		// TODO Auto-generated method stub
+		
 		
 		int count = aMapper.getCountMember();
 		
@@ -37,7 +38,7 @@ public class AdminServiceImpl implements AdminService
 	
 	@Override
 	public int[] getPageData(int page, String authority, String enabled) {
-		// TODO Auto-generated method stub
+		
 		int start = (page*10)-10;
 		Map<String, Object> map = new HashMap<>();
 		map.put("authority", authority);
@@ -60,7 +61,7 @@ public class AdminServiceImpl implements AdminService
 
 	@Override
 	public List<Map<String,Object>> adminMemberListData(int page) {
-		// TODO Auto-generated method stub
+		
 		int start = (page*10)-10;
 		
 		return aMapper.adminMemberListData(start);
@@ -68,19 +69,19 @@ public class AdminServiceImpl implements AdminService
 
 	@Override
 	public int getTotalMember() {
-		// TODO Auto-generated method stub
+		
 		return aMapper.getCountMember();
 	}
 
 	@Override
 	public List<Map<String,Object>> adminMemberFindByName(String name) {
-		// TODO Auto-generated method stub
+		
 		return aMapper.adminMemberFindByName(name);
 	}
 
 	@Override
 	public List<Map<String, Object>> adminMemberFilterListData(String authority, String enabled, int page) {
-		// TODO Auto-generated method stub
+		
 		int start = (page*10)-10;
 		Map<String, Object> map = new HashMap<>();
 		map.put("authority", authority);
@@ -91,7 +92,7 @@ public class AdminServiceImpl implements AdminService
 
 	@Override
 	public int getCountFilterMember(String authority, String enabled) {
-		// TODO Auto-generated method stub
+		
 		Map<String, Object> map = new HashMap<>();
 		map.put("authority", authority);
 		map.put("enabled", Integer.parseInt(enabled));
@@ -100,13 +101,13 @@ public class AdminServiceImpl implements AdminService
 
 	@Override
 	public Map<String, Object> adminMemberDetailData(int member_id) {
-		// TODO Auto-generated method stub
+		
 		return aMapper.adminMemberDetailData(member_id);
 	}
 
 	@Override
 	public void adminUpdateMemberEnabled(int enabled, int member_id) {
-		// TODO Auto-generated method stub
+		
 		MemberVO vo = new MemberVO();
 		vo.setEnabled(enabled);
 		vo.setMember_id(member_id);
@@ -115,7 +116,7 @@ public class AdminServiceImpl implements AdminService
 
 	@Override
 	public List<Map<String, Object>> adminCourseListData(int page) {
-		// TODO Auto-generated method stub
+		
 		int start = (page*10)-10;
 		
 		return aMapper.adminCourseListData(start);
@@ -123,19 +124,19 @@ public class AdminServiceImpl implements AdminService
 
 	@Override
 	public int adminGetCountCourse() {
-		// TODO Auto-generated method stub
+		
 		return aMapper.adminGetCountCourse();
 	}
 	
 	@Override
 	public int adminGetCountFindCourse(String title) {
-		// TODO Auto-generated method stub
+		
 		return aMapper.adminGetCountFindCourse(title);
 	}
 
 	@Override
 	public List<Map<String, Object>> adminFindCourseListData(String title, int page) {
-		// TODO Auto-generated method stub
+		
 		int start = (page*10)-10;
 		Map<String, Object> map = new HashMap<>();
 		map.put("title", title);
@@ -146,14 +147,130 @@ public class AdminServiceImpl implements AdminService
 
 	@Override
 	public int adminGetTotalInstCount() {
-		// TODO Auto-generated method stub
+		
 		return aMapper.adminGetTotalInstCount();
 	}
 
 	@Override
 	public List<CourseVO> adminGetBest5Course() {
-		// TODO Auto-generated method stub
+		
 		return aMapper.adminGetBest5Course();
+	}
+
+	@Override
+	public List<Map<String, Object>> adminCoursePaymentListData(int page, String order_status) {
+		
+		Map<String, Object> map = new HashMap<>();
+		int start = (page*10)-10;
+		map.put("start", start);
+		map.put("order_status", order_status);
+		return aMapper.adminCoursePaymentListData(map);
+	}
+
+	@Override
+	public int adminCountCoursePayment(String order_status) {
+		
+		return aMapper.adminCountCoursePayment(order_status);
+	}
+
+	@Override
+	public List<Map<String, Object>> adminExamListData(int page) {
+		
+		int start = (page*10)-10;
+		
+		return aMapper.adminExamListData(start);
+	}
+
+	@Override
+	public int adminExamCount() {
+		
+		return aMapper.adminExamCount();
+	}
+
+	@Override
+	public List<Map<String, Object>> adminQnaListData(int page, int categoryno, String status) {
+		
+		Map<String, Object> map = new HashMap<>();
+		int start = (page*10)-10;
+		
+		map.put("start", start);
+		map.put("categoryno", categoryno);
+		map.put("status", status);
+		
+		return aMapper.adminQnaListData(map);
+	}
+
+	@Override
+	public int adminQnaCount(int categoryno, String status) {
+		
+		Map<String, Object> map = new HashMap<>();
+		map.put("categoryno", categoryno);
+		map.put("status", status);
+		
+		return aMapper.adminQnaCount(map);
+	}
+
+	@Override
+	public Map<String, Object> adminQnaDetailData(int no) {
+		
+		return aMapper.adminQnaDetailData(no);
+	}
+
+	@Override
+	@Transactional
+	public void adminQnaAnswerInsert(int member_id, int no, String content) {
+		
+		Map<String, Object> map = new HashMap<>();
+		map.put("member_id", member_id);
+		map.put("no", no);
+		map.put("content", content);
+		
+		aMapper.adminQnaAnswerInsert(map);
+		aMapper.adminQnaStatusUpdate(no);
+	}
+
+	@Override
+	@Transactional
+	public void adminPaymentCancleCourse(int no, int member_id, int course_no) {
+		
+		Map<String, Object> map = new HashMap<>();
+		//member_id, course_no
+		// 매개변수 no : course 주문내역 no
+		map.put("member_id", member_id);
+		map.put("course_no", course_no);
+		
+		aMapper.adminPaymentCancleCourse(no);
+		aMapper.adminDeleteEnrollment(map);
+	}
+
+	@Override
+	public List<Map<String, Object>> adminOrderBookListData(int page, String order_status) {
+		
+		
+		Map<String, Object> map = new HashMap<>();
+		int start = (page*10)-10;
+		map.put("start", start);
+		map.put("order_status", order_status);
+		
+		return aMapper.adminOrderBookListData(map);
+	}
+
+	@Override
+	public int adminOrderBookCount(String order_status) {
+		
+		return aMapper.adminOrderBookCount(order_status);
+	}
+
+	@Override
+	public void adminPaymentCancleBook(int no) {
+		
+		aMapper.adminPaymentCancleBook(no);
+	}
+
+	@Override
+	public List<Map<String, Object>> adminPaymentDetailListData(int no) {
+		
+		return aMapper.adminPaymentDetailListData(no);
 	}
 
 	
