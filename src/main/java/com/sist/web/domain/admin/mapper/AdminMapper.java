@@ -166,27 +166,142 @@ public interface AdminMapper
 	
 	// 강의 결제 내역 조회
 	/*
-	 * 	<select id="adminCoursePaymentListData" resultType="hashmap" parameterType="int">
+	 * 	<select id="adminCoursePaymentListData" resultType="hashmap" parameterType="hashmap">
 			SELECT P.NO, P.MEMBER_ID, M.NAME, P.COURSE_NO, C.TITLE, TO_CHAR(P.PRICE,'999,999') as price, TO_CHAR(P.REGDATE,'YYYY.MM.DD') AS REGDATE, P.ORDER_STATUS
 			FROM COURSE_PAYMENT P
 			JOIN MEMBER M
 			ON P.MEMBER_ID=M.MEMBER_ID
 			JOIN COURSE C
 			ON P.COURSE_NO=C.NO
+			
+			<where>
+				<if test="order_status=='결제완료'">
+					AND order_status='결제완료'
+				</if>
+				<if test="order_status=='환불대기'">
+					AND order_status='환불대기'
+				</if>
+				<if test="order_status=='취소'">
+					AND order_status='취소'
+				</if>
+				
+			</where>
+			
 			ORDER BY P.REGDATE DESC, P.NO DESC
 			OFFSET #{start} ROWS FETCH NEXT 10 ROWS ONLY
 		</select>
 	 */
-	public List<Map<String, Object>> adminCoursePaymentListData(int start);
+	public List<Map<String, Object>> adminCoursePaymentListData(Map<String, Object> map);
 	
-	// 결제 내역 갯수
-	@Select("SELECT count(*) "
-			+ "FROM COURSE_PAYMENT P "
-			+ "JOIN MEMBER M "
-			+ "ON P.MEMBER_ID=M.MEMBER_ID "
-			+ "JOIN COURSE C "
-			+ "ON P.COURSE_NO=C.NO ")
-	public int adminCountCoursePayment();
+	/*
+	 * <!-- 강의결제내역 갯수 출력 -->
+		<select id="adminCountCoursePayment" parameterType="string">
+			SELECT count(*) 
+			FROM COURSE_PAYMENT P 
+			JOIN MEMBER M 
+			ON P.MEMBER_ID=M.MEMBER_ID 
+			JOIN COURSE C 
+			ON P.COURSE_NO=C.NO
+			<where>
+				<if test="order_status=='결제완료'">
+					AND order_status='결제완료'
+				</if>
+				<if test="order_status=='환불대기'">
+					AND order_status='환불대기'
+				</if>
+				<if test="order_status=='취소'">
+					AND order_status='취소'
+				</if>
+			</where>
+		</select>
+	 */
+	public int adminCountCoursePayment(String order_status);
+	
+	/*
+	 * <!-- 강의결제내역취소처리 -->
+		<update id="adminPaymentCancleCourse" parameterType="int">
+			UPDATE course_payment SET
+			order_status='환불완료'
+			WHERE no=#{no}
+		</update>
+	 */
+	public void adminPaymentCancleCourse(int no);
+	
+	/*
+	 * <!-- 도서 주문 목록 조회 -->
+		<select id="adminOrderBookListData" parameterType="hashmap" resultType="hashmap">
+			SELECT o.no,
+			        o.member_id,
+			        m.name,
+			        TO_CHAR(o.total_price,'999,999') as total_price,
+			        o.order_status,
+			        TO_CHAR(o.regdate,'yyyy-mm-dd hh:mi:ss') as regdate
+			FROM book_order o
+			JOIN member m on o.member_id=m.member_id
+			<where>
+				<if test="order_status=='결제완료'">
+					AND order_status='결제완료'
+				</if>
+				<if test="order_status=='환불대기'">
+					AND order_status='환불대기'
+				</if>
+				<if test="order_status=='환불완료'">
+					AND order_status='환불완료'
+				</if>
+			</where>
+			ORDER BY o.regdate DESC , o.no DESC
+			OFFSET #{start} ROWS FETCH NEXT 10 ROWS ONLY
+		</select>
+	*/
+	public List<Map<String, Object>> adminOrderBookListData(Map<String, Object> map);
+	
+	/*
+		<!-- 도서주문목록갯수 -->
+		<select id="adminOrderBookCount" parameterType="hashmap" resultType="int">
+			SELECT count(*)
+			FROM book_order o
+			JOIN member m on o.member_id=m.member_id
+			<where>
+				<if test="order_status=='결제완료'">
+					AND order_status='결제완료'
+				</if>
+				<if test="order_status=='환불대기'">
+					AND order_status='환불대기'
+				</if>
+				<if test="order_status=='환불완료'">
+					AND order_status='환불완료'
+				</if>
+			</where>
+		</select>
+	 */
+	public int adminOrderBookCount(String order_status);
+	
+	/*
+	 * <!-- 도서결제내역취소처리 -->
+		<update id="adminPaymentCancleBook" parameterType="int">
+			UPDATE book_order SET
+			order_status='환불완료'
+			WHERE no=#{no}
+		</update>
+	 */
+	public void adminPaymentCancleBook(int no);
+	
+	/*
+	 * <!-- 도서주문내역상세 -->
+		<select id="adminPaymentDetailListData" resultType="hashmap" parameterType="int">
+		SELECT o.no,
+		        b.title,
+		        b.poster,
+		        b.author,
+		        d.quantity,
+		        TO_CHAR(d.price, '999,999') AS price
+		FROM book_order_detail d
+		JOIN book_order o ON o.no=d.book_order_no
+		JOIN book b ON b.no=d.book_no
+		WHERE o.no=#{no}
+	</select>
+	 */
+	public List<Map<String, Object>> adminPaymentDetailListData(int no);
 	
 	// 시험관리 - 결과 출력
 	/*

@@ -11,7 +11,8 @@
 			<a href="/admin/member" class="exam-nav-item" th:classappend="${admin_html == 'admin/member' || admin_html == 'admin/member_detail'} ? 'active':''"><i class="fa-solid fa-user"></i> 회원관리</a>
 			<a href="/admin/course" class="exam-nav-item" th:classappend="${admin_html == 'admin/course'} ? 'active':''"><i class="fa-solid fa-book-open"></i> 강의관리</a>
 			<a href="/admin/exam" class="exam-nav-item" th:classappend="${admin_html == 'admin/exam'} ? 'active':''"><i class="fa-solid fa-pen"></i> 시험관리</a>
-			<a href="/admin/order" class="exam-nav-item" th:classappend="${admin_html == 'admin/order'} ? 'active':''"><i class="fa-solid fa-credit-card"></i> 결제/주문 관리</a>
+			<a href="/admin/order_course" class="exam-nav-item" th:classappend="${admin_html == 'admin/order_course'} ? 'active':''"><i class="fa-solid fa-credit-card"></i> 결제/주문 관리 - 강의</a>
+			<a href="/admin/order_book" class="exam-nav-item" th:classappend="${admin_html == 'admin/order_book' || admin_html == 'admin/order_book_detail'} ? 'active':''"><i class="fa-solid fa-credit-card"></i> 결제/주문 관리 - 도서</a>
 			<a href="/admin/notice" class="exam-nav-item"  th:classappend="${admin_html == 'admin/notice' || admin_html == 'admin/notice_insert'} ? 'active':''"><i class="fa-solid fa-bullhorn"></i> 공지사항 관리</a>
 			<a href="/admin/qna" class="exam-nav-item" th:classappend="${admin_html == 'admin/qna' || admin_html == 'admin/qna_detail'} ? 'active':''"><i class="fa-solid fa-comment"></i> 문의하기 답변</a>
 		</nav>
