@@ -90,8 +90,8 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:7000}
 
-    session:
-      store-type: redis
+  session:
+    store-type: redis
 
 mybatis:
   type-aliases-package: com.sist.web.domain
