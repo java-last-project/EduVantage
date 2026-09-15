@@ -52,6 +52,7 @@ Type=simple
 User=ubuntu
 WorkingDirectory=$AGENT_DIR
 EnvironmentFile=$AGENT_ENV
+Environment="KUBECONFIG=/home/ubuntu/.kube/config"
 ExecStart=/usr/bin/java -jar $AGENT_DIR/agent.jar -url $JENKINS_URL -secret \${JENKINS_AGENT_SECRET} -name $AGENT_NAME -webSocket -workDir $AGENT_DIR
 Restart=always
 RestartSec=10
