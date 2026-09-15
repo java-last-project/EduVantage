@@ -2,13 +2,65 @@
 <html>
 
 <style>
-	/* section-card 안에 폼 내용 넣을 때 쓰는 여백용 래퍼 */
-	.section-card-body{ padding:24px; }
-
 	@media (max-width:900px){
 		.price-row{ flex-direction:column; }
 	}
 </style>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+$(function(){
+    $('#thumbnailFile').on('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('key', '32b008a176792bfe995aebee18a27788');
+
+        axios.post('https://api.imgbb.com/1/upload', formData)
+            .then(function(response) {
+                const url = response.data.data.url;
+                $('#thumbnailUrl').val(url);
+                $('#preview').attr('src', url).show();
+                $('#thumbPlaceholder').hide();
+            })
+            .catch(function(error) {
+                console.error('업로드 실패:', error);
+                alert('썸네일 업로드에 실패했습니다.');
+            });
+    });
+
+    // 상세 커리큘럼/안내 이미지 - 여러 장 업로드 (기존 값이 있으면 이어서 관리)
+    let detailImageUrls = $('#imagesUrl').val() ? $('#imagesUrl').val().split('^') : [];
+
+    $('#detailImageFile').on('change', function(e) {
+        const files = Array.from(e.target.files);
+        if (!files.length) return;
+
+        files.forEach(function(file) {
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('key', '32b008a176792bfe995aebee18a27788');
+
+            axios.post('https://api.imgbb.com/1/upload', formData)
+                .then(function(response) {
+                    const url = response.data.data.url;
+                    detailImageUrls.push(url);
+                    $('#imagesUrl').val(detailImageUrls.join('^'));
+
+                    const $slot = $('<div class="image-slot"></div>');
+                    $slot.append($('<img>').attr('src', url));
+                    $('#detailImageSlots').append($slot);
+                })
+                .catch(function(error) {
+                    console.error('업로드 실패:', error);
+                    alert('이미지 업로드에 실패했습니다.');
+                });
+        });
+    });
+});
+</script>
 
 <div class="layout">
 <main class="main">
@@ -24,8 +76,13 @@
 		<div class="section-card-header">썸네일</div>
 		<div class="section-card-body">
 			<div class="thumb-upload">
-				<i class="fa-solid fa-image fa-lg"></i>
-				<span>클릭해서 썸네일 업로드</span>
+			    <div id="thumbPlaceholder" th:style="${vo.thumbnail != null} ? 'display:none;' : ''">
+			        <i class="fa-solid fa-image fa-lg"></i>
+			        <span>클릭해서 썸네일 업로드</span>
+			    </div>
+			    <img id="preview" th:src="${vo.thumbnail}" th:style="${vo.thumbnail != null} ? 'display:block;' : 'display:none;'">
+			    <input type="file" id="thumbnailFile" accept="image/*">
+			    <input type="hidden" name="thumbnail" id="thumbnailUrl" th:value="${vo.thumbnail}">
 			</div>
 		</div>
 	</div>
@@ -36,17 +93,17 @@
 			<div class="form-row">
 				<label>강의명</label>
 				<input type="hidden" th:value="${vo.no}" name="no">
-				
-				<input type="text" class="form-input" th:value="${vo.title}" name="title">
+
+				<input type="text" class="form-input" th:value="${vo.title}" name="title" required>
 			</div>
 			<div class="price-row">
 				<div class="form-row">
 					<label>정가</label>
-					<input type="number" class="form-input" th:value="${vo.regular_price}" name="regular_price">
+					<input type="number" class="form-input" th:value="${vo.regular_price}" name="regular_price" required>
 				</div>
 				<div class="form-row">
 					<label>판매가</label>
-					<input type="number" class="form-input" th:value="${vo.pay_price}" name="pay_price">
+					<input type="number" class="form-input" th:value="${vo.pay_price}" name="pay_price" required>
 				</div>
 			</div>
 		</div>
@@ -55,7 +112,20 @@
 	<div class="section-card">
 		<div class="section-card-header">강의 소개</div>
 		<div class="section-card-body">
-			<textarea class="form-textarea" th:text="${vo.content}" placeholder="html 형식으로 입력..." name="content"></textarea>
+			<textarea class="form-textarea" th:text="${vo.content}" placeholder="html 형식으로 입력..." name="content" required></textarea>
+		</div>
+	</div>
+
+	<div class="section-card">
+		<div class="section-card-header">상세 커리큘럼 및 안내 이미지</div>
+		<div class="section-card-body">
+			<input type="file" id="detailImageFile" accept="image/*" multiple>
+			<input type="hidden" name="images" id="imagesUrl" th:value="${vo.images}">
+			<div class="image-slots" id="detailImageSlots" style="margin-top:12px;">
+				<div class="image-slot" th:each="img : ${vo.images != null ? #strings.arraySplit(vo.images, '^') : {}}" th:if="${img != null and !#strings.isEmpty(img)}">
+					<img th:src="${img}">
+				</div>
+			</div>
 		</div>
 	</div>
 

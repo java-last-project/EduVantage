@@ -19,6 +19,10 @@ spring:
       username: ${VECTOR_DB_USERNAME}
       password: ${VECTOR_DB_PASSWORD}
       driver-class-name: org.postgresql.Driver
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 # web => upload
 
   jpa:
@@ -40,15 +44,27 @@ spring:
     mode: HTML
   # spring AI
   ai:
-    openai:
-      api-key: ${OPENAI_API_KEY}
-      embedding:
-        options:
-            model: text-embedding-3-small
+    model:
+      chat: google-genai
+
+    google:
+      genai:
+        api-key: ${GENAI_API_KEY}
+
+        chat:
+          model: gemini-3.5-flash
+          temperature: 0.4
+
+        embedding:
+          api-key: ${GENAI_API_KEY}
+          project-id: ${GENAI_PROJECT_ID}
+          text:
+            model: gemini-embedding-001
+            dimensions: 768
   # kafka
   kafka:
     # 카프카 브로커 위치
-    bootstrap-servers: localhost:29092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
     listener:
       ack-mode: batch
     producer:
@@ -68,6 +84,15 @@ spring:
         spring.json.trusted.packages: "*"
       # 토픽에 쌓인 과거 메시지부터 다 읽음
       auto-offset-reset: earliest
+  # Redis
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:7000}
+
+    session:
+      store-type: redis
+
 mybatis:
   type-aliases-package: com.sist.web.domain
   mapper-locations: classpath:mybatis/mapper/**/*.xml
@@ -80,3 +105,21 @@ logging:
     org.hibernate.orm.jdbc.bind: TRACE
 # security
 # websocket => kafka
+youtube:
+  api:
+    key: ${YOUTUBE_API_KEY}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<style>
+	/* [새로 추가] 첨부파일 다운로드 버튼 */
+	.file-attach{
+		display:inline-flex;
+		align-items:center;
+		gap:8px;
+		padding:10px 16px;
+		background:#ffffff;
+		border:1px solid var(--border-color);
+		border-radius:8px;
+		color:var(--main-color, #2563eb);
+		text-decoration:none;
+		font-size:14px;
+		font-weight:500;
+	}
+	.file-attach:hover{
+		background:var(--bg-light-blue, #eff6ff);
+		border-color:var(--main-color, #2563eb);
+	}
+	.file-attach i{ font-size:14px; }
+</style>
+
+<div class="layout">
+<main class="main">
+
+    <a href="javascript:history.back()" class="back-link"><i class="fa-solid fa-arrow-left"></i> 새소식 목록으로</a>
+
+    <div class="page-header">
+        <h1 class="page-title">[[${vo.SUBJECT}]]</h1>
+        <p class="page-desc">조회 [[${vo.HIT}]] · [[${vo.REGDATE}]]</p>
+    </div>
+
+    <div th:if="${vo.FILENAME != null}" style="margin-bottom:20px;">
+        <a th:href="@{/instructor/news_download(filename=${vo.FILENAME})}" class="file-attach">
+            <i class="fa-solid fa-paperclip"></i>
+            <span th:text="${vo.filename}">첨부파일</span>
+            <i class="fa-solid fa-download" style="margin-left:4px;"></i>
+        </a>
+    </div>
+
+    <div class="section-card">
+        <div class="section-card-body">
+            <p style="white-space: pre-wrap;">[[${vo.CONTENT}]]</p>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-outline" href="javascript:history.back()">목록으로</a>
+    </div>
+
+</main>
+</div>
+
+</html>

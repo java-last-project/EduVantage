@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<div class="app-wrapper" id="aiExamCreateApp" v-cloak>
+  <th:block th:replace="~{exam/sidebar::sidebar('examList')}"></th:block>
+
+  <main class="main-content py-4 px-4 flex-grow-1" style="min-width:0; padding-bottom:80px;">
+    <div style="max-width:1100px; margin:0 auto;">
+      <div class="border-bottom pb-3 mb-4">
+        <h3 class="fw-bold text-dark mb-1" style="font-size:24px; letter-spacing:-0.5px;">
+          AI 맞춤시험
+        </h3>
+
+        <p class="text-secondary small mb-0">
+          원하는 주제와 난이도를 선택해 새로운 시험을 생성합니다.
+        </p>
+      </div>
+
+      <div class="border rounded-4 bg-white overflow-hidden" style="max-width:850px; margin:0 auto;">
+        <div class="p-4 border-bottom">
+          <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                 style="width:52px; height:52px; background-color:#eef2ff;">
+              <i class="fa-solid fa-wand-magic-sparkles" style="font-size:20px; color:#4f46e5;"></i>
+            </div>
+
+            <div>
+              <h5 class="fw-bold text-dark mb-1">
+                시험 생성 조건
+              </h5>
+
+              <p class="text-muted small mb-0">
+                입력한 조건을 바탕으로 객관식 4지선다 시험을 생성합니다.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4">
+          <div class="mb-4">
+            <label class="form-label fw-bold">
+              시험명
+            </label>
+
+            <input type="text" class="form-control py-2" v-model.trim="form.examName" placeholder="예: Spring 핵심 테스트">
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-bold">
+              주제
+            </label>
+
+			<input type="text" class="form-control py-2" :class="{'is-invalid':subjectError}"
+				   v-model="form.subject" maxlength="50" @input="subjectError=''" placeholder="예: Spring">
+
+			<div v-if="subjectError" class="invalid-feedback d-block">{{subjectError}}</div>
+
+			<div v-else class="form-text">
+              시험 전체의 중심이 되는 기술이나 과목을 입력해주세요.
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-bold">
+              세부 키워드
+            </label>
+
+            <div class="d-flex gap-2">
+			  <input type="text" class="form-control py-2" :class="{'is-invalid':keywordError}"
+					 v-model="keywordInput" maxlength="30" @input="keywordError=''"
+					 @keyup.enter.prevent="addKeyword" placeholder="예: DI/IoC">
+
+              <button type="button" class="btn btn-outline-primary px-4" @click="addKeyword">
+                추가
+              </button>
+            </div>
+			<div v-if="keywordError" class="invalid-feedback d-block">{{keywordError}}</div>
+
+            <div v-if="form.keywords.length" class="d-flex flex-wrap gap-2 mt-3">
+              <button v-for="(keyword,index) in form.keywords" :key="keyword" type="button"
+                      class="btn btn-sm bg-light text-secondary border rounded-pill px-3" @click="removeKeyword(index)">
+                {{keyword}}
+                <i class="fa-solid fa-xmark ms-1"></i>
+              </button>
+            </div>
+
+            <div class="form-text">
+              여러 키워드를 추가하면 문제 범위를 세부적으로 지정할 수 있습니다.
+            </div>
+          </div>
+
+          <div class="row g-4 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-bold">
+                난이도
+              </label>
+
+              <div class="d-flex gap-2">
+                <button v-for="item in difficulties" :key="item.value" type="button"
+                        class="btn flex-fill border py-2" :class="form.difficulty===item.value ? 'btn-primary' : 'btn-light text-secondary'" @click="form.difficulty=item.value">
+                  {{item.label}}
+                </button>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-bold">
+                문제 수
+              </label>
+
+              <div class="d-flex gap-2">
+                <button v-for="count in questionCounts" :key="count" type="button" class="btn flex-fill border py-2"
+                        :class="form.questionCount===count ? 'btn-primary' : 'btn-light text-secondary'" @click="form.questionCount=count">
+                  {{count}}문제
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="border rounded-3 p-3 mb-4" style="background-color:var(--bg-body);">
+            <div class="d-flex align-items-start gap-2">
+              <i class="fa-solid fa-circle-info mt-1" style="color:var(--main-color);"></i>
+              <div class="text-muted small">
+                AI 문제 생성에는 잠시 시간이 걸릴 수 있습니다.
+                생성이 완료되면 바로 시험 응시 화면으로 이동합니다.
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <a href="/exam/list" class="btn btn-light border px-4 py-2">
+              <i class="fa-solid fa-arrow-left me-1"></i>
+              목록으로
+            </a>
+
+            <button type="button" class="btn btn-primary fw-bold px-5 py-2" @click="createExam" :disabled="loading">
+              <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
+
+              <i v-else class="fa-solid fa-wand-magic-sparkles me-1"></i>
+              {{loading?'시험 생성 중...':'AI 시험 생성'}}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const {createApp,ref}=Vue
+
+  createApp({
+    setup(){
+      const loading=ref(false)
+      const keywordInput=ref('')
+	  const subjectError=ref('')
+	  const keywordError=ref('')
+	  const garbageInputs=new Set(['아무거나','몰라','모름','기타','테스트','test','asdf','qwer','ㅋㅋㅋ'])
+
+      const form=ref({
+        examName:'',
+        subject:'',
+        keywords:[],
+        difficulty:2,
+        questionCount:10
+      })
+
+      const difficulties=[
+        {
+          label:'하',
+          value:1
+        },
+        {
+          label:'중',
+          value:2
+        },
+        {
+          label:'상',
+          value:3
+        }
+      ]
+
+      const questionCounts=[10,20,30]
+	  const hasMeaningfulCharacter=(value)=>/[A-Za-z0-9가-힣]/.test(value)
+	  const isGarbageInput=(value)=>garbageInputs.has(value.trim().toLowerCase())
+
+	  const validateSubject=()=>{
+		const subject=form.value.subject.trim()
+		if(subject.length<2 || subject.length>50){
+		  subjectError.value='주제는 2~50자로 입력해주세요.'
+		  return false
+		}
+		if(!hasMeaningfulCharacter(subject) || isGarbageInput(subject)){
+		  subjectError.value='학습 주제를 구체적으로 입력해주세요.'
+		  return false
+		}
+		form.value.subject=subject
+		subjectError.value=''
+		return true
+	  }
+
+	  const validateKeyword=(keyword)=>{
+		if(keyword.length<2 || keyword.length>30){
+		  return '키워드는 2~30자로 입력해주세요.'
+		}
+		if(!hasMeaningfulCharacter(keyword) || isGarbageInput(keyword)){
+		  return '학습 주제와 관련된 구체적인 키워드를 입력해주세요.'
+		}
+		return ''
+	  }
+
+      const addKeyword=()=>{
+        const keyword=keywordInput.value.trim()
+
+        if(!keyword){
+		  keywordError.value='키워드를 입력해주세요.'
+          return
+        }
+
+		if(form.value.keywords.length>=5){
+		  keywordError.value='키워드는 최대 5개까지 입력할 수 있습니다.'
+		  return
+		}
+
+		const validationMessage=validateKeyword(keyword)
+		if(validationMessage){
+		  keywordError.value=validationMessage
+		  return
+		}
+
+		if(form.value.keywords.some(item=>item.toLowerCase()===keyword.toLowerCase())){
+		  keywordError.value='이미 추가된 키워드입니다.'
+          return
+        }
+
+        form.value.keywords.push(keyword)
+        keywordInput.value=''
+		keywordError.value=''
+      }
+
+      const removeKeyword=(index)=>{
+        form.value.keywords.splice(index,1)
+		keywordError.value=''
+      }
+
+      const validateForm=()=>{
+        if(!form.value.examName){
+          alert('시험명을 입력해주세요.')
+          return false
+        }
+
+		const validSubject=validateSubject()
+
+        if(form.value.keywords.length===0){
+		  keywordError.value='키워드는 1~5개 입력해주세요.'
+		  return false
+        }
+		keywordError.value=''
+
+		return validSubject
+      }
+
+      const createExam=async()=>{
+        if(loading.value || !validateForm()){
+          return
+        }
+
+        loading.value=true
+
+        try{
+          const res=await api.post('/exam/ai/generate',
+                  form.value
+          )
+
+          sessionStorage.setItem(
+                  'aiExam',
+                  JSON.stringify({
+                    examName:res.data.examName,
+                    subject:res.data.subject,
+                    difficulty:res.data.difficulty,
+                  })
+          )
+		  location.href='/exam/detail?ai=true&enrollmentNo='+res.data.enrollmentNo
+        }catch(error){
+          console.error('AI 시험 생성 실패:',error)
+
+          const message=
+                  error.response?.data?.detail ||
+                  error.response?.data?.message ||
+                  'AI 시험 생성에 실패했습니다.'
+
+          alert(message)
+        }finally{
+          loading.value=false
+        }
+      }
+
+      return{
+        form,
+        loading,
+        keywordInput,
+		subjectError,
+		keywordError,
+        difficulties,
+        questionCounts,
+        addKeyword,
+        removeKeyword,
+        createExam
+      }
+    }
+  }).mount('#aiExamCreateApp')
+</script>
+
+</html>

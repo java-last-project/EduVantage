@@ -67,7 +67,8 @@
                                     <span v-if="q.QUESTION_TYPE===1" class="badge bg-light text-secondary border me-2">객관식</span>
                                     <span v-else class="badge border me-2" style="background-color: #fffbeb; color: #d97706; border-color: #fde68a;">주관식</span>
 
-                                    <span v-if="q.IS_CORRECT==='Y'" class="badge bg-success">정답 (+{{ q.SCORE }}점)</span>
+									<span v-if="q.QUESTION_TYPE!==1 && q.SCORE>0 && q.SCORE<q.MAX_SCORE" class="badge bg-primary">부분 점수 (+{{ q.SCORE }}점)</span>
+									<span v-else-if="q.IS_CORRECT==='Y'" class="badge bg-success">정답 (+{{ q.SCORE }}점)</span>
                                     <span v-else-if="q.IS_CORRECT==='N'" class="badge bg-danger">오답 (0점)</span>
                                     <span v-else-if="q.IS_CORRECT==='W'" class="badge bg-warning text-dark">채점 대기</span>
                                 </div>
@@ -119,12 +120,49 @@
                             </div>
 
                         </div>
+                        <div v-if="recommendCourses.length>0" class="mt-5 pt-4 border-top">
+                            <div class="mb-3">
+                                <h5 class="fw-bold mb-1">
+                                    <i class="fa-solid fa-wand-magic-sparkles me-2 text-primary"></i>AI 기반 맞춤 강의 추천
+                                </h5>
 
+                                <p class="text-muted small mb-0">
+                                    틀린 문제와 관련성이 높은 학습 내용을 바탕으로 추천한 강의입니다.
+                                </p>
+                            </div>
+
+                            <div class="row g-3">
+                                <div v-for="course in recommendCourses" :key="course.course_no" class="col-md-4">
+                                    <div class="card h-100 border recommend-link" @click="goToCourse(course.course_no)">
+                                        <img v-if="course.thumbnail" :src="course.thumbnail" :alt="course.title"
+                                             class="card-img-top" style="height: 160px; object-fit: cover;">
+
+                                        <div class="card-body">
+                                            <h6 class="fw-bold">
+                                                {{course.title}}
+                                            </h6>
+
+											<div v-if="!isAiExam" class="small text-muted mt-3">
+                                                관련 오답 {{course.matched_count}}문항
+                                            </div>
+
+											<div v-if="!isAiExam" class="small text-muted">
+                                                평균 연관도
+                                                {{Math.round(course.avg_similarity*100)}}%
+                                            </div>
+
+											<div v-else class="small text-muted mt-3">
+												검색 연관도 {{Math.round(course.similarity*100)}}%
+											</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="text-center mt-4">
                             <a href="/exam/list" class="btn btn-outline-secondary px-4 py-2">시험 목록으로 돌아가기</a>
                         </div>
                     </div>
-
                 </div>
         </div>
     </main>
@@ -137,13 +175,15 @@
 </script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <script>
-const {createApp,ref,onMounted,nextTick }=Vue
+const {createApp,ref,onMounted,nextTick}=Vue
 const resultApp=createApp({
     setup() {
         const master=ref({})
         const details=ref([])
         const examTitle=ref('')
         const loading = ref(true)
+        const recommendCourses=ref([])
+		const isAiExam=ref(false)
 
         const sanitizeLatex=(text)=>{
             if (!text) return ''
@@ -152,7 +192,7 @@ const resultApp=createApp({
             return cleaned
         }
 
-        const getOptionText = (q, num) => {
+        const getOptionText=(q, num)=>{
             return q[`OPTION${num}`] || q[`option${num}`] || ''
         }
 
@@ -167,18 +207,21 @@ const resultApp=createApp({
             try {
                 const res=await (typeof api!=='undefined'?api:axios).get('/exam/result_vue?no='+enrollmentNo)
                 master.value=res.data.master || {}
+				isAiExam.value=master.value.EXAM_NO==null && master.value.THEME==null
                 examTitle.value=res.data.examTitle || '시험 결과'
                 const rawDetails=res.data.details || []
-                details.value = rawDetails.map(item => {
-                    const desc = item.DESCRIPTION || item.description || ''
-                    const fixedDesc = sanitizeLatex(desc)
+                details.value=rawDetails.map(item=>{
+                    const desc=item.DESCRIPTION || item.description || ''
+                    const fixedDesc=sanitizeLatex(desc)
                     return {
                         ...item,
                         DESCRIPTION: fixedDesc,
                         description: fixedDesc
                     }
                 })
-                nextTick(() => {
+				await loadRecommendCourses(enrollmentNo)
+
+                nextTick(()=>{
                     if (window.MathJax && window.MathJax.typesetPromise) {
                         MathJax.typesetPromise()
                     }
@@ -188,6 +231,40 @@ const resultApp=createApp({
                 alert('시험 결과를 불러올 수 없습니다.')
             }
         }
+
+		const loadRecommendCourses=async(enrollmentNo)=>{
+            const wrongQuestionNos=[
+                ...new Set(
+                    details.value
+                        .filter(item=>item.IS_CORRECT==='N')
+                        .map(item=>item.QUESTION_NO)
+                )
+            ]
+
+            if(wrongQuestionNos.length===0){
+                recommendCourses.value=[]
+                return
+            }
+
+            try{
+				const endpoint=isAiExam.value
+					?'/exam/result/ai-recommend'
+					:'/exam/result/recommend'
+				const payload=isAiExam.value
+					?{enrollmentNo:Number(enrollmentNo)}
+					:{question_nos:wrongQuestionNos}
+				const res=await (typeof api!=='undefined'?api:axios).post(endpoint,payload)
+
+                recommendCourses.value=res.data || []
+            }catch(err){
+                console.error('추천 강의 조회 실패:',err)
+                recommendCourses.value=[]
+            }
+        }
+        const goToCourse=(no)=>{
+            location.href="/course/detail?no="+no
+        }
+
         onMounted(()=>{
             loadResultData()
         })
@@ -196,7 +273,10 @@ const resultApp=createApp({
             details,
             examTitle,
             loading,
-            getOptionText
+            getOptionText,
+            recommendCourses,
+			isAiExam,
+            goToCourse
         }
     }
 })

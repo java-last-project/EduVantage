@@ -91,7 +91,7 @@
 			<div th:if="${isSearch==true}">검색결과 <b>[[${count}]]</b>건</div>
 			<div th:if="${isSearch==false}">전체 <b>[[${count}]]</b>명 중 <b>[[${startNum}]]-[[${endNum}]]</b> 표시</div>
 			
-			<div th:if="${isSearch==false}" class="page-controls">
+			<div th:if="${isSearch==false && count>10}" class="page-controls">
 				<button th:if="${startPage > 1}" class="page-btn nav"><a th:href="@{/admin/member(page=${startPage-1}, authority=${authority}, enabled=${enabled})}"><i class="fa-solid fa-chevron-left"></i></a></button>
 				<button th:each="i:${#numbers.sequence(startPage,endPage)}" th:class="${curpage==i}?'page-btn active':'page-btn'"><a th:href="@{/admin/member(page=${i}, authority=${authority}, enabled=${enabled})}">[[${i}]]</a></button>
 				<button th:if="${endPage < totalpage}" class="page-btn nav"><a th:href="@{/admin/member(page=${endPage+1}, authority=${authority}, enabled=${enabled})}"><i class="fa-solid fa-chevron-right"></i></a></button>
@@ -102,8 +102,3 @@
 
 </main>
 </div>
-<script>
-	function selectedValue() {
-		this.form.submit()
-	}
-</script>

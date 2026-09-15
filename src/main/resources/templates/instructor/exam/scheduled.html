@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" href="/css/instructor/scheduled-exam.css">
+
+<main class="main scheduled-workspace" id="scheduledExamApp" v-cloak>
+	<header class="page-header">
+		<div>
+			<h1 class="page-title">정기시험 관리</h1>
+			<p class="page-desc">응시 일정과 문제를 구성하고 등록한 시험을 관리합니다.</p>
+		</div>
+		<button type="button" class="btn-primary" @click="store.openCreate" :disabled="store.showForm">
+			<i class="fa-solid fa-plus"></i> 시험 등록
+		</button>
+	</header>
+
+	<div v-if="store.errorMessage" class="scheduled-error" role="alert">
+		<i class="fa-solid fa-circle-exclamation"></i>
+		<span>{{store.errorMessage}}</span>
+	</div>
+
+	<section v-if="store.showForm" class="section-card scheduled-form-card">
+		<div class="section-card-header">
+			<span>{{store.form.no?'정기시험 수정':'새 정기시험 등록'}}</span>
+			<button type="button" class="scheduled-close" aria-label="닫기" @click="store.closeForm">
+				<i class="fa-solid fa-xmark"></i>
+			</button>
+		</div>
+		<div class="section-card-body">
+			<div v-if="store.editingStarted" class="scheduled-notice">
+				진행 중인 시험은 종료 일시만 변경할 수 있습니다.
+			</div>
+
+			<div class="scheduled-form-grid">
+				<div class="form-row scheduled-title-field">
+					<label for="scheduledTitle">시험명</label>
+					<input id="scheduledTitle" v-model.trim="store.form.title" type="text" class="form-input"
+					       maxlength="1000" placeholder="시험명을 입력하세요" :disabled="store.editingStarted">
+				</div>
+				<div class="form-row">
+					<label for="scheduledOpenDate">응시 시작</label>
+					<input id="scheduledOpenDate" v-model="store.form.open_date" type="datetime-local" class="form-input"
+					       :disabled="store.editingStarted">
+				</div>
+				<div class="form-row">
+					<label for="scheduledCloseDate">응시 종료</label>
+					<input id="scheduledCloseDate" v-model="store.form.close_date" type="datetime-local" class="form-input">
+				</div>
+				<div class="form-row">
+					<label for="scheduledTimeLimit">제한시간</label>
+					<div class="scheduled-time-input">
+						<input id="scheduledTimeLimit" v-model.number="store.form.time_limit" type="number" class="form-input"
+						       min="10" max="300" :disabled="store.editingStarted">
+						<span>분</span>
+					</div>
+				</div>
+			</div>
+
+			<div v-if="!store.editingStarted" class="scheduled-question-section">
+				<div class="scheduled-question-heading">
+					<div>
+						<h2>출제 문제</h2>
+						<p>문제은행에서 선택한 문항의 배점 합계가 100점이어야 합니다.</p>
+					</div>
+					<div class="scheduled-score" :class="{'score-complete':store.selectedScore===100}">
+						{{store.form.question_nos.length}}문항 · {{store.selectedScore}}점
+					</div>
+				</div>
+
+				<div class="scheduled-question-tools">
+					<select v-model.number="store.theme" class="form-input scheduled-theme">
+						<option :value="0">전체 과목</option>
+						<option :value="1">정보처리기사</option>
+						<option :value="2">정보보안기사</option>
+						<option :value="3">SQLD</option>
+						<option :value="4">리눅스 마스터</option>
+						<option :value="5">빅데이터 분석기사</option>
+					</select>
+					<div class="scheduled-search">
+						<i class="fa-solid fa-magnifying-glass"></i>
+						<input v-model="store.search" type="search" placeholder="문제 내용 검색">
+					</div>
+				</div>
+
+				<div class="scheduled-question-list">
+					<label v-for="question in store.filteredQuestions" :key="question.no" class="scheduled-question-item">
+						<input v-model="store.form.question_nos" type="checkbox" :value="question.no">
+						<span class="scheduled-question-no">#{{question.no}}</span>
+						<span class="scheduled-question-title">{{question.title}}</span>
+						<span class="scheduled-question-type">{{question.type===1?'객관식':'주관식'}}</span>
+						<strong>{{question.score}}점</strong>
+					</label>
+					<div v-if="store.filteredQuestions.length===0" class="scheduled-empty compact">조건에 맞는 문제가 없습니다.</div>
+				</div>
+			</div>
+
+			<div class="form-actions scheduled-form-actions">
+				<button type="button" class="btn-outline" @click="store.closeForm">취소</button>
+				<button type="button" class="btn-primary" @click="store.saveExam" :disabled="store.saving">
+					{{store.saving?'저장 중...':'저장하기'}}
+				</button>
+			</div>
+		</div>
+	</section>
+
+	<section class="section-card table-card scheduled-list-card">
+		<div class="section-card-header">
+			<span>등록한 시험</span>
+			<span class="scheduled-count">{{store.exams.length}}건</span>
+		</div>
+		<div v-if="store.loading" class="scheduled-loading" aria-label="목록을 불러오는 중입니다.">
+			<div v-for="index in 4" :key="index" class="scheduled-loading-row">
+				<span></span><span></span><span></span><span></span>
+			</div>
+		</div>
+		<div v-else-if="store.exams.length===0" class="scheduled-empty">
+			<i class="fa-regular fa-calendar"></i>
+			<p>등록한 정기시험이 없습니다.</p>
+		</div>
+		<div v-else class="table-responsive">
+			<table>
+				<thead>
+				<tr>
+					<th>시험명</th>
+					<th>응시 기간</th>
+					<th>구성</th>
+					<th>상태</th>
+					<th class="scheduled-action-column">관리</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr v-for="exam in store.exams" :key="exam.no">
+					<td><strong>{{exam.title}}</strong></td>
+					<td>
+						<div>{{formatDate(exam.open_date)}}</div>
+						<div class="scheduled-date-end">~ {{formatDate(exam.close_date)}}</div>
+					</td>
+					<td>{{exam.question_count}}문항 · {{exam.time_limit}}분</td>
+					<td>
+						<span class="scheduled-status" :class="'status-'+exam.status.toLowerCase()">{{statusText(exam.status)}}</span>
+					</td>
+					<td>
+						<div class="card-actions">
+							<button v-if="exam.status!=='CLOSED'" type="button" class="btn-sm-outline" @click="store.openEdit(exam)">수정</button>
+							<button v-if="exam.status==='READY'" type="button" class="btn-sm-danger" @click="store.deleteExam(exam)">삭제</button>
+							<span v-if="exam.status==='CLOSED'" class="scheduled-finished">관리 종료</span>
+						</div>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+</main>
+
+<script src="/vue/exam/instructorScheduledExamStore.js"></script>
+<script>
+    const scheduledExamPinia=Pinia.createPinia()
+    const scheduledExamApp=Vue.createApp({
+        setup(){
+            const store=useInstructorScheduledExamStore()
+            const formatDate=(value)=>{
+                if(!value) return '-'
+                return String(value).replace('T',' ').slice(0,16)
+            }
+            const statusText=(status)=>{
+                if(status==='READY') return '진행 전'
+                if(status==='OPEN') return '진행 중'
+                return '종료'
+            }
+            Vue.onMounted(()=>store.loadExams())
+            return {store,formatDate,statusText}
+        }
+    })
+    scheduledExamApp.use(scheduledExamPinia)
+    scheduledExamApp.mount('#scheduledExamApp')
+</script>
+</html>
