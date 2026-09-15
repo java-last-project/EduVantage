@@ -158,16 +158,19 @@ public class AdminServiceImpl implements AdminService
 	}
 
 	@Override
-	public List<Map<String, Object>> adminCoursePaymentListData(int page) {
+	public List<Map<String, Object>> adminCoursePaymentListData(int page, String order_status) {
 		
+		Map<String, Object> map = new HashMap<>();
 		int start = (page*10)-10;
-		return aMapper.adminCoursePaymentListData(start);
+		map.put("start", start);
+		map.put("order_status", order_status);
+		return aMapper.adminCoursePaymentListData(map);
 	}
 
 	@Override
-	public int adminCountCoursePayment() {
+	public int adminCountCoursePayment(String order_status) {
 		
-		return aMapper.adminCountCoursePayment();
+		return aMapper.adminCountCoursePayment(order_status);
 	}
 
 	@Override
@@ -224,6 +227,50 @@ public class AdminServiceImpl implements AdminService
 		
 		aMapper.adminQnaAnswerInsert(map);
 		aMapper.adminQnaStatusUpdate(no);
+	}
+
+	@Override
+	@Transactional
+	public void adminPaymentCancleCourse(int no, int member_id, int course_no) {
+		
+		Map<String, Object> map = new HashMap<>();
+		//member_id, course_no
+		// 매개변수 no : course 주문내역 no
+		map.put("member_id", member_id);
+		map.put("course_no", course_no);
+		
+		aMapper.adminPaymentCancleCourse(no);
+		aMapper.adminDeleteEnrollment(map);
+	}
+
+	@Override
+	public List<Map<String, Object>> adminOrderBookListData(int page, String order_status) {
+		
+		
+		Map<String, Object> map = new HashMap<>();
+		int start = (page*10)-10;
+		map.put("start", start);
+		map.put("order_status", order_status);
+		
+		return aMapper.adminOrderBookListData(map);
+	}
+
+	@Override
+	public int adminOrderBookCount(String order_status) {
+		
+		return aMapper.adminOrderBookCount(order_status);
+	}
+
+	@Override
+	public void adminPaymentCancleBook(int no) {
+		
+		aMapper.adminPaymentCancleBook(no);
+	}
+
+	@Override
+	public List<Map<String, Object>> adminPaymentDetailListData(int no) {
+		
+		return aMapper.adminPaymentDetailListData(no);
 	}
 
 	
