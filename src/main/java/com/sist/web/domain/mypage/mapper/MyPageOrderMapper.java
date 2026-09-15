@@ -54,11 +54,20 @@ public interface MyPageOrderMapper {
 	@Select("SELECT COUNT(*) FROM book_order WHERE member_id=#{member_id}")
 	public int bookOrderTotalCount(int member_id);
 	
-	// 환불 대기
+	// course 환불 대기
+	@Update("UPDATE course_payment SET order_status='환불대기' "
+			+ "WHERE no=#{no} AND member_id=#{member_id} AND order_status='결제완료'")
+	public void coursePaymentAwaitRefund(
+			@Param("no") int no,
+			@Param("member_id") int member_id
+			);
+	
+	// books 환불 대기
 	@Update("UPDATE book_order SET order_status='환불대기' "
 			+ "WHERE no=#{no} AND member_id=#{member_id} AND order_status='결제완료'")
 	public void bookOrderAwaitRefund(
 			@Param("no") int no,
 			@Param("member_id") int member_id
 			);
+	
 }

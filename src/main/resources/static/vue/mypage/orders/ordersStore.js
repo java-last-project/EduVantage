@@ -70,6 +70,16 @@ const useOrdersStore=defineStore('mypage/orders',{
 			this.bCurpage=1
 			this.booksOrderListData(this.member_id)
 		},
+		courseDataRecv(res){
+			console.log(res.data)
+			this.cList=res.data.cList
+			this.cCurpage=res.data.page
+			this.cTotalpage=res.data.totalpage
+			this.cStartpage=res.data.startpage
+			this.cEndpage=res.data.endpage 
+			this.cCount=res.data.cCount
+			this.cTotalCount=res.data.cTotalCount
+		},
 		bookDataRecv(res){
 			console.log(res.data)
 			this.bList=res.data.bList
@@ -90,6 +100,18 @@ const useOrdersStore=defineStore('mypage/orders',{
 			})
 			this.bookDataRecv(res)
 			this.bTotalCount=res.data.bTotalCount
+		},
+		async courseChangeWaitRefundState(no){
+			//this.member_id=member_id
+			const res=await api.put('/mypage/course_wait_refund_vue',{},{
+				params:{
+					page:this.cCurpage,
+					no:no,
+					order_status:this.cOrderStatus
+				}
+			})
+			this.courseDataRecv(res)
+			alert("환불 요청 처리 되었습니다.")
 		},
 		async booksChangeWaitRefundState(no){
 			//this.member_id=member_id

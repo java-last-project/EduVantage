@@ -11,4 +11,9 @@ public interface CourseService {
 	public int[] coursePageData(int page,String category,String fd);
 	public List<TechStackVO> courseCategoryList();
 	public CourseVO courseDetail(int no);
+
+	//public void courseEnrollmentInsert(int member_id, int course_no, int price);
+	//public int courseEnrollmentAlready(int member_id, int course_no);
+	//public void courseCartInsert(int member_id, int course_no);
+	//public int courseCartAlready(int member_id, int course_no);
 }
