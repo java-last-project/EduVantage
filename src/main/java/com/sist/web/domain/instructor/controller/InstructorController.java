@@ -13,7 +13,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.sist.web.domain.course.vo.CourseVO;
 import com.sist.web.domain.enrollment.vo.CourseQnaReplyVO;
-import com.sist.web.domain.enrollment.vo.CourseQnaVO;
 import com.sist.web.domain.instructor.service.InstructorService;
 import com.sist.web.domain.member.vo.MemberVO;
 
@@ -50,10 +49,9 @@ public class InstructorController {
 	@GetMapping("/instructor/course_detail")
 	public String instructor_course_detail(HttpSession session, @RequestParam("course_no") int course_no, Model model)
 	{
-		//int member_id = (int)session.getAttribute("member_id");
-		 
+		int member_id = (int)session.getAttribute("member_id");
 		List<Map<String,Object>> sList = iService.InstCourseEnrollStudList(course_no);
-		CourseVO vo = iService.InstCourseDetailData(course_no);
+		CourseVO vo = iService.InstCourseDetailData(course_no, member_id);
 		
 		model.addAttribute("vo", vo);
 		model.addAttribute("sList", sList);
@@ -129,10 +127,10 @@ public class InstructorController {
 				file.transferTo(dest);
 				
 			} catch (Exception ex) {
-				// TODO: handle exception
 				ex.printStackTrace();
 				filename = null;
 				filesize = null;
+				//TODO: 알림 추가 예정
 			}
 			
 			iService.instCourseNewsInsert(courseId, subject, content, filename, filesize);
@@ -140,7 +138,7 @@ public class InstructorController {
 		else
 		{
 			
-			iService.instCourseNewsInsert(courseId, subject, content);	// filename, filesize 추가해서 보내주는거 만들어야함
+			iService.instCourseNewsInsert(courseId, subject, content);
 		}
 		
 	    return "redirect:/instructor/news?courseId=" + courseId;
@@ -200,7 +198,8 @@ public class InstructorController {
 	@GetMapping("/instructor/course_edit")
 	public String instructor_course_edit(HttpSession session, @RequestParam("course_no") int course_no, Model model)
 	{
-		CourseVO vo = iService.InstCourseDetailData(course_no);
+		int member_id = (int)session.getAttribute("member_id");
+		CourseVO vo = iService.InstCourseDetailData(course_no, member_id);
 		
 		model.addAttribute("vo", vo);
 		
@@ -387,10 +386,6 @@ public class InstructorController {
 		{
 			CourseQnaReplyVO ans = iService.instQnaAnswerData(no);
 			model.addAttribute("ans", ans);
-		}
-		else if(map.get("STATUS").equals("N"))	// 답변대기일 경우 답변 내용 작성
-		{
-			
 		}
 		
 		model.addAttribute("vo", map);
