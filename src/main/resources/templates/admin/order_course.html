@@ -56,6 +56,8 @@
 					<td style="text-align:right;">
 						<form th:if="${vo.ORDER_STATUS == '환불대기'}" method="post" th:action="@{/admin/order_course_cancel}">
 							<input type="hidden" name="no" th:value="${vo.NO}">
+							<input type="text" name="course_no" th:value="${vo.COURSENO}">
+							<input type="text" name="member_id" th:value="${vo.MEMBERID}">
 							<button type="submit" class="btn-detail">환불처리</button>
 						</form>
 					</td>

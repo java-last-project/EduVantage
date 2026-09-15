@@ -38,7 +38,7 @@ public interface AdminService {
 	
 	public List<Map<String, Object>> adminCoursePaymentListData(int page, String order_status);	// 결제관리 - 강의
 	public int adminCountCoursePayment(String order_status);
-	public void adminPaymentCancleCourse(int no);
+	public void adminPaymentCancleCourse(int no, int member_id, int course_no);
 	
 	public List<Map<String, Object>> adminOrderBookListData(int page, String order_status);
 	public int adminOrderBookCount(String order_status);
