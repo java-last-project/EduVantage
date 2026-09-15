@@ -139,7 +139,35 @@ public class MyPageRestController {
 		return ResponseEntity.ok(map);
 	}
 	
-	// 환불 대기 상태 변경
+	// course 환불 대기 상태 변경
+	@PutMapping("/mypage/course_wait_refund_vue")
+	public ResponseEntity<Map> mypage_course_wait_refund_vue(
+			@RequestParam("page") int page,
+			@RequestParam("no") int no,
+			@RequestParam("order_status") String order_status,
+			HttpSession session
+			){
+		Map map=new HashMap();
+		try {
+			int member_id=(int)session.getAttribute("member_id");
+			mService.coursePaymentAwaitRefund(no, member_id);
+			List<CoursePaymentVO> cList=mService.coursePaymentListData(page,member_id,order_status);
+			int[] pages=mService.pages("course_payment",page, member_id,order_status);
+			map.put("cList", cList);
+			map.put("page", pages[0]);
+			map.put("totalpage", pages[1]);
+			map.put("startpage", pages[2]);
+			map.put("endpage", pages[3]);
+			map.put("cCount", pages[4]);
+			map.put("cTotalCount", mService.coursePaymentTotalCount(member_id));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().build();
+		}
+		return ResponseEntity.ok(map);
+	}
+	
+	// book 환불 대기 상태 변경
 	@PutMapping("/mypage/book_wait_refund_vue")
 	public ResponseEntity<Map> mypage_book_wait_refund_vue(
 			@RequestParam("page") int page,
@@ -159,4 +187,77 @@ public class MyPageRestController {
 		return ResponseEntity.ok(map);
 	}
 	
+	
+	@PostMapping("/course/enrollment_insert")
+	public ResponseEntity<Map> course_enrollment_insert_vue(
+			@RequestParam("member_id") int member_id,
+			@RequestParam("course_no") int course_no,
+			@RequestParam("price") int price
+			) {
+		Map map=new HashMap();
+		try {
+			mService.courseEnrollmentInsert(member_id, course_no, price);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().build();
+		}
+		return ResponseEntity.ok(map);
+	}
+	
+	@GetMapping("/course/enrollment_already")
+	public ResponseEntity<Map> course_enrollment_already(
+			@RequestParam("member_id") int member_id,
+			@RequestParam("course_no") int course_no
+			) {
+		Map map=new HashMap();
+		try {
+			int already=mService.courseEnrollmentAlready(member_id, course_no);
+			if(already==0) {
+				map.put("enrolled", false);
+			}
+			else map.put("enrolled", true);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().build();
+		}
+		return ResponseEntity.ok(map);
+	}
+	
+	@PostMapping("/course/cart_insert")
+	public ResponseEntity<Map> course_cart_insert_vue(
+			@RequestParam("member_id") int member_id,
+			@RequestParam("course_no") int course_no
+			) {
+		Map map=new HashMap();
+		try {
+			mService.courseCartInsert(member_id, course_no);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().build();
+		}
+		return ResponseEntity.ok(map);
+	}
+	
+	@GetMapping("/course/cart_already")
+	public ResponseEntity<Map> course_cart_already(
+			@RequestParam("member_id") int member_id,
+			@RequestParam("course_no") int course_no
+			) {
+		Map map=new HashMap();
+		try {
+			int already=mService.courseCartAlready(member_id, course_no);
+			if(already==0) {
+				map.put("cart", false);
+			}
+			else map.put("cart", true);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().build();
+		}
+		return ResponseEntity.ok(map);
+	}
 }

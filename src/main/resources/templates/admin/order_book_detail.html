@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<div class="layout">
+<main class="main">
+
+	<a href="/admin/order_book" class="back-link"><i class="fa-solid fa-arrow-left"></i> 목록으로</a>
+
+	<div class="page-header">
+		<h1 class="page-title">주문 상세</h1>
+	</div>
+
+	<div class="table-card">
+		<table>
+			<thead>
+				<tr>
+					<th style="width:80px;"></th>
+					<th>도서명</th>
+					<th>저자</th>
+					<th>수량</th>
+					<th>가격</th>
+				</tr>
+			</thead>
+			<tbody>
+
+				<!-- 반복 -->
+				<tr th:each="vo:${list}">
+					<td><img th:src="${vo.POSTER}" style="width:48px; height:64px; object-fit:cover; border-radius:4px;"></td>
+					<td>[[${vo.TITLE}]]</td>
+					<td>[[${vo.AUTHOR}]]</td>
+					<td>[[${vo.QUANTITY}]]</td>
+					<td>[[${vo.PRICE}]]원</td>
+				</tr>
+
+			</tbody>
+		</table>
+	</div>
+
+</main>
+</div>
+
+</html>

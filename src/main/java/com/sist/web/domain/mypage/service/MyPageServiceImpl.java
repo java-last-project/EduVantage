@@ -3,6 +3,7 @@ package com.sist.web.domain.mypage.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sist.web.domain.book.vo.BookOrderDetailVO;
 import com.sist.web.domain.book.vo.BookOrderVO;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class MyPageServiceImpl implements MyPageService {
 	private final MyPageMapper mMapper;
 	private final MyPageOrderMapper oMapper;
+	private final MyPageCartMapper cMapper;
 	
 	@Override
 	public List<CourseEnrollmentVO> mypageCourseListData(int member_id) {
@@ -102,6 +104,45 @@ public class MyPageServiceImpl implements MyPageService {
 	public int coursePaymentTotalCount(int member_id) {
 		// TODO Auto-generated method stub
 		return oMapper.coursePaymentTotalCount(member_id);
+	}
+	@Override
+	public void coursePaymentAwaitRefund(int no, int member_id) {
+		// TODO Auto-generated method stub
+		oMapper.coursePaymentAwaitRefund(no, member_id);
+	}
+	
+	@Override
+	public void courseCartDelete(int member_id, int course_no) {
+		// TODO Auto-generated method stub
+		cMapper.courseCartDelete(member_id, course_no);
+	}
+	
+	
+	@Override
+	@Transactional
+	public void courseEnrollmentInsert(int member_id, int course_no, int price) {
+		// TODO Auto-generated method stub
+		cMapper.coursePaymentInsert(member_id, course_no, price);
+		cMapper.courseCartDelete(member_id, course_no);
+		cMapper.courseEnrollmentInsert(member_id, course_no);
+	}
+
+	@Override
+	public int courseEnrollmentAlready(int member_id, int course_no) {
+		// TODO Auto-generated method stub
+		return cMapper.courseEnrollmentAlready(member_id, course_no);
+	}
+
+	@Override
+	public void courseCartInsert(int member_id, int course_no) {
+		// TODO Auto-generated method stub
+		cMapper.courseCartInsert(member_id, course_no);
+	}
+
+	@Override
+	public int courseCartAlready(int member_id, int course_no) {
+		// TODO Auto-generated method stub
+		return cMapper.courseCartAlready(member_id, course_no);
 	}
 
 }

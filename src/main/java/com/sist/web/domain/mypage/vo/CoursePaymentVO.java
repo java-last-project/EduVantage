@@ -21,4 +21,5 @@ public class CoursePaymentVO {
 	private String title; // 강의명
 	private String instructor; // 강사명
 	private String thumbnail; // 강의 썸네일
+	private int progress; // 진행률
 }

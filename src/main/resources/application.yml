@@ -106,6 +106,9 @@ youtube:
   api:
     key: ${YOUTUBE_API_KEY}
 
+portone:
+  imp-code: ${PORTONE_IMP_CODE}
+
 management:
   endpoints:
     web:

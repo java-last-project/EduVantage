@@ -2,6 +2,8 @@ package com.sist.web.domain.mypage.service;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.sist.web.domain.book.vo.BookOrderVO;
 import com.sist.web.domain.enrollment.vo.*;
 import com.sist.web.domain.member.vo.MemberVO;
@@ -24,8 +26,16 @@ public interface MyPageService {
 	public int[] pages(String type, int page,int member_id,String order_status);
 	
 	public List<CourseCartVO> courseCartListData(int page,int member_id);
+	public void coursePaymentAwaitRefund(int no,int member_id);
 	
 	public List<BookOrderVO> bookOrderListData(int page,int member_id,String order_status);
 	public void bookOrderAwaitRefund(int no,int member_id);
 	public int bookOrderTotalCount(int member_id);
+
+	
+	public void courseEnrollmentInsert(int member_id, int course_no, int price);
+	public int courseEnrollmentAlready(int member_id, int course_no);
+	public void courseCartInsert(int member_id, int course_no);
+	public int courseCartAlready(int member_id, int course_no);
+	public void courseCartDelete(int member_id,int course_no);
 }

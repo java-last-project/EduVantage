@@ -4,10 +4,12 @@
   <select id="mypageCourseListData" resultType="com.sist.web.domain.enrollment.vo.CourseEnrollmentVO"
   		parameterType="int"
   >
-  	SELECT course_no,is_completed,progress,TO_CHAR(e.regdate,'yyyy-mm-dd') as dbday,title,m.name as instructor,thumbnail
+  	SELECT e.course_no,is_completed,progress,TO_CHAR(e.regdate,'yyyy-mm-dd') as dbday,title,m.name as instructor,thumbnail
 	FROM course_enrollment e JOIN course c ON e.course_no=c.no
 	JOIN member m ON c.instructor_no=m.member_id
+	JOIN course_payment p ON p.member_id=e.member_id AND p.course_no=e.course_no
 	WHERE e.member_id=#{member_id}
+	AND order_status='결제완료'
 	ORDER BY e.regdate DESC
   </select>
   <select id="lastAccessedCourse" resultType="com.sist.web.domain.enrollment.vo.CourseEnrollmentVO"

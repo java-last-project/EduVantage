@@ -168,20 +168,38 @@ textarea.form-control {
 	height: 100px;
 }
 
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-submit, .btn-cancel {
+    flex: 1;
+    padding: 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 0;
+    transition: background-color 0.2s;
+}
+
 .btn-submit {
-	width: 100%;
-	padding: 16px;
-	background-color: #5a5cff;
-	color: #fff;
-	border: none;
-	border-radius: 8px;
-	font-size: 16px;
-	font-weight: 700;
-	cursor: pointer;
-	margin-top: 20px;
-	transition: background-color 0.2s;
+    background-color: #5a5cff;
+    color: #fff;
 }
 
 .btn-submit:hover {
-	background-color: #484ae6;
+    background-color: #484ae6;
+}
+
+.btn-cancel {
+    background-color: #e4e6eb;
+    color: #333;
+}
+
+.btn-cancel:hover {
+    background-color: #d8dadf;
 }
