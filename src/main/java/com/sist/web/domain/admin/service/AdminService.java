@@ -3,7 +3,6 @@ package com.sist.web.domain.admin.service;
 import java.util.*;
 
 import com.sist.web.domain.course.vo.CourseVO;
-import com.sist.web.domain.member.vo.MemberVO;
 
 public interface AdminService {
 	
