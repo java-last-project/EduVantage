@@ -21,14 +21,26 @@ pipeline {
 		}
 
 		stage('Build & Test') {
-			steps {
-				// gradlew 권한 없으면 빌드 안됨
-				sh '''
-					chmod +x gradlew
-					./gradlew clean build
-				'''
-			}
-		}
+        	steps {
+        	// Jenkins 환경변수 파일 사용
+        		withCredentials([
+        			file(
+        				credentialsId: 'eduvantage-env',
+        				variable: 'ENV_FILE'
+        			)
+        		]) {
+        			sh '''
+        				chmod +x gradlew
+
+        				set -a
+        				. "$ENV_FILE"
+        				set +a
+
+        				./gradlew clean build
+        			'''
+        		}
+        	}
+        }
 
 		stage('Docker Build') {
 			steps {
