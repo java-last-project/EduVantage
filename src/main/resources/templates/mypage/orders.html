@@ -47,7 +47,7 @@ const SESSION_ID = /*[[${session.member_id}]]*/ 0
 		  </select> -->
 		</div>
 
-      <div class="border rounded-3 mb-3 overflow-hidden" v-for="(cvo,i) in store.cList" :key="index">
+      <div class="border rounded-3 mb-3 overflow-hidden" v-for="(cvo,i) in store.cList" :key="cvo.no">
 
 		<div class="d-flex justify-content-between align-items-center bg-light px-3 py-2">
 		  <div>
@@ -141,7 +141,7 @@ const SESSION_ID = /*[[${session.member_id}]]*/ 0
 		  </select> -->
 		</div>
 
-      <div class="border rounded-3 mb-3 overflow-hidden" v-for="(bvo,i) in store.bList" :key="index">
+      <div class="border rounded-3 mb-3 overflow-hidden" v-for="(bvo,i) in store.bList" :key="bvo.no">
 
 		<div class="d-flex justify-content-between align-items-center bg-light px-3 py-2">
 		  <div>

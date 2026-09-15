@@ -1,11 +1,15 @@
 package com.sist.web.domain.mypage.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
+
+import com.sist.web.domain.book.vo.BookCartVO;
 
 @Mapper
 @Repository
@@ -50,4 +54,15 @@ public interface MyPageCartMapper {
 	public void courseCartDelete(
 			@Param("member_id") int member_id,
 			@Param("course_no") int course_no);
+	
+	public List<BookCartVO> bookCartListData(
+			@Param("member_id") int member_id,
+			@Param("start") int start);
+	public int bookCartRowCount(int member_id);
+	
+	@Delete("DELETE FROM book_cart WHERE member_id=#{member_id} AND book_no=#{book_no}")
+	public void bookCartDelete(
+			@Param("member_id") int member_id,
+			@Param("book_no") int book_no);
+	
 }
