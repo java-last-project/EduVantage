@@ -37,11 +37,27 @@
 	<!-- 새 강의 등록 -->
 	<insert id="instInsertNewCourse" parameterType="com.sist.web.domain.course.vo.CourseVO">
 		INSERT INTO course(
-	        title, instructor_no, star, student_count, pay_price, regular_price, content, thumbnail, images
+	        title, 
+	        instructor_no, 
+	        star, 
+	        student_count, 
+	        pay_price, 
+	        regular_price, 
+	        content, 
+	        thumbnail, 
+	        images
 	    )
 	    VALUES 
 	    (
-	        #{title}, #{instructor_no}, 5, 0, #{pay_price}, #{regular_price}, #{content}, #{thumbnail}, #{images}
+	        #{title}, 
+	        #{instructor_no}, 
+	        5, 
+	        0, 
+	        #{pay_price}, 
+	        #{regular_price}, 
+	        #{content}, 
+	        #{thumbnail}, 
+	        #{images}
 	    )
 	</insert>
 	

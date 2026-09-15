@@ -1,6 +1,5 @@
 package com.sist.web.domain.admin.controller;
 
-import org.apache.naming.StringManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +10,6 @@ import com.sist.web.domain.admin.service.AdminService;
 import com.sist.web.domain.community.service.NoticeBoardService;
 import com.sist.web.domain.community.vo.NoticeBoardVO;
 import com.sist.web.domain.course.vo.CourseVO;
-import com.sist.web.domain.member.vo.MemberVO;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
