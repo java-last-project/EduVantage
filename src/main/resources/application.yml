@@ -105,3 +105,21 @@ logging:
 youtube:
   api:
     key: ${YOUTUBE_API_KEY}
+
+portone:
+  imp-code: ${PORTONE_IMP_CODE}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
