@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.sist.web.domain.enrollment.mapper.EnrollmentNoticeMapper">
+	<select id="courseNoticeListData" resultType="com.sist.web.domain.enrollment.vo.CourseNoticeVO" parameterType="int">
+		SELECT n.no,n.subject,TO_CHAR(n.regdate,'yyyy-mm-dd') as dbday, m.name as instuctor,
+		filename
+		FROM course_notice n
+		JOIN course c ON c.no=n.course_id
+		JOIN member m ON c.instructor_no=m.member_id
+		WHERE course_id=#{course_id}
+		ORDER BY no DESC
+		OFFSET #{start} ROWS FETCH NEXT 5 ROWS ONLY	
+	</select>
+	<select id="courseNoticeRowCount" resultType="int" parameterType="int">
+		SELECT COUNT(*) FROM course_notice WHERE course_id=#{course_id}
+	</select>
+	<select id="courseNoticeDetailData" resultType="com.sist.web.domain.enrollment.vo.CourseNoticeVO">
+		SELECT no,content,hit,filename,filesize
+		FROM course_notice
+		WHERE no=#{no}
+	</select>
+</mapper>

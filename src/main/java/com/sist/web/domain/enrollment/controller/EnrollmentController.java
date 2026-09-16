@@ -77,13 +77,6 @@ public class EnrollmentController {
 		return "enrollment/layout/main";
 	}
 	
-	@GetMapping("/exam")
-	public String enrollment_exam(Model model) {
-		model.addAttribute("menu","exam");
-		model.addAttribute("enrollment_html","enrollment/exam");
-		return "enrollment/layout/main";
-	}
-	
 	@GetMapping("/evaluation")
 	public String enrollment_evaluation(@PathVariable("course_no") int course_no, Model model) {
 		model.addAttribute("menu","evaluation");

@@ -3,9 +3,13 @@ package com.sist.web.domain.mypage.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.sist.web.domain.book.vo.BookCartVO;
 import com.sist.web.domain.book.vo.BookOrderDetailVO;
 import com.sist.web.domain.book.vo.BookOrderVO;
+import com.sist.web.domain.course.service.CourseService;
+import com.sist.web.domain.course.vo.CourseVO;
 import com.sist.web.domain.enrollment.vo.*;
 import com.sist.web.domain.member.vo.MemberVO;
 import com.sist.web.domain.mypage.vo.CourseCartVO;
@@ -19,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 public class MyPageServiceImpl implements MyPageService {
 	private final MyPageMapper mMapper;
 	private final MyPageOrderMapper oMapper;
+	private final MyPageCartMapper cMapper;
+	private final CourseService cService;
 	
 	@Override
 	public List<CourseEnrollmentVO> mypageCourseListData(int member_id) {
@@ -59,7 +65,7 @@ public class MyPageServiceImpl implements MyPageService {
 		if(type.equals("course_payment")) count=oMapper.coursePaymentRowCount(member_id,order_status);
 		else if(type.equals("course_cart")) count=oMapper.courseCartRowCount(member_id);
 		else if(type.equals("book_order")) count=oMapper.bookOrderRowCount(member_id,order_status);
-		else if(type.equals("book_cart")) count=oMapper.courseCartRowCount(member_id);
+		else if(type.equals("book_cart")) count=cMapper.bookCartRowCount(member_id);
 		
 		int totalpage=(int)Math.ceil(count/3.0);
 		final int BLOCK=10;
@@ -102,6 +108,70 @@ public class MyPageServiceImpl implements MyPageService {
 	public int coursePaymentTotalCount(int member_id) {
 		// TODO Auto-generated method stub
 		return oMapper.coursePaymentTotalCount(member_id);
+	}
+	@Override
+	public void coursePaymentAwaitRefund(int no, int member_id) {
+		// TODO Auto-generated method stub
+		oMapper.coursePaymentAwaitRefund(no, member_id);
+	}
+	
+	@Override
+	public void courseCartDelete(int member_id, int course_no) {
+		// TODO Auto-generated method stub
+		cMapper.courseCartDelete(member_id, course_no);
+	}
+	
+	
+	@Override
+	@Transactional
+	public void courseEnrollmentInsert(int member_id, int course_no, int price) {
+		// TODO Auto-generated method stub
+		cMapper.coursePaymentInsert(member_id, course_no, price);
+		cMapper.courseCartDelete(member_id, course_no);
+		cMapper.courseEnrollmentInsert(member_id, course_no);
+	}
+
+	@Override
+	public int courseEnrollmentAlready(int member_id, int course_no) {
+		// TODO Auto-generated method stub
+		return cMapper.courseEnrollmentAlready(member_id, course_no);
+	}
+
+	@Override
+	public void courseCartInsert(int member_id, int course_no) {
+		// TODO Auto-generated method stub
+		cMapper.courseCartInsert(member_id, course_no);
+	}
+
+	@Override
+	public int courseCartAlready(int member_id, int course_no) {
+		// TODO Auto-generated method stub
+		return cMapper.courseCartAlready(member_id, course_no);
+	}
+	
+	@Override
+	@Transactional
+	public void courseCartCheckout(int member_id, List<Integer> cList) {
+		// TODO Auto-generated method stub
+		for(int cno: cList) {
+			if(cMapper.courseEnrollmentAlready(member_id, cno) > 0) continue;
+			CourseVO vo=cService.courseDetail(cno);
+			cMapper.coursePaymentInsert(member_id, cno, vo.getPay_price());
+			cMapper.courseCartDelete(member_id, cno);
+			cMapper.courseEnrollmentInsert(member_id, cno);
+		}
+	}
+	@Override
+	public List<BookCartVO> bookCartListData(int member_id, int page) {
+		// TODO Auto-generated method stub
+		final int ROWSIZE=3;
+		int start=(page*ROWSIZE)-ROWSIZE;
+		return cMapper.bookCartListData(member_id, start);
+	}
+	@Override
+	public void bookCartDelete(int member_id, int book_no) {
+		// TODO Auto-generated method stub
+		cMapper.bookCartDelete(member_id, book_no);
 	}
 
 }

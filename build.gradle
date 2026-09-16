@@ -30,8 +30,7 @@ dependencies {
 	// k3s
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	// Redis
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.springframework.session:spring-session-data-redis'
+	implementation 'org.springframework.boot:spring-boot-starter-session-data-redis'
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'

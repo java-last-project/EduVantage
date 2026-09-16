@@ -2,12 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sist.web.domain.mypage.mapper.MyPageOrderMapper">
   <select id="coursePaymentListData" resultType="com.sist.web.domain.mypage.vo.CoursePaymentVO" parameterType="int">
-		SELECT p.no,course_no,title,thumbnail,m.name as instructor,price,
-		TO_CHAR(p.regdate,'yyyy-mm-dd hh24:mi:ss') as dbday, order_status
+		SELECT p.no, p.course_no, c.title, c.thumbnail, m.name AS instructor,
+		       p.price, TO_CHAR(p.regdate,'yyyy-mm-dd hh24:mi:ss') AS dbday,
+		       p.order_status, e.progress
 		FROM course_payment p
-		JOIN course c ON p.course_no=c.no
-		JOIN member m ON c.instructor_no=m.member_id
-		WHERE p.member_id=#{member_id}
+		JOIN course c ON p.course_no = c.no
+		JOIN member m ON c.instructor_no = m.member_id
+		LEFT JOIN course_enrollment e
+		       ON e.course_no = p.course_no
+		      AND e.member_id = p.member_id
+		WHERE p.member_id = #{member_id}
 	    <if test="order_status != null and order_status != ''">
 	        AND p.order_status = #{order_status}
 	    </if>		

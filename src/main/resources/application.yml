@@ -19,6 +19,10 @@ spring:
       username: ${VECTOR_DB_USERNAME}
       password: ${VECTOR_DB_PASSWORD}
       driver-class-name: org.postgresql.Driver
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 # web => upload
 
   jpa:
@@ -86,9 +90,6 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:7000}
 
-    session:
-      store-type: redis
-
 mybatis:
   type-aliases-package: com.sist.web.domain
   mapper-locations: classpath:mybatis/mapper/**/*.xml
@@ -104,18 +105,3 @@ logging:
 youtube:
   api:
     key: ${YOUTUBE_API_KEY}
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health
-  endpoint:
-    health:
-      probes:
-        enabled: true
-  health:
-    livenessstate:
-      enabled: true
-    readinessstate:
-      enabled: true

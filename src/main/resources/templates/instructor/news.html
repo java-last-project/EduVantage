@@ -34,7 +34,7 @@
 				<tr th:each="vo : ${list}">
                 <td>[[${vo.NO}]]</td>
                 <td class="qna-title-text"><a class="plain-link" th:href="@{/instructor/news_detail(no=${vo.NO})}">[[${vo.SUBJECT}]]</a></td>
-                <td class="date-text">[[${vo.FILENAME != null ? vo.FILENAME : '-'}]]</td>
+                <td class="date-text">[[${vo.FILENAME != null ? vo.filename : '-'}]]</td>
                 <td class="views-text">[[${vo.HIT}]]</td>
                 <td class="date-text">[[${vo.REGDATE}]]</td>
             </tr>
