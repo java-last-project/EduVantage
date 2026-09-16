@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.sist.web.domain.course.service.CourseService;
 import com.sist.web.domain.course.vo.CourseVO;
 import com.sist.web.domain.enrollment.service.EnrollmentService;
+import com.sist.web.domain.enrollment.vo.CourseEnrollmentVO;
 import com.sist.web.domain.enrollment.vo.CourseEvaluationVO;
 
 import lombok.RequiredArgsConstructor;
@@ -28,13 +29,22 @@ public class EnrollmentController {
 	private final YoutubeService yService;
 
 	@ModelAttribute
-    public void setCourseNo(@PathVariable("course_no") int course_no, Model model) {
-        model.addAttribute("course_no", course_no);
+    public void setCourseNo(@PathVariable("course_no") int course_no, HttpSession session, Model model) {
+		int member_id=(int)session.getAttribute("member_id");
+		model.addAttribute("course_no", course_no);
         model.addAttribute("title", eService.courseTitleData(course_no));
+		//CourseEnrollmentVO evo=eService.courseEnrollmentDetailData(member_id, course_no);
+		//model.addAttribute("evo",evo);
+		model.addAttribute("progress",eService.courseEnrollmentDetailData(member_id, course_no).getProgress());
     }
 
 	@GetMapping
-	public String enrollment_dashboarad(@PathVariable("course_no") int course_no, Model model) {
+	public String enrollment_dashboarad(
+			@PathVariable("course_no") int course_no, 
+			HttpSession session,
+			Model model) {
+		int member_id=(int)session.getAttribute("member_id");
+		eService.lastAccessedUpdate(member_id, course_no);
 		CourseVO vo=eService.courseDetailData(course_no);
 		model.addAttribute("vo",vo);
 		model.addAttribute("menu","dashboard");
@@ -79,6 +89,9 @@ public class EnrollmentController {
 	
 	@GetMapping("/evaluation")
 	public String enrollment_evaluation(@PathVariable("course_no") int course_no, Model model) {
+		if((int)model.getAttribute("progress")<80) {
+			return "redirect:/enrollment/"+course_no;
+		}
 		model.addAttribute("menu","evaluation");
 		model.addAttribute("enrollment_html","enrollment/evaluation");
 		return "enrollment/layout/main";
