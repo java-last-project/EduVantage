@@ -1,10 +1,13 @@
 package com.sist.web.domain.enrollment.restcontroller;
 
+import java.io.*;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,9 +20,11 @@ import com.sist.web.domain.course.vo.CourseVO;
 import com.sist.web.domain.enrollment.service.EnrollmentService;
 import com.sist.web.domain.enrollment.vo.CourseEvaluationLikeVO;
 import com.sist.web.domain.enrollment.vo.CourseEvaluationVO;
+import com.sist.web.domain.enrollment.vo.CourseNoticeVO;
 import com.sist.web.domain.enrollment.vo.CourseQnaReplyVO;
 import com.sist.web.domain.enrollment.vo.CourseQnaVO;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
@@ -304,5 +309,72 @@ public class EnrollmentRestController {
 			return ResponseEntity.internalServerError().build();
 		}
 		return ResponseEntity.ok(map);
+	}
+	
+	// Notice
+	@GetMapping("/enrollment/notice_vue")
+	public ResponseEntity notice_vue(
+			@RequestParam("page") int page,
+			@RequestParam("course_no") int course_no
+			) {
+		Map map=new HashMap();
+		try {
+			//map=commonsQnaListData(page, course_no);
+			List<CourseNoticeVO> nList=eService.courseNoticeListData(course_no, page); 
+			int[] pages=eService.noticePages(page, course_no);
+			map.put("nList", nList);
+			
+			map.put("page", pages[0]);
+			map.put("totalpage", pages[1]);
+			map.put("startpage", pages[2]);
+			map.put("endpage", pages[3]);
+			map.put("nCount", pages[4]);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().build();
+		}
+		return ResponseEntity.ok(map);
+	}
+	
+	@GetMapping("/enrollment/notice_detail_vue")
+	public ResponseEntity notice_detail_vue(
+			@RequestParam("no") int no
+			) {
+		Map map=new HashMap();
+		try {
+			CourseNoticeVO curNvo=eService.courseNoticeDetailData(no);
+			map.put("curNvo", curNvo);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().build();
+		}
+		return ResponseEntity.ok(map);
+	}
+	
+	// 파일 다운로드
+	@GetMapping("/enrollment/notice_download")
+	public void notice_download(
+			@RequestParam("filename") String filename,
+			HttpServletResponse response
+			) throws IOException {
+		String uploadDir=System.getProperty("user.dir")+File.separator+
+				"uploads"+File.separator+
+				"courseNews"+File.separator;
+		File file = new File(uploadDir+filename);
+		if(!file.exists()) {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
+		String encodeFilename=URLEncoder.encode(filename,"UTF-8").replaceAll("\\+", "%20");
+		
+		response.setContentType("application/octet-stream");
+	    response.setHeader("Content-Disposition", "attachment; filename=\"" +
+	    		encodeFilename + "\"");
+	    response.setContentLengthLong(file.length());
+
+	    try (FileInputStream fis = new FileInputStream(file);
+	    	OutputStream os = response.getOutputStream()) {
+	    		FileCopyUtils.copy(fis, os);
+	    	}
 	}
 }

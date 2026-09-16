@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import com.sist.web.domain.course.vo.CourseVO;
 import com.sist.web.domain.enrollment.vo.CourseEvaluationLikeVO;
 import com.sist.web.domain.enrollment.vo.CourseEvaluationVO;
+import com.sist.web.domain.enrollment.vo.CourseNoticeVO;
 import com.sist.web.domain.enrollment.vo.CourseQnaReplyVO;
 import com.sist.web.domain.enrollment.vo.CourseQnaVO;
 
@@ -35,4 +36,9 @@ public interface EnrollmentService {
 	public void courseQnaInsert(CourseQnaVO vo);
 	public int courseQnaDelete(int no,int member_id);
 	public int courseQnaUpdate(CourseQnaVO vo);
+	
+	// Notice
+	public List<CourseNoticeVO> courseNoticeListData(int course_id,int page);
+	public int[] noticePages(int page,int course_no);
+	public CourseNoticeVO courseNoticeDetailData(int no);
 }
