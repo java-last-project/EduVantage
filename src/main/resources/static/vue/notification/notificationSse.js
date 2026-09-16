@@ -31,7 +31,7 @@ function showToast(type, title, content, related_id) {
     const titleSectionEl = document.createElement("div")
     titleSectionEl.className = "d-flex gap-2 d-inline-flex align-items-center justify-content-center"
     const badgeEl = document.createElement("span")
-    badgeEl.className = "position-relative text-decoration-none px-1 py-1 rounded-circle"
+    badgeEl.className = "position-relative text-center text-decoration-none px-1 py-1 rounded-circle"
     badgeEl.style.width = "32px"
     badgeEl.style.height = "32px"
     const iconEl = document.createElement("i")
@@ -55,6 +55,13 @@ function showToast(type, title, content, related_id) {
             window.location.href="/notice/detail?no="+related_id
         })
         badgeEl.classList.add("text-danger", "bg-danger-subtle")
+        iconEl.className = "fa-solid fa-bullhorn";
+    }
+    if (type === "QNA_REPLIED"){
+        toast.addEventListener("click", ()=>{
+            window.location.href="/qna/detail?no="+related_id
+        })
+        badgeEl.classList.add("text-primary", "bg-primary-subtle")
         iconEl.className = "fa-solid fa-bullhorn";
     }
 

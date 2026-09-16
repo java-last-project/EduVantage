@@ -15,7 +15,7 @@
             activeTab: null,
             tabs: ['커뮤니티', '도서', '공지사항', '강의', '시험'],
             tabTypeMap: {
-                '커뮤니티': ['POST_COMMENTED', 'COMMENT_REPLIED'],
+                '커뮤니티': ['POST_COMMENTED', 'COMMENT_REPLIED', 'QNA_REPLIED'],
                 '도서': [],
                 '공지사항': ['NOTICE_UPLOAD'],
                 '강의': ['COURSE_COMPLETED'],
@@ -85,9 +85,12 @@
                         window.location.href="/freeboard/detail?no="+notification.related_id
                     }
                     if(notification.type === "NOTICE_UPLOAD"){
+                        window.location.href="/notice/detail?no="+notification.related_id
+                    }
+                    if(notification.type === "QNA_REPLIED"){
                         console.log(notification)
                         console.log(notification.related_id)
-                        window.location.href="/notice/detail?no="+notification.related_id
+                        window.location.href="/qna/detail?no="+notification.related_id
                     }
                 }
             },
