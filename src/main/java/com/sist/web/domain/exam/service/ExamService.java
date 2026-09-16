@@ -9,11 +9,11 @@ public interface ExamService {
 	public List<ExamQuestionVO> examDetailData(Integer examNo,Integer theme,int count);
 	public ExamEnrollmentVO getOrCreateEnrollment(int memberId, Integer examNo, Integer theme);
 	public String getExamTitle(Integer examNo);
-	public Map<String, Object> submitExam(Map<String, Object> params);
-	public List<Map<String, Object>> getPendingSubjectiveList(int graderId);
-	public boolean claimTask(int answerNo, int graderId);
-	public void releaseClaim(int answerNo, int graderId);
-	public void gradeSubjective(int enrollmentNo, int answerNo, int graderId, int score);
-	public Map<String, Object> getExamResultData(int enrollmentNo);
+	public int getExamLimitMinutes(Integer examNo);
+	public Map<String, Object> submitExam(int memberId,Map<String, Object> params);
+	public Map<String, Object> getExamResultData(int memberId,int enrollmentNo);
+	public Integer getScheduledExamResult(int memberId,int examNo);
 	public List<Map<String, Object>> getMyExamList(int memberId);
+	public ExamEnrollmentVO createAiEnrollment(Integer memberId, List<Integer> questionNos);
+	public Map<String,Object> getAiExamDetailData(int memberId,int enrollmentNo);
 }

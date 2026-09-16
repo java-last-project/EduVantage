@@ -331,6 +331,14 @@
 	justify-content: center;
 	color: #999;
 	border-radius: 12px;
+	overflow: hidden; 
+}
+
+.desc-image img {
+	max-width: 100%;
+	height: auto;
+	-webkit-image-rendering: -webkit-optimize-contrast;
+	image-rendering: crisp-edges;
 }
 
 /* 댓글 영역 틀 */

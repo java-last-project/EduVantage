@@ -101,6 +101,7 @@ public class QnaServiceImpl implements QnaService {
 	@Override
 	@Transactional
 	public void qnaReplyInsert(QnaReplyVO vo, Integer qnaNo) {
+		// 답변 저장 + 문의 상태 변경 함께 반영
 		Map<String,Object> map=new HashMap<>();
 		map.put("qnaNo", qnaNo);
 		map.put("status", "Y");
@@ -120,6 +121,7 @@ public class QnaServiceImpl implements QnaService {
 	@Override
 	@Transactional
 	public void qnaReplyDelete(int no, Integer qnaNo) {
+		// 답변 삭제 시 문의 상태도 답변 대기로 복구
 		Map<String,Object> map=new HashMap<>();
 		map.put("qnaNo", qnaNo);
 		map.put("status", "N");

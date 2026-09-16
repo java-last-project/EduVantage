@@ -4,8 +4,10 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import com.sist.web.domain.exam.vo.ExamUserAnswerVO;
-import com.sist.web.domain.notification.mapper.ScheduledExamMapper;
+import com.sist.web.domain.exam.vo.ScheduledExamVO;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.sist.web.domain.exam.mapper.ExamMapper;
 import com.sist.web.domain.exam.vo.ExamEnrollmentVO;
@@ -17,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class ExamServiceImpl implements ExamService{
+	private static final int EXAM_LIMIT_MINUTES=120;
+	private static final int SUBMIT_GRACE_SECONDS=30;
 	private final ExamMapper eMapper;
 	
 	@Override
@@ -37,6 +41,27 @@ public class ExamServiceImpl implements ExamService{
 		map.put("exam_no",examNo);
 		map.put("theme",theme!=null&&theme!=0?theme:null);
 
+		if(examNo!=null && examNo>0){
+			ScheduledExamVO svo=eMapper.getScheduledExam(examNo);
+			if(svo==null){
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND,"존재하지 않는 시험입니다.");
+			}
+			LocalDateTime now=LocalDateTime.now();
+			if(now.isBefore(svo.getOpen_date())){
+				throw new ResponseStatusException(HttpStatus.CONFLICT,"아직 응시 기간이 아닙니다.");
+			}
+			if(now.isAfter(svo.getClose_date())){
+				throw new ResponseStatusException(HttpStatus.CONFLICT,"응시 기간이 종료되었습니다.");
+			}
+			if(eMapper.countScheduledExamQuestions(examNo)==0){
+				throw new ResponseStatusException(HttpStatus.CONFLICT,"등록된 시험 문제가 없습니다.");
+			}
+			if(eMapper.findCompletedEnrollment(map)!=null){
+				throw new ResponseStatusException(HttpStatus.CONFLICT,"이미 응시를 완료한 시험입니다.");
+			}
+		}
+
+		// 제한 시간 내 재접속 시 기존 응시 기록 유지
 		ExamEnrollmentVO activeVo=eMapper.findActiveEnrollment(map);
 		if(activeVo!=null){
 			return activeVo;
@@ -57,25 +82,87 @@ public class ExamServiceImpl implements ExamService{
 	}
 
 	@Override
+	public int getExamLimitMinutes(Integer examNo){
+		if(examNo!=null && examNo>0){
+			ScheduledExamVO svo=eMapper.getScheduledExam(examNo);
+			if(svo!=null && svo.getTime_limit()!=null){
+				return svo.getTime_limit();
+			}
+		}
+		return EXAM_LIMIT_MINUTES;
+	}
+
+	@Override
 	@Transactional
-	public Map<String, Object> submitExam(Map<String, Object> params) {
-		int enrollmentNo=(Integer)params.get("enrollmentNo");
+	public Map<String, Object> submitExam(int memberId,Map<String, Object> params) {
+		Object rawEnrollmentNo=params.get("enrollmentNo");
+		if(rawEnrollmentNo==null){
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"응시기록 번호가 없습니다.");
+		}
+		int enrollmentNo;
+		try{
+			enrollmentNo=Integer.parseInt(String.valueOf(rawEnrollmentNo));
+		}catch(NumberFormatException ex){
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"잘못된 응시기록 번호입니다.");
+		}
+		Map<String,Object> enrollmentParams=new HashMap<>();
+		enrollmentParams.put("enrollmentNo",enrollmentNo);
+		enrollmentParams.put("memberId",memberId);
+		ExamEnrollmentVO enrollment=eMapper.getEnrollmentForMember(enrollmentParams);
+		if(enrollment==null){
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND,"존재하지 않는 응시기록입니다.");
+		}
+		if(enrollment.getEndtime()!=null){
+			throw new ResponseStatusException(HttpStatus.CONFLICT,"이미 제출이 완료된 시험입니다.");
+		}
+		int limitMinutes=getExamLimitMinutes(enrollment.getExam_no());
+		if(enrollment.getStarttime()==null || LocalDateTime.now().isAfter(
+				enrollment.getStarttime().plusMinutes(limitMinutes).plusSeconds(SUBMIT_GRACE_SECONDS))){
+			throw new ResponseStatusException(HttpStatus.CONFLICT,"시험 제한 시간이 종료되었습니다.");
+		}
+		if(enrollment.getExam_no()!=null && enrollment.getExam_no()>0){
+			ScheduledExamVO svo=eMapper.getScheduledExam(enrollment.getExam_no());
+			if(svo==null || LocalDateTime.now().isAfter(svo.getClose_date())){
+				throw new ResponseStatusException(HttpStatus.CONFLICT,"응시 기간이 종료되었습니다.");
+			}
+		}
+
 		Map<String,Object> raw=(Map<String,Object>)params.get("answers");
 		if(raw==null || raw.isEmpty()){
-			throw new IllegalArgumentException("제출된 답안이 없습니다");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"제출된 답안이 없습니다.");
 		}
 		List<Integer> qno=new ArrayList<>();
-		for(String key:raw.keySet()){
-			qno.add(Integer.parseInt(key));
+		try{
+			for(String key:raw.keySet()){
+				qno.add(Integer.parseInt(key));
+			}
+		}catch(NumberFormatException ex){
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"잘못된 문제 번호가 포함되어 있습니다.");
 		}
-		List<ExamQuestionVO> questions=eMapper.getQuestionForGrading(qno);
+		Map<String,Object> questionParams=new HashMap<>();
+		questionParams.put("exam_no",enrollment.getExam_no());
+		questionParams.put("theme",enrollment.getTheme());
+		questionParams.put("qno",qno);
+		boolean aiExam=enrollment.getExam_no()==null && enrollment.getTheme()==null;
+		if(aiExam){
+			questionParams.put("enrollment_no",enrollmentNo);
+		}
+		List<ExamQuestionVO> questions=eMapper.getQuestionForGrading(questionParams);
+		if(questions.isEmpty()){
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"채점할 시험 문제가 없습니다.");
+		}
 
-		int totalCount=questions.size();
-		double pointPerQuestion=100.0/totalCount;
+		Set<Integer> questionNoSet=new HashSet<>();
+		for(ExamQuestionVO qvo:questions){
+			questionNoSet.add(qvo.getNo());
+		}
+		if(!questionNoSet.containsAll(qno)){
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"시험에 포함되지 않은 문제가 있습니다.");
+		}
 
 		// 채점
 		List<ExamUserAnswerVO> answers=new ArrayList<>();
-		double rawTotalScore=0.0;
+		int totalScore=0;
 		boolean hasSubjective=false;
 
 		for(ExamQuestionVO qvo:questions){
@@ -90,12 +177,15 @@ public class ExamServiceImpl implements ExamService{
 				boolean isCorrect=qvo.getAnswer()!=null && qvo.getAnswer().trim().equals(userAns);
 				if(isCorrect){
 					avo.setIs_correct("Y");
-					avo.setScore((int)Math.round(pointPerQuestion));
-					rawTotalScore+=pointPerQuestion;
+					avo.setScore(qvo.getScore());
+					totalScore+=qvo.getScore();
 				}else{
 					avo.setIs_correct("N");
 					avo.setScore(0);
 				}
+			}else if(qvo.getType()==2 && userAns.isBlank()){
+				avo.setIs_correct("N");
+				avo.setScore(0);
 			}else{
 				avo.setIs_correct("W");
 				avo.setScore(0);
@@ -104,84 +194,56 @@ public class ExamServiceImpl implements ExamService{
 			answers.add(avo);
 		}
 
+		// 답안 저장 + 응시 상태 함께 반영
 		if(!answers.isEmpty()){
+			if(aiExam){
+				eMapper.deleteUserAnswers(enrollmentNo);
+			}
 			eMapper.insertUserAnswers(answers);
 		}
 
-		int finalScore=(int)Math.round(rawTotalScore);
-
 		ExamEnrollmentVO evo=new ExamEnrollmentVO();
 		evo.setNo(enrollmentNo);
+		evo.setMember_id(memberId);
 		evo.setEndtime(LocalDateTime.now());
-		evo.setTotalscore(finalScore);
+		evo.setTotalscore(totalScore);
 		evo.setStatus(hasSubjective?"WAITING":"COMPLETE");
 
-		eMapper.updateEnrollmentFinish(evo);
+		if(eMapper.updateEnrollmentFinish(evo)==0){
+			throw new ResponseStatusException(HttpStatus.CONFLICT,"이미 제출이 완료된 시험입니다.");
+		}
 
 		Map<String,Object> result=new HashMap<>();
 		result.put("status",evo.getStatus());
 		result.put("enrollmentNo",enrollmentNo);
-		result.put("totalscore",finalScore);
+		result.put("totalscore",totalScore);
 		return result;
 	}
 
 	@Override
-	public List<Map<String, Object>> getPendingSubjectiveList(int graderId) {
-		return eMapper.selectPendingSubjectiveList(graderId);
-	}
-
-	@Override
-	@Transactional
-	public boolean claimTask(int answerNo, int graderId) {
-		Map<String,Object> map=new HashMap<>();
-		map.put("answerNo",answerNo);
-		map.put("graderId",graderId);
-		return eMapper.claimGradingTask(map)>0;
-	}
-
-	@Override
-	@Transactional
-	public void releaseClaim(int answerNo, int graderId) {
-		Map<String,Object> map=new HashMap<>();
-		map.put("answerNo",answerNo);
-		map.put("graderId",graderId);
-		eMapper.releaseGradingClaim(map);
-	}
-
-	@Override
-	@Transactional
-	public void gradeSubjective(int enrollmentNo, int answerNo, int graderId, int score) {
-		Map<String, Object> map = new HashMap<>();
-		map.put("answerNo", answerNo);
-		map.put("graderId", graderId);
-		map.put("score", score);
-		eMapper.gradeSubjectiveAnswer(map);
-
-		int remain=eMapper.countRemainingPending(enrollmentNo);
-		if(remain==0){
-			eMapper.finalizeEnrollmentScore(enrollmentNo);
-		}
-	}
-
-	@Override
-	public Map<String, Object> getExamResultData(int enrollmentNo) {
-		Map<String,Object> map=eMapper.selectExamResultMaster(enrollmentNo);
+	public Map<String, Object> getExamResultData(int memberId,int enrollmentNo) {
+		Map<String,Object> params=new HashMap<>();
+		params.put("memberId",memberId);
+		params.put("enrollmentNo",enrollmentNo);
+		Map<String,Object> map=eMapper.selectExamResultMaster(params);
 		if(map==null){
-			throw new IllegalArgumentException("존재하지 않는 응시기록입니다.");
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND,"존재하지 않는 응시기록입니다.");
 		}
 		List<Map<String,Object>> details=eMapper.selectExamResultDetails(enrollmentNo);
-		Object rawExamNo = map.get("EXAM_NO") != null ? map.get("EXAM_NO") : map.get("exam_no");
-		Integer examNo = null;
-		if (rawExamNo != null && !String.valueOf(rawExamNo).isEmpty()) {
-			examNo = Integer.parseInt(String.valueOf(rawExamNo));
+		// MyBatis Map key 대소문자 차이 대응
+		Object rawExamNo=map.get("EXAM_NO")!=null ? map.get("EXAM_NO") : map.get("exam_no");
+		Integer examNo=null;
+		if (rawExamNo!=null && !String.valueOf(rawExamNo).isEmpty()) {
+			examNo=Integer.parseInt(String.valueOf(rawExamNo));
 		}
 
-		String examTitle="상시 모의고사";
+		Object rawTheme=map.get("THEME")!=null ? map.get("THEME") : map.get("theme");
+		String examTitle=rawTheme==null?"AI 맞춤시험":"상시 모의고사";
 		if (examNo!=null && examNo>0) {
 			String sTitle=eMapper.getScheduledExamTitle(examNo);
 			if (sTitle!=null) examTitle=sTitle;
 		}
-		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> response=new HashMap<>();
 		response.put("master", map);
 		response.put("examTitle", examTitle);
 		response.put("details", details);
@@ -189,8 +251,63 @@ public class ExamServiceImpl implements ExamService{
 	}
 
 	@Override
+	public Integer getScheduledExamResult(int memberId,int examNo){
+		Map<String,Object> map=new HashMap<>();
+		map.put("member_id",memberId);
+		map.put("exam_no",examNo);
+		ExamEnrollmentVO vo=eMapper.findCompletedEnrollment(map);
+		return vo!=null?vo.getNo():null;
+	}
+
+	@Override
 	public List<Map<String, Object>> getMyExamList(int memberId) {
 		return eMapper.selectMyExamList(memberId);
+	}
+
+	@Override
+	@Transactional
+	public ExamEnrollmentVO createAiEnrollment(Integer memberId, List<Integer> questionNos) {
+		if(memberId==null || questionNos==null || questionNos.isEmpty()){
+			throw new IllegalArgumentException("AI 시험 응시정보가 올바르지 않습니다.");
+		}
+		ExamEnrollmentVO vo=new ExamEnrollmentVO();
+		vo.setMember_id(memberId);
+		vo.setStarttime(LocalDateTime.now());
+		eMapper.insertEnrollment(vo);
+
+		Map<String,Object> map=new HashMap<>();
+		map.put("enrollmentNo",vo.getNo());
+		map.put("questionNos",questionNos);
+		eMapper.insertAiExamQuestions(map);
+		return vo;
+	}
+
+	@Override
+	public Map<String,Object> getAiExamDetailData(int memberId,int enrollmentNo) {
+		Map<String,Object> params=new HashMap<>();
+		params.put("memberId",memberId);
+		params.put("enrollmentNo",enrollmentNo);
+
+		ExamEnrollmentVO enrollment=eMapper.getEnrollmentForMember(params);
+		if(enrollment==null || enrollment.getExam_no()!=null || enrollment.getTheme()!=null){
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND,"존재하지 않는 AI 시험입니다.");
+		}
+		if(enrollment.getEndtime()!=null){
+			throw new ResponseStatusException(HttpStatus.CONFLICT,"이미 제출이 완료된 시험입니다.");
+		}
+
+		List<ExamQuestionVO> questions=eMapper.examDetailDataByEnrollment(params);
+		if(questions.isEmpty()){
+			throw new ResponseStatusException(HttpStatus.CONFLICT,"AI 시험에 연결된 문제가 없습니다.");
+		}
+
+		Map<String,Object> result=new HashMap<>();
+		result.put("enrollmentNo",enrollment.getNo());
+		result.put("startTime",enrollment.getStarttime());
+		result.put("timeLimitMinutes",EXAM_LIMIT_MINUTES);
+		result.put("count",questions.size());
+		result.put("list",questions);
+		return result;
 	}
 
 }

@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eduvantage
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: eduvantage
+  template:
+    metadata:
+      labels:
+        app: eduvantage
+    spec:
+      containers:
+        - name: eduvantage
+          image: kisd09/eduvantage:latest
+          ports:
+            - containerPort: 9090
+
+          env:
+            - name: TZ
+              value: Asia/Seoul
+
+          envFrom:
+            - secretRef:
+                name: eduvantage-secret
+            - configMapRef:
+                name: eduvantage-config
+
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 9090
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 18
+
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 9090
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 6
+
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 9090
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3

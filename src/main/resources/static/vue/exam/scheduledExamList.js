@@ -6,6 +6,7 @@ const scheduledExamApp = createApp({
     setup(){
         //정기시험 목록, 반응형 선언 DOM바로 반영
         const sList = ref([])
+		const loggedIn = ref(typeof EXAM_LOGGED_IN!=='undefined' && EXAM_LOGGED_IN)
 
         //params
         const year = ref(new Date().getFullYear())
@@ -65,10 +66,31 @@ const scheduledExamApp = createApp({
         }
         //다음 페이지
         const nextPage = () => {
-            if(page.value >= totalpage.value) return
+            if(page.value >= totalpage.value-1) return
             page.value += 1
             scheduledExamListData()
         }
+
+		const takeRegularExam = (examNo) => {
+			if(!loggedIn.value) return
+			if(confirm('정기 시험에 응시하시겠습니까? 바로 시험이 시작됩니다.')){
+				location.href=`/exam/detail?examNo=${examNo}`
+			}
+		}
+
+		const viewResult = async (examNo) => {
+			try{
+				const res=await api.get('/exam/scheduled_result_vue',{params:{examNo}})
+				location.href=`/exam/result?no=${res.data.enrollmentNo}`
+			}catch(error){
+				console.error(error)
+				if(error.response?.status===404){
+					alert('해당 시험의 응시 결과가 없습니다.')
+					return
+				}
+				alert('시험 결과를 불러오지 못했습니다.')
+			}
+		}
 
         //알림등록 및 취소
         const examNotiRegister = async (exam) => {
@@ -107,7 +129,7 @@ const scheduledExamApp = createApp({
             scheduledExamListData()
         })
 
-        return {sList,year,month, page, totalpage, prevMonth, nextMonth, prevPage, nextPage, examNotiRegister}
+        return {sList,loggedIn,year,month, page, totalpage, prevMonth, nextMonth, prevPage, nextPage, examNotiRegister, takeRegularExam, viewResult}
     }
 })
 

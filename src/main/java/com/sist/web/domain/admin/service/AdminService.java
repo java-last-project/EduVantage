@@ -3,7 +3,6 @@ package com.sist.web.domain.admin.service;
 import java.util.*;
 
 import com.sist.web.domain.course.vo.CourseVO;
-import com.sist.web.domain.member.vo.MemberVO;
 
 public interface AdminService {
 	
@@ -36,5 +35,26 @@ public interface AdminService {
 	// 대시보드 출력용
 	public int adminGetTotalInstCount();	// 총 강사수
 	public List<CourseVO> adminGetBest5Course();	// 수강생 수 Best 5 강좌
+	
+	public List<Map<String, Object>> adminCoursePaymentListData(int page, String order_status);	// 결제관리 - 강의
+	public int adminCountCoursePayment(String order_status);
+	public void adminPaymentCancleCourse(int no, int member_id, int course_no);
+	
+	public List<Map<String, Object>> adminOrderBookListData(int page, String order_status);
+	public int adminOrderBookCount(String order_status);
+	public void adminPaymentCancleBook(int no);
+	public List<Map<String, Object>> adminPaymentDetailListData(int no);
+	
+	public List<Map<String, Object>> adminExamListData(int page);
+	public int adminExamCount();
+	
+	public List<Map<String, Object>> adminQnaListData(int page, int categoryno, String status);
+	public int adminQnaCount(int categoryno, String status);
+	
+	public Map<String, Object> adminQnaDetailData(int no);
+	
+	public void adminQnaAnswerInsert(int member_id, int no, String content);
+	
+	
 	
 }

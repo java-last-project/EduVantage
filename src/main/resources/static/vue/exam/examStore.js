@@ -7,7 +7,9 @@ const initialState=()=>({
 	enrollmentNo:null,
 	username:'',
 	examNo:null,
-	title:''
+	title:'',
+	startTime:null,
+	timeLimitMinutes:120
 })
 const useExamStore=defineStore('exam_store',{
     state:initialState,
@@ -22,13 +24,19 @@ const useExamStore=defineStore('exam_store',{
 	            const res=await api.post('/exam/detail_vue', {
 	                theme: this.theme,
 	                count: this.count,
-					examNo: this.examNo
+					examNo: this.examNo,
+					ai: params?.ai ?? false,
+					enrollmentNo: params?.enrollmentNo ?? null,
+					examName: params?.examName ?? null
 	            })
 	            this.enrollmentNo=res.data.enrollmentNo
 				this.title=res.data.title
+				this.startTime=res.data.startTime
+				this.timeLimitMinutes=res.data.timeLimitMinutes || 120
 	            this.list=res.data.list
 			}catch(error){
-			console.error(error)
+				console.error(error)
+				throw error
 			}
 		}
 	}

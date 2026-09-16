@@ -12,4 +12,8 @@ import lombok.Data;
 @Data
 public class BookOrderDetailVO {
 	private int no, book_order_no, book_no, quantity, price;
+	
+	//JOIN 컬럼
+	private String title;
+	private String poster;
 }

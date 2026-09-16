@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.web.domain.exam.mapper.AiExamMapper">
+
+    <insert id="insertAiQuestion" parameterType="com.sist.web.domain.exam.vo.ExamQuestionVO"
+            useGeneratedKeys="true" keyProperty="no" keyColumn="no">
+        INSERT INTO exam_question(
+            title,
+            answer,
+            description,
+            type,
+            difficulty,
+            score,
+			ai_topic,
+			ai_keywords
+        )
+        VALUES(
+            #{title},
+             #{answer},
+            #{description},
+            #{type},
+            #{difficulty},
+			#{score},
+			#{ai_topic},
+			#{ai_keywords}
+        )
+    </insert>
+    <insert id="insertAiOption" parameterType="com.sist.web.domain.exam.vo.ExamOptionVO">
+        INSERT INTO exam_option(
+            question_no,
+            option1,
+            option2,
+            option3,
+            option4
+        )
+        VALUES(
+            #{question_no},
+            #{option1},
+            #{option2},
+            #{option3},
+            #{option4}
+        )
+    </insert>
+</mapper>

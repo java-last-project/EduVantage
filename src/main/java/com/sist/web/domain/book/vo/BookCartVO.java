@@ -17,4 +17,5 @@ public class BookCartVO {
 	private String title;
     private String poster;
     private int price;
+    private String publisher;
 }

@@ -66,7 +66,6 @@ function showToast(type, title, content, related_id) {
     }
 
 
-
     const titleEl = document.createElement("strong")
     titleEl.textContent = title
 

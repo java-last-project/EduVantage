@@ -15,10 +15,11 @@ import lombok.Data;
 public class CoursePaymentVO {
 	private int no,member_id,course_no,price;
 	private Date regdate;
-	private String dbday;
+	private String order_status,dbday;
 	
 	// JOIN 컬럼
 	private String title; // 강의명
 	private String instructor; // 강사명
 	private String thumbnail; // 강의 썸네일
+	private int progress; // 진행률
 }

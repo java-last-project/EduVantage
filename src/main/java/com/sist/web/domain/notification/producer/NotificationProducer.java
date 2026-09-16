@@ -36,9 +36,9 @@ public class NotificationProducer {
     /**
      * [WHAT] 내 댓글에 대댓글 알림, 카프카 토픽에 넣는 역할
      */
-    public void publishCommentReplied(int memberId, int postNo, String qnaTitle){
+    public void publishCommentReplied(int memberId, int qnaNo, String qnaTitle){
         kafkaTemplate.send(NotificationTopics.COMMENT_REPLIED, new NotificationEventVO(
-                memberId, postNo, qnaTitle, UUID.randomUUID().toString()
+                memberId, qnaNo, qnaTitle, UUID.randomUUID().toString()
         ));
     }
 
