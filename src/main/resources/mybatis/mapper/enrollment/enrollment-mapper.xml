@@ -89,7 +89,7 @@
 		WHERE MEMBER_ID=#{member_id}
 		AND COURSE_NO=#{course_no}
 	</select>
-	
+
 	
 
 </mapper>
