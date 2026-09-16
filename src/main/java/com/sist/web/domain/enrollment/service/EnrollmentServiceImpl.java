@@ -9,6 +9,7 @@ import com.sist.web.domain.course.vo.CourseVO;
 import com.sist.web.domain.enrollment.mapper.EnrollmentMapper;
 import com.sist.web.domain.enrollment.mapper.EnrollmentNoticeMapper;
 import com.sist.web.domain.enrollment.mapper.EnrollmentQnaMapper;
+import com.sist.web.domain.enrollment.vo.CourseEnrollmentVO;
 import com.sist.web.domain.enrollment.vo.CourseEvaluationLikeVO;
 import com.sist.web.domain.enrollment.vo.CourseEvaluationVO;
 import com.sist.web.domain.enrollment.vo.CourseNoticeVO;
@@ -188,6 +189,16 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 	public CourseNoticeVO courseNoticeDetailData(int no) {
 		// TODO Auto-generated method stub
 		return nMapper.courseNoticeDetailData(no);
+	}
+	@Override
+	public CourseEnrollmentVO courseEnrollmentDetailData(int member_id, int course_no) {
+		// TODO Auto-generated method stub
+		return eMapper.courseEnrollmentDetailData(member_id, course_no);
+	}
+	@Override
+	public void lastAccessedUpdate(int member_id, int course_no) {
+		// TODO Auto-generated method stub
+		eMapper.lastAccessedUpdate(member_id, course_no);
 	}
 
 }

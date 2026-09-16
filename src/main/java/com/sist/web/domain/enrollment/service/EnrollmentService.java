@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.sist.web.domain.course.vo.CourseVO;
+import com.sist.web.domain.enrollment.vo.CourseEnrollmentVO;
 import com.sist.web.domain.enrollment.vo.CourseEvaluationLikeVO;
 import com.sist.web.domain.enrollment.vo.CourseEvaluationVO;
 import com.sist.web.domain.enrollment.vo.CourseNoticeVO;
@@ -13,6 +14,7 @@ import com.sist.web.domain.enrollment.vo.CourseQnaVO;
 
 public interface EnrollmentService {
 	public CourseVO courseDetailData(int course_no);
+	public CourseEnrollmentVO courseEnrollmentDetailData(int member_id,int course_no);
 	public List<CourseEvaluationVO> evaluationListData(int page,int course_no,int member_id);
 	public String courseTitleData(int course_no);
 	//public int evaluationCount(int course_no);
@@ -26,6 +28,8 @@ public interface EnrollmentService {
 	public double courseStarData(int course_no);
 	public CourseEvaluationVO evaluationMyData(int course_no,int member_id);
 	public Integer enrollmentNoData(Integer member_id,Integer course_no);
+	
+	public void lastAccessedUpdate(int member_id,int course_no);
 
 	// Qna
 	public List<CourseQnaVO> courseQnaListData(int course_no,int page);
