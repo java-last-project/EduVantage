@@ -27,6 +27,7 @@ public class ExamGradingServiceImpl implements ExamGradingService {
     @Override
     @Transactional
     public boolean claimTask(int answerNo, int graderId) {
+        // 선점 여부는 조건부 UPDATE 결과로 판단해 중복 채점 방지
         return gradingMapper.claimGradingTask(gradingParams(answerNo, graderId)) > 0;
     }
 
@@ -47,6 +48,7 @@ public class ExamGradingServiceImpl implements ExamGradingService {
             throw new IllegalStateException("선점하지 않았거나 이미 처리된 답안입니다.");
         }
 
+		// Oracle/MyBatis 설정에 따라 Map 키 대소문자가 달라질 수 있음
 		Object rawEnrollmentNo=claimedAnswer.get("ENROLLMENT_NO")!=null
 				?claimedAnswer.get("ENROLLMENT_NO"):claimedAnswer.get("enrollment_no");
 		Object rawMaxScore=claimedAnswer.get("MAX_SCORE")!=null

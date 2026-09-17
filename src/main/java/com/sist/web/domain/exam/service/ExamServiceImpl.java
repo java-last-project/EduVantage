@@ -143,6 +143,7 @@ public class ExamServiceImpl implements ExamService{
 		questionParams.put("exam_no",enrollment.getExam_no());
 		questionParams.put("theme",enrollment.getTheme());
 		questionParams.put("qno",qno);
+		// AI 시험은 응시마다 생성된 문제만 채점 대상으로 제한
 		boolean aiExam=enrollment.getExam_no()==null && enrollment.getTheme()==null;
 		if(aiExam){
 			questionParams.put("enrollment_no",enrollmentNo);
@@ -160,7 +161,7 @@ public class ExamServiceImpl implements ExamService{
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"시험에 포함되지 않은 문제가 있습니다.");
 		}
 
-		// 채점
+		// 객관식은 즉시 채점하고, 미응답 주관식은 채점 대기열에 넣지 않음
 		List<ExamUserAnswerVO> answers=new ArrayList<>();
 		int totalScore=0;
 		boolean hasSubjective=false;
@@ -197,6 +198,7 @@ public class ExamServiceImpl implements ExamService{
 		// 답안 저장 + 응시 상태 함께 반영
 		if(!answers.isEmpty()){
 			if(aiExam){
+				// 동일 응시의 AI 답안이 남아 있으면 교체한 뒤 저장
 				eMapper.deleteUserAnswers(enrollmentNo);
 			}
 			eMapper.insertUserAnswers(answers);
@@ -209,6 +211,7 @@ public class ExamServiceImpl implements ExamService{
 		evo.setTotalscore(totalScore);
 		evo.setStatus(hasSubjective?"WAITING":"COMPLETE");
 
+		// 종료 상태를 조건부 갱신해 동시 제출 중 한 건만 확정
 		if(eMapper.updateEnrollmentFinish(evo)==0){
 			throw new ResponseStatusException(HttpStatus.CONFLICT,"이미 제출이 완료된 시험입니다.");
 		}
@@ -275,6 +278,7 @@ public class ExamServiceImpl implements ExamService{
 		vo.setStarttime(LocalDateTime.now());
 		eMapper.insertEnrollment(vo);
 
+		// AI 시험은 정해진 시험 번호가 없으므로 응시 기록에 생성 문제를 미리 연결
 		Map<String,Object> map=new HashMap<>();
 		map.put("enrollmentNo",vo.getNo());
 		map.put("questionNos",questionNos);

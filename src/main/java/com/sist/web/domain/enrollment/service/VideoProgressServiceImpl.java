@@ -27,7 +27,7 @@ public class VideoProgressServiceImpl implements VideoProgressService{
         String completed=vo.getProgress()>=90?"Y":"N";
         vo.setCompleted(completed);
 
-        // 영상 진도 + 강좌 진도 함께 반영
+        // 영상 저장 후 전체 진도율까지 같은 트랜잭션에서 갱신
         pMapper.videoProgressSave(vo);
         int totalCount=pMapper.videoTotalCount(vo.getEnrollment_no());
         int completedCount=pMapper.videoCompletedCount(vo.getEnrollment_no());

@@ -32,6 +32,7 @@ public class AiExamServiceImpl implements AiExamService{
     @Override
     @Transactional
     public AiExamCreateResponse createExam(AiExamCreateRequest request,Integer memberId) {
+        // 사용자 입력을 먼저 정리해 프롬프트에 빈 값이나 중복 키워드가 들어가지 않게 함
         validateRequest(request);
 
         String difficultyText=getDifficultyText(request.getDifficulty());
@@ -71,6 +72,7 @@ public class AiExamServiceImpl implements AiExamService{
                 request.getQuestionCount()
         );
 
+        // 스키마 검증만으로 부족한 문제 수와 필수 학습 메타데이터는 별도 확인
         AiExamCreateResponse response=builder.build()
                 .prompt()
                 .user(prompt)
@@ -81,10 +83,12 @@ public class AiExamServiceImpl implements AiExamService{
                 );
         validateResponse(response,request.getQuestionCount());
 
+        // 시험명·주제·난이도는 생성 결과가 아닌 검증된 요청값 사용
         response.setExamName(request.getExamName());
         response.setSubject(request.getSubject());
         response.setDifficulty(request.getDifficulty());
 
+        // 문제·보기와 응시 기록을 한 트랜잭션에서 묶어 부분 저장 방지
         List<Integer> questionNos=saveQuestions(response,request);
 		ExamEnrollmentVO enrollment=examService.createAiEnrollment(memberId,questionNos);
 
@@ -112,12 +116,12 @@ public class AiExamServiceImpl implements AiExamService{
 					1000
 			));
 
-            // 객관식
             questionVO.setType(1);
 
             questionVO.setDifficulty(request.getDifficulty());
             questionVO.setScore(getQuestionScore(i,request.getQuestionCount()));
 
+            // 생성된 문제 번호를 보기와 응시 기록의 연결 키로 사용
             aiMapper.insertAiQuestion(questionVO);
 
             ExamOptionVO optionVO=new ExamOptionVO();
@@ -155,6 +159,7 @@ public class AiExamServiceImpl implements AiExamService{
 		}
 		request.setSubject(subject);
 
+		// 대소문자만 다른 키워드는 같은 입력으로 보고 프롬프트 중복을 줄임
 		List<String> normalizedKeywords=normalizeRequestKeywords(request.getKeywords());
 		if(normalizedKeywords.isEmpty() || normalizedKeywords.size()>5) {
 			throw new IllegalArgumentException("키워드는 1~5개 입력해주세요.");
@@ -200,6 +205,7 @@ public class AiExamServiceImpl implements AiExamService{
             throw new IllegalStateException("AI가 요청한 문제 수와 다르게 생성했습니다.");
         }
 
+        // 형식이 맞아도 실제 저장에 필요한 값이 빠질 수 있어 문항별로 확인
         for(AiExamQuestionResponse question:response.getQuestions()) {
             if(question.getTitle()==null || question.getTitle().isBlank()) {
                 throw new IllegalStateException("문제 내용이 비어 있습니다.");
@@ -238,6 +244,7 @@ public class AiExamServiceImpl implements AiExamService{
             return 5;
         }
 
+        // 30문항도 총점 100점이 되도록 앞의 10문항만 4점
         if(questionCount==30) {
             return index<10?4:3;
         }
@@ -249,6 +256,7 @@ public class AiExamServiceImpl implements AiExamService{
 		return value.length()<=maxLength?value:value.substring(0,maxLength);
 	}
 
+	// AI가 준 키워드는 길이·개수를 제한해 문제 메타데이터에 저장
 	private List<String> normalizeKeywords(List<String> keywords) {
 		if(keywords==null){
 			return Collections.emptyList();
