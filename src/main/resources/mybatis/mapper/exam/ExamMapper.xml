@@ -95,6 +95,58 @@
 		WHERE ROWNUM=1
 	</select>
 
+	<select id="findResumableEnrollment" parameterType="hashmap" resultType="com.sist.web.domain.exam.vo.ExamEnrollmentVO">
+		SELECT no, member_id, exam_no, theme, starttime, endtime
+		FROM (
+		SELECT e.no, e.member_id, e.exam_no, e.theme,
+		e.starttime, e.endtime
+		FROM exam_enrollment e
+		LEFT JOIN scheduled_exam s ON s.no = e.exam_no
+		WHERE e.member_id = #{memberId}
+		AND e.endtime IS NULL
+		<if test="enrollmentNo != null">
+			AND e.no = #{enrollmentNo}
+		</if>
+		AND (
+		(
+		e.exam_no IS NOT NULL
+		AND s.no IS NOT NULL
+		AND s.open_date &lt;= SYSDATE
+		AND s.close_date &gt;= SYSDATE
+		AND CAST(e.starttime AS DATE)
+		&gt; SYSDATE - NVL(s.time_limit, 120) / (24 * 60)
+		)
+		OR
+		(
+		e.exam_no IS NULL
+		AND CAST(e.starttime AS DATE)
+		&gt; SYSDATE - 120 / (24 * 60)
+		AND (
+		(
+		e.theme IS NOT NULL
+		AND (
+		SELECT COUNT(DISTINCT a.question_no)
+		FROM exam_user_answer a
+		WHERE a.enrollment_no = e.no
+		) IN (20, 40, 60, 80, 100)
+		)
+		OR
+		(
+		e.theme IS NULL
+		AND EXISTS (
+		SELECT 1
+		FROM exam_user_answer a
+		WHERE a.enrollment_no = e.no
+		)
+		)
+		)
+		)
+		)
+		ORDER BY e.starttime DESC, e.no DESC
+		)
+		WHERE ROWNUM = 1
+	</select>
+
 	<select id="findCompletedEnrollment" parameterType="hashmap" resultType="com.sist.web.domain.exam.vo.ExamEnrollmentVO">
 		SELECT no,member_id,exam_no,theme,starttime,endtime,totalscore,status
 		FROM (

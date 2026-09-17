@@ -219,6 +219,9 @@ const examApp=createApp({
 				count:EXAM_COUNT,
 				examNo:EXAM_NO
 			}
+			if (ENROLLMENT_NO!=null) {
+				requestParams.enrollmentNo=ENROLLMENT_NO
+			}
 			if(AI_EXAM){
 				const aiExam=JSON.parse(sessionStorage.getItem('aiExam') || '{}')
 				requestParams.ai=true
@@ -227,6 +230,11 @@ const examApp=createApp({
 			}
 			try{
 				await store.examDetailData(requestParams)
+				const activeExamLink=document.getElementById('active-exam-link')
+				if (activeExamLink && store.enrollmentNo) {
+					activeExamLink.href='/exam/detail?enrollmentNo='+encodeURIComponent(store.enrollmentNo)
+					activeExamLink.style.removeProperty('display')
+				}
 			}catch(error){
 				const message=error.response?.data?.detail || error.response?.data?.message || '시험 정보를 불러오지 못했습니다.'
 				alert(message)
