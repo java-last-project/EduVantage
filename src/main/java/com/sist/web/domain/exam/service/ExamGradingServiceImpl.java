@@ -55,6 +55,9 @@ public class ExamGradingServiceImpl implements ExamGradingService {
 				?claimedAnswer.get("MAX_SCORE"):claimedAnswer.get("max_score");
 		int enrollmentNo=Integer.parseInt(String.valueOf(rawEnrollmentNo));
 		int maxScore=Integer.parseInt(String.valueOf(rawMaxScore));
+		Object rawPracticeExam=claimedAnswer.get("PRACTICE_EXAM")!=null
+				?claimedAnswer.get("PRACTICE_EXAM"):claimedAnswer.get("practice_exam");
+		boolean practiceExam=Integer.parseInt(String.valueOf(rawPracticeExam))==1;
 		if(score<0 || score>maxScore){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"문항 배점 범위를 벗어났습니다.");
 		}
@@ -67,7 +70,12 @@ public class ExamGradingServiceImpl implements ExamGradingService {
 
         // 마지막 주관식 채점 후에만 총점 확정
         if (gradingMapper.countRemainingPending(enrollmentNo) == 0) {
-            gradingMapper.finalizeEnrollmentScore(enrollmentNo);
+			if(practiceExam){
+				// 상시시험은 주관식까지 확정된 뒤 정답률로 최종 점수 계산
+				gradingMapper.finalizePracticeEnrollmentScore(enrollmentNo);
+			}else{
+				gradingMapper.finalizeEnrollmentScore(enrollmentNo);
+			}
         }
     }
 

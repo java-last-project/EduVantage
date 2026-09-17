@@ -145,6 +145,7 @@ public class ExamServiceImpl implements ExamService{
 		questionParams.put("qno",qno);
 		// AI 시험은 응시마다 생성된 문제만 채점 대상으로 제한
 		boolean aiExam=enrollment.getExam_no()==null && enrollment.getTheme()==null;
+		boolean practiceExam=enrollment.getExam_no()==null && enrollment.getTheme()!=null;
 		if(aiExam){
 			questionParams.put("enrollment_no",enrollmentNo);
 		}
@@ -164,6 +165,7 @@ public class ExamServiceImpl implements ExamService{
 		// 객관식은 즉시 채점하고, 미응답 주관식은 채점 대기열에 넣지 않음
 		List<ExamUserAnswerVO> answers=new ArrayList<>();
 		int totalScore=0;
+		int correctCount=0;
 		boolean hasSubjective=false;
 
 		for(ExamQuestionVO qvo:questions){
@@ -179,7 +181,12 @@ public class ExamServiceImpl implements ExamService{
 				if(isCorrect){
 					avo.setIs_correct("Y");
 					avo.setScore(qvo.getScore());
-					totalScore+=qvo.getScore();
+					// 답안 점수는 기존대로 저장하고, 상시시험 총점만 정답 수로 계산
+					if(practiceExam){
+						correctCount++;
+					}else{
+						totalScore+=qvo.getScore();
+					}
 				}else{
 					avo.setIs_correct("N");
 					avo.setScore(0);
@@ -193,6 +200,10 @@ public class ExamServiceImpl implements ExamService{
 				hasSubjective=true;
 			}
 			answers.add(avo);
+		}
+		if(practiceExam && !hasSubjective){
+			// 상시시험은 확정된 정답 수를 서버에서 조회한 문항 수로 환산
+			totalScore=(int)Math.round((double)correctCount/questions.size()*100);
 		}
 
 		// 답안 저장 + 응시 상태 함께 반영
