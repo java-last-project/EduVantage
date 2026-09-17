@@ -7,7 +7,8 @@ import com.sist.web.domain.exam.vo.ExamQuestionVO;
 
 public interface ExamService {
 	public List<ExamQuestionVO> examDetailData(Integer examNo,Integer theme,int count);
-	public ExamEnrollmentVO getOrCreateEnrollment(int memberId, Integer examNo, Integer theme);
+	public ExamEnrollmentVO getOrCreateEnrollment(int memberId, Integer examNo, Integer theme, int count);
+	public List<ExamQuestionVO> getPracticeExamQuestions(int memberId,int enrollmentNo);
 	public String getExamTitle(Integer examNo);
 	public int getExamLimitMinutes(Integer examNo);
 	public Map<String, Object> submitExam(int memberId,Map<String, Object> params);

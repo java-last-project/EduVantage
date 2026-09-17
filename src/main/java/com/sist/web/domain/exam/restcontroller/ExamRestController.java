@@ -57,7 +57,7 @@ public class ExamRestController {
 				return ResponseEntity.ok(map);
 			}
 
-            ExamEnrollmentVO vo=eService.getOrCreateEnrollment(mid,examNo,theme);
+            ExamEnrollmentVO vo=eService.getOrCreateEnrollment(mid,examNo,theme,count);
             map.put("enrollmentNo",vo.getNo());
             map.put("startTime",vo.getStarttime());
 
@@ -65,10 +65,13 @@ public class ExamRestController {
             if(examNo!=null && examNo>0){
                 title=eService.getExamTitle(examNo);
             }
-            List<ExamQuestionVO> list=eService.examDetailData(examNo,theme,count);
+            boolean practiceExam=vo.getExam_no()==null && vo.getTheme()!=null;
+            List<ExamQuestionVO> list=practiceExam
+                    ?eService.getPracticeExamQuestions(mid,vo.getNo())
+                    :eService.examDetailData(examNo,theme,count);
             map.put("enrollmentNo",vo.getNo());
             map.put("title",title);
-            map.put("count",count);
+            map.put("count",practiceExam?list.size():count);
             map.put("list",list);
 			map.put("timeLimitMinutes",eService.getExamLimitMinutes(examNo));
 		}catch(ResponseStatusException ex){

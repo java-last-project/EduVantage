@@ -269,7 +269,10 @@
 
         try{
           const res=await api.post('/exam/ai/generate',
-                  form.value
+                  form.value,
+                  {
+                    timeout:120000
+                  }
           )
 
           sessionStorage.setItem(

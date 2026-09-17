@@ -36,7 +36,7 @@ pipeline {
         				. "$ENV_FILE"
         				set +a
 
-        				./gradlew clean build
+        				./gradlew build --build-cache
         			'''
         		}
         	}
