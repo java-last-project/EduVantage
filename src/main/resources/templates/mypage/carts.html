@@ -56,9 +56,6 @@ const IMP_CODE = /*[[${impCode}]]*/ 0
             <span class="fw-bold">{{cvo.pay_price}}원</span>
           </div>
         </div>
-<!--         <button class="btn btn-sm text-secondary flex-shrink-0" aria-label="삭제">
-          <i class="bi bi-x-lg"></i>
-        </button> -->
       </div>
  
     <div class="card-footer bg-white d-flex justify-content-between align-items-center p-4">
@@ -111,17 +108,6 @@ const IMP_CODE = /*[[${impCode}]]*/ 0
   <div class="fw-bold text-end">{{bvo.price.toLocaleString()}}원</div>
   <button class="btn btn-dark btn-sm" @click="store.goToBookCheckout(bvo)">구매하기</button>
 </div>
- 
-<!--     <div class="card-footer bg-white d-flex justify-content-between align-items-center p-4">
-      <span class="text-secondary">선택 상품 <span class="fw-bold text-dark">{{store.selectedCount}}개</span></span>
-      <div class="d-flex align-items-center gap-3">
-        <div class="text-end">
-          <div class="text-secondary" style="font-size: 12px">총 결제금액</div>
-          <div class="fw-bold fs-5">{{store.selectedTotal.toLocaleString()}}원</div>
-        </div>
-        <button class="btn btn-dark px-4" :disabled="store.selectedCount===0" @click="store.requestPay">결제하기</button>
-      </div>
-    </div> -->
    </div>
   </div>
 

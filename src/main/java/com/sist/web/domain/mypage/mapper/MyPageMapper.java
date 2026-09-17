@@ -15,9 +15,19 @@ public interface MyPageMapper {
 	public List<CourseEnrollmentVO> mypageCourseListData(int member_id);
 	public List<CourseEnrollmentVO> lastAccessedCourse(int member_id);
 	
-	@Select("SELECT COUNT(*) FROM course_enrollment "
-			+ "WHERE member_id=#{member_id} AND is_completed='N'")
+	@Select("SELECT COUNT(*) FROM course_payment "
+            + "WHERE member_id=#{member_id} AND order_status='결제완료'")
 	public int enrolledCount(int member_id);
+	
+	@Select("SELECT COUNT(*) "
+			+ "FROM free_board "
+			+ "WHERE member_id=#{member_id}")
+	public int myBoardCount(int member_id);
+	
+	@Select("SELECT COUNT(*) "
+			+ "FROM course_evaluation "
+			+ "WHERE member_id=#{member_id}")
+	public int myEvaluationCount(int member_id);
 	
 	@Select("SELECT member_id,username,name,sex,"
 			+ "TO_CHAR(regdate,'yyyy-mm-dd') as dbRday,"

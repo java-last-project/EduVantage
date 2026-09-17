@@ -51,8 +51,12 @@ public class MyPageRestController {
 		try {
 			int member_id=(int)session.getAttribute("member_id");
 			int eCount=mService.enrolledCount(member_id);
+			int bCount=mService.myBoardCount(member_id);
+			int vCount=mService.myEvaluationCount(member_id);
 			MyMemberVO vo=mService.memberProfileData(member_id);
 			map.put("eCount", eCount);
+			map.put("bCount", bCount);
+			map.put("vCount", vCount);
 			map.put("vo", vo);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -197,12 +201,13 @@ public class MyPageRestController {
 	
 	@PostMapping("/course/enrollment_insert")
 	public ResponseEntity<Map> course_enrollment_insert_vue(
-			@RequestParam("member_id") int member_id,
 			@RequestParam("course_no") int course_no,
-			@RequestParam("price") int price
+			@RequestParam("price") int price,
+			HttpSession session
 			) {
 		Map map=new HashMap();
 		try {
+			int member_id=(int)session.getAttribute("member_id");
 			mService.courseEnrollmentInsert(member_id, course_no, price);
 		} catch (Exception e) {
 			// TODO: handle exception

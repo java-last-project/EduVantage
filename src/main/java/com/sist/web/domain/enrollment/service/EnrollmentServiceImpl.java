@@ -96,10 +96,10 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 	
 	@Override
 	@Transactional
-	public void evaluationDelete(int ce_no, int course_no) {
+	public void evaluationDelete(int ce_no, int course_no, int member_id) {
 		// TODO Auto-generated method stub
 		eMapper.evalLikeDeleteAll(ce_no);
-		eMapper.evaluationDelete(ce_no);
+		eMapper.evaluationDelete(ce_no, member_id);
 		eMapper.courseStarUpdate(course_no);
 	}
 	@Override
