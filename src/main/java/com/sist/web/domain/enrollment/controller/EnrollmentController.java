@@ -52,6 +52,7 @@ public class EnrollmentController {
 		model.addAttribute("course_no", course_no);
         model.addAttribute("title", eService.courseTitleData(course_no));
 		model.addAttribute("progress",evo.getProgress());
+		model.addAttribute("completed",evo.getIs_completed());
     }
 
 	@GetMapping
@@ -110,6 +111,16 @@ public class EnrollmentController {
 		}
 		model.addAttribute("menu","evaluation");
 		model.addAttribute("enrollment_html","enrollment/evaluation");
+		return "enrollment/layout/main";
+	}
+	
+	@GetMapping("/certificate")
+	public String enrollment_certificate(@PathVariable("course_no") int course_no, Model model) {
+		if(!"Y".equals(model.getAttribute("completed"))) {
+		      return "redirect:/enrollment/"+course_no;
+		}
+		//model.addAttribute("menu","evaluation");
+		model.addAttribute("enrollment_html","enrollment/certificate");
 		return "enrollment/layout/main";
 	}
 }
