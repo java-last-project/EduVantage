@@ -28,7 +28,10 @@ public class CourseController {
 	@GetMapping("/course/detail")
 	public String course_detail(Model model,@RequestParam("no")int no) {
 		CourseVO vo=cService.courseDetail(no);
-		System.out.println(vo);
+		if(vo==null) {
+			return "redirect:/course/list";
+		}
+		//System.out.println(vo);
 		model.addAttribute("impCode", impCode);
 		model.addAttribute("course", vo);
 		model.addAttribute("main_html", "course/detail");

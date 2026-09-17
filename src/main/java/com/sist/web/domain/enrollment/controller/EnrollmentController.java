@@ -7,6 +7,7 @@ import com.sist.web.domain.enrollment.vo.CourseVideoVO;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,14 +29,30 @@ public class EnrollmentController {
 	private final CourseService cService;
 	private final YoutubeService yService;
 
+	static class NotEnrolledException extends RuntimeException {
+		private final int course_no;
+		public NotEnrolledException(int course_no) {
+			// TODO Auto-generated constructor stub
+			this.course_no=course_no;
+		}
+	}
+	
+	@ExceptionHandler(NotEnrolledException.class)
+	public String handlerNotEnrolled(NotEnrolledException ex) {
+		return "redirect:/course/detail?no="+ex.course_no;
+	}
+	
 	@ModelAttribute
     public void setCourseNo(@PathVariable("course_no") int course_no, HttpSession session, Model model) {
 		int member_id=(int)session.getAttribute("member_id");
+		CourseEnrollmentVO evo=eService.courseEnrollmentDetailData(member_id, course_no);
+		if(evo==null) {
+			throw new NotEnrolledException(course_no);
+		}
 		model.addAttribute("course_no", course_no);
         model.addAttribute("title", eService.courseTitleData(course_no));
-		//CourseEnrollmentVO evo=eService.courseEnrollmentDetailData(member_id, course_no);
-		//model.addAttribute("evo",evo);
-		model.addAttribute("progress",eService.courseEnrollmentDetailData(member_id, course_no).getProgress());
+		model.addAttribute("progress",evo.getProgress());
+		model.addAttribute("completed",evo.getIs_completed());
     }
 
 	@GetMapping
@@ -94,6 +111,16 @@ public class EnrollmentController {
 		}
 		model.addAttribute("menu","evaluation");
 		model.addAttribute("enrollment_html","enrollment/evaluation");
+		return "enrollment/layout/main";
+	}
+	
+	@GetMapping("/certificate")
+	public String enrollment_certificate(@PathVariable("course_no") int course_no, Model model) {
+		if(!"Y".equals(model.getAttribute("completed"))) {
+		      return "redirect:/enrollment/"+course_no;
+		}
+		//model.addAttribute("menu","evaluation");
+		model.addAttribute("enrollment_html","enrollment/certificate");
 		return "enrollment/layout/main";
 	}
 }

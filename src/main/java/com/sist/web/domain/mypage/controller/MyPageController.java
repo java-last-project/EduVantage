@@ -1,6 +1,7 @@
 package com.sist.web.domain.mypage.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -40,7 +41,11 @@ public class MyPageController {
 	public String mypage_dashboard(HttpSession session, Model model) {
 		int member_id=(int)session.getAttribute("member_id");
 		List<CourseEnrollmentVO> list=mService.lastAccessedCourse(member_id);
+		List<CourseEnrollmentVO> certList=mService.mypageCourseListData(member_id)
+				.stream().filter(vo->"Y".equals(vo.getIs_completed()))
+				.collect(Collectors.toList());
 		model.addAttribute("cLastList",list);
+		model.addAttribute("certList",certList);
 		model.addAttribute("active","dashboard");
 		model.addAttribute("main_html","mypage/layout/main");
 		model.addAttribute("mypage_html","mypage/dashboard");
