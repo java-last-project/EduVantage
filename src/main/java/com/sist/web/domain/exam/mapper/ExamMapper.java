@@ -30,7 +30,7 @@ public interface ExamMapper {
 	public Map<String, Object> selectExamResultMaster(Map<String,Object> map);
 	public List<Map<String, Object>> selectExamResultDetails(int enrollmentNo);
 	public List<Map<String, Object>> selectMyExamList(int memberId);
-	public void insertAiExamQuestions(Map<String,Object> map);
+	public void insertEnrollmentQuestions(Map<String,Object> map);
 	public List<ExamQuestionVO> examDetailDataByEnrollment(Map<String,Object> map);
 	public void deleteUserAnswers(Integer enrollmentNo);
 	public List<ExamQuestionVO> selectAiWrongQuestionMetadata(Map<String,Object> map);

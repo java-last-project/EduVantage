@@ -48,13 +48,11 @@ public class InstructorExamRestController {
             @PathVariable int answerNo,
             @RequestBody SubjectiveGradeRequest request,
             HttpSession session) {
-        if (request.getScore() < 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "점수는 0 이상이어야 합니다.");
-        }
         gradingService.gradeSubjective(
                 answerNo,
                 requireInstructorId(session),
-                request.getScore());
+                request.getScore(),
+                request.getCorrect());
         return ResponseEntity.noContent().build();
     }
 

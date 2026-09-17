@@ -6,5 +6,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class SubjectiveGradeRequest {
-    private int score;
+    private Integer score;
+    private Boolean correct;
 }

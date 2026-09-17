@@ -79,7 +79,9 @@ public class AiExamServiceImpl implements AiExamService{
                 .call()
                 .entity(
                         AiExamCreateResponse.class,
-                        spec->spec.validateSchema()
+                        spec->spec
+                                .useProviderStructuredOutput()
+                                .validateSchema()
                 );
         validateResponse(response,request.getQuestionCount());
 

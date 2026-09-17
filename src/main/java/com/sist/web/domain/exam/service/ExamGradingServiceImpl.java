@@ -39,7 +39,7 @@ public class ExamGradingServiceImpl implements ExamGradingService {
 
     @Override
     @Transactional
-    public void gradeSubjective(int answerNo, int graderId, int score) {
+    public void gradeSubjective(int answerNo, int graderId, Integer score, Boolean correct) {
         Map<String, Object> params = gradingParams(answerNo, graderId);
 
         // 선점 여부와 채점자 일치 여부 DB 재검증
@@ -58,10 +58,21 @@ public class ExamGradingServiceImpl implements ExamGradingService {
 		Object rawPracticeExam=claimedAnswer.get("PRACTICE_EXAM")!=null
 				?claimedAnswer.get("PRACTICE_EXAM"):claimedAnswer.get("practice_exam");
 		boolean practiceExam=Integer.parseInt(String.valueOf(rawPracticeExam))==1;
-		if(score<0 || score>maxScore){
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"문항 배점 범위를 벗어났습니다.");
+		if(practiceExam){
+			if(correct==null || score!=null){
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"상시시험은 정답 또는 오답을 선택해야 합니다.");
+			}
+			// 상시시험은 판정만 저장하고 문항 점수는 총점에 사용하지 않음
+			params.put("score",0);
+			params.put("isCorrect",correct?"Y":"N");
+		}else{
+			if(score==null || correct!=null || score<0 || score>maxScore){
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"문항 배점 범위를 벗어났습니다.");
+			}
+			params.put("score",score);
+			params.put("isCorrect",score>0?"Y":"N");
 		}
-		params.put("score",score);
+		params.put("practiceExam",practiceExam?1:0);
 		params.put("maxScore",maxScore);
 
         if (gradingMapper.gradeSubjectiveAnswer(params) == 0) {

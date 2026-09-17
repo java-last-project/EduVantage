@@ -100,7 +100,8 @@
     <update id="gradeSubjectiveAnswer" parameterType="hashmap">
         UPDATE exam_user_answer
         SET score=#{score},
-			is_correct=CASE WHEN #{score} &gt; 0 THEN 'Y' ELSE 'N' END,
+            is_correct=CASE WHEN #{practiceExam}=1 THEN #{isCorrect}
+                            WHEN #{score} &gt; 0 THEN 'Y' ELSE 'N' END,
             graded_at=SYSDATE
         WHERE no=#{answerNo}
           AND grader_id=#{graderId}
