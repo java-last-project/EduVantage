@@ -56,11 +56,17 @@ echo "[3/8] Docker 설치"
 
 if ! command -v docker >/dev/null 2>&1; then
 	curl -fsSL https://get.docker.com | sudo sh
-	sudo usermod -aG docker "$USER"
 fi
 
 sudo systemctl enable docker
 sudo systemctl start docker
+
+# Docker가 이미 설치되어 있어도 ubuntu 계정의 그룹 권한은 항상 확인
+if ! id -nG "$USER" | grep -qw docker; then
+	sudo usermod -aG docker "$USER"
+	echo "Docker 그룹에 $USER 계정을 추가했습니다."
+	echo "새 SSH 세션부터 sudo 없이 docker 명령을 사용할 수 있습니다."
+fi
 
 # --------------------------------------------------
 # 4. k3s
@@ -81,14 +87,20 @@ until sudo k3s kubectl get nodes >/dev/null 2>&1; do
 	sleep 2
 done
 
-# 일반 사용자 kubectl 설정
+# ubuntu 계정에서 sudo 없이 kubectl을 사용할 수 있도록 kubeconfig 복사
 mkdir -p "$HOME/.kube"
 
 sudo cp /etc/rancher/k3s/k3s.yaml "$HOME/.kube/config"
 sudo chown "$USER:$USER" "$HOME/.kube/config"
 chmod 600 "$HOME/.kube/config"
 
+# 현재 setup 스크립트에서 바로 kubectl 사용
 export KUBECONFIG="$HOME/.kube/config"
+
+# 이후 SSH 로그인에서도 동일한 kubeconfig 사용
+if ! grep -qxF 'export KUBECONFIG="$HOME/.kube/config"' "$HOME/.bashrc"; then
+	echo 'export KUBECONFIG="$HOME/.kube/config"' >> "$HOME/.bashrc"
+fi
 
 # --------------------------------------------------
 # 5. EC2 Private IP
@@ -118,6 +130,7 @@ cat > .env <<EOF
 KAFKA_HOST=$PRIVATE_IP
 EOF
 
+# 현재 실행 중인 셸에는 새 docker 그룹 권한이 아직 반영되지 않을 수 있으므로 sudo 사용
 sudo docker compose up -d
 
 # --------------------------------------------------
@@ -192,6 +205,7 @@ sudo docker compose -f "$PROJECT_DIR/docker-compose.yml" ps
 
 echo
 echo "[Kubernetes]"
+kubectl get nodes
 kubectl get pods
 kubectl get deployment
 kubectl get service
@@ -201,3 +215,6 @@ echo
 echo "========================================"
 echo " EC2 Setup 완료"
 echo "========================================"
+echo
+echo "Docker 그룹 권한은 새 SSH 세션부터 적용됩니다."
+echo "현재 SSH 연결을 종료한 뒤 다시 접속하면 sudo 없이 docker를 사용할 수 있습니다."

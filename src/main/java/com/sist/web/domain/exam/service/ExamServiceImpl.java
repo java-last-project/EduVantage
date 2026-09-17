@@ -35,11 +35,16 @@ public class ExamServiceImpl implements ExamService{
 
 	@Override
 	@Transactional
-	public ExamEnrollmentVO getOrCreateEnrollment(int memberId, Integer examNo, Integer theme) {
+	public ExamEnrollmentVO getOrCreateEnrollment(int memberId, Integer examNo, Integer theme, int count) {
 		Map<String,Object> map=new HashMap<>();
 		map.put("member_id",memberId);
 		map.put("exam_no",examNo);
 		map.put("theme",theme!=null&&theme!=0?theme:null);
+		boolean practiceExam=examNo==null;
+		if(practiceExam && (theme==null || theme<=0 ||
+				(count!=20 && count!=40 && count!=60 && count!=80 && count!=100))){
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"상시시험 주제 또는 문항 수가 올바르지 않습니다.");
+		}
 
 		if(examNo!=null && examNo>0){
 			ScheduledExamVO svo=eMapper.getScheduledExam(examNo);
@@ -64,7 +69,28 @@ public class ExamServiceImpl implements ExamService{
 		// 제한 시간 내 재접속 시 기존 응시 기록 유지
 		ExamEnrollmentVO activeVo=eMapper.findActiveEnrollment(map);
 		if(activeVo!=null){
-			return activeVo;
+			if(!practiceExam){
+				return activeVo;
+			}
+			Map<String,Object> activeParams=Map.of("memberId",memberId,"enrollmentNo",activeVo.getNo());
+			List<ExamQuestionVO> fixed=eMapper.examDetailDataByEnrollment(activeParams);
+			if(!fixed.isEmpty()){
+				if(!Set.of(20,40,60,80,100).contains(fixed.size())){
+					throw new ResponseStatusException(HttpStatus.CONFLICT,"고정된 출제 문항이 불완전합니다.");
+				}
+				return activeVo;
+			}
+			// 이전 버전의 미고정 응시는 재사용하지 않고 새 응시로 시작
+		}
+
+		List<ExamQuestionVO> practiceQuestions=null;
+		if(practiceExam){
+			// 출제 문항을 한 번만 추첨하고 응시 기록에 고정
+			practiceQuestions=examDetailData(null,theme,count);
+			if(practiceQuestions.size()!=count ||
+					practiceQuestions.stream().map(ExamQuestionVO::getNo).distinct().count()!=count){
+				throw new ResponseStatusException(HttpStatus.CONFLICT,"요청한 문항 수만큼 출제할 수 없습니다.");
+			}
 		}
 
 		ExamEnrollmentVO vo=new ExamEnrollmentVO();
@@ -73,7 +99,31 @@ public class ExamServiceImpl implements ExamService{
 		vo.setTheme(theme!=null&&theme!=0?theme:null);
 		vo.setStarttime(LocalDateTime.now());
 		eMapper.insertEnrollment(vo);
+		if(practiceExam){
+			Map<String,Object> questionMap=new HashMap<>();
+			questionMap.put("enrollmentNo",vo.getNo());
+			questionMap.put("questionNos",practiceQuestions.stream().map(ExamQuestionVO::getNo).toList());
+			eMapper.insertEnrollmentQuestions(questionMap);
+		}
 		return vo;
+	}
+
+	@Override
+	public List<ExamQuestionVO> getPracticeExamQuestions(int memberId,int enrollmentNo){
+		Map<String,Object> params=Map.of("memberId",memberId,"enrollmentNo",enrollmentNo);
+		ExamEnrollmentVO enrollment=eMapper.getEnrollmentForMember(params);
+		if(enrollment==null || enrollment.getExam_no()!=null || enrollment.getTheme()==null){
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND,"존재하지 않는 상시시험입니다.");
+		}
+		if(enrollment.getEndtime()!=null){
+			throw new ResponseStatusException(HttpStatus.CONFLICT,"이미 제출이 완료된 시험입니다.");
+		}
+		List<ExamQuestionVO> questions=eMapper.examDetailDataByEnrollment(params);
+		if(!Set.of(20,40,60,80,100).contains(questions.size())){
+			// 고정 문항이 없거나 일부만 남은 응시는 시험지로 사용하지 않음
+			throw new ResponseStatusException(HttpStatus.CONFLICT,"출제 문항이 고정되지 않았거나 불완전합니다. 시험 목록에서 새로 시작해 주세요.");
+		}
+		return questions;
 	}
 
 	@Override
@@ -127,8 +177,13 @@ public class ExamServiceImpl implements ExamService{
 			}
 		}
 
+		boolean aiExam=enrollment.getExam_no()==null && enrollment.getTheme()==null;
+		boolean practiceExam=enrollment.getExam_no()==null && enrollment.getTheme()!=null;
 		Map<String,Object> raw=(Map<String,Object>)params.get("answers");
-		if(raw==null || raw.isEmpty()){
+		if(raw==null && practiceExam){
+			raw=Collections.emptyMap();
+		}
+		if(raw==null || (raw.isEmpty() && !practiceExam)){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"제출된 답안이 없습니다.");
 		}
 		List<Integer> qno=new ArrayList<>();
@@ -139,14 +194,16 @@ public class ExamServiceImpl implements ExamService{
 		}catch(NumberFormatException ex){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"잘못된 문제 번호가 포함되어 있습니다.");
 		}
+		if(practiceExam && (qno.size()!=new HashSet<>(qno).size() ||
+				raw.keySet().stream().anyMatch(key->!key.equals(String.valueOf(Integer.parseInt(key)))))){
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"중복되거나 잘못된 문제 번호가 포함되어 있습니다.");
+		}
 		Map<String,Object> questionParams=new HashMap<>();
 		questionParams.put("exam_no",enrollment.getExam_no());
 		questionParams.put("theme",enrollment.getTheme());
 		questionParams.put("qno",qno);
-		// AI 시험은 응시마다 생성된 문제만 채점 대상으로 제한
-		boolean aiExam=enrollment.getExam_no()==null && enrollment.getTheme()==null;
-		boolean practiceExam=enrollment.getExam_no()==null && enrollment.getTheme()!=null;
-		if(aiExam){
+		// AI·상시시험은 응시 기록에 고정된 문제만 채점 대상으로 제한
+		if(aiExam || practiceExam){
 			questionParams.put("enrollment_no",enrollmentNo);
 		}
 		List<ExamQuestionVO> questions=eMapper.getQuestionForGrading(questionParams);
@@ -208,8 +265,8 @@ public class ExamServiceImpl implements ExamService{
 
 		// 답안 저장 + 응시 상태 함께 반영
 		if(!answers.isEmpty()){
-			if(aiExam){
-				// 동일 응시의 AI 답안이 남아 있으면 교체한 뒤 저장
+			if(aiExam || practiceExam){
+				// 고정된 문항 목록을 채점한 뒤 placeholder를 실제 답안으로 교체
 				eMapper.deleteUserAnswers(enrollmentNo);
 			}
 			eMapper.insertUserAnswers(answers);
@@ -293,7 +350,7 @@ public class ExamServiceImpl implements ExamService{
 		Map<String,Object> map=new HashMap<>();
 		map.put("enrollmentNo",vo.getNo());
 		map.put("questionNos",questionNos);
-		eMapper.insertAiExamQuestions(map);
+		eMapper.insertEnrollmentQuestions(map);
 		return vo;
 	}
 

@@ -169,7 +169,7 @@
 		type
 		FROM EXAM_QUESTION
 		<choose>
-			<!-- AI 시험 -->
+			<!-- 응시 기록에 문항이 고정된 AI·상시시험 -->
 			<when test="enrollment_no!=null">
 				WHERE no IN(
 				SELECT question_no
@@ -307,7 +307,7 @@
 		ORDER BY e.no DESC
 	</select>
 
-	<insert id="insertAiExamQuestions" parameterType="hashmap">
+	<insert id="insertEnrollmentQuestions" parameterType="hashmap">
 		INSERT INTO exam_user_answer(
 			enrollment_no,
 			question_no,
