@@ -78,7 +78,8 @@
     <!-- 본인이 선점한 채점 대기 답안만 허용 -->
     <select id="selectClaimedAnswer" parameterType="hashmap" resultType="hashmap">
         SELECT a.enrollment_no AS enrollment_no,
-               q.score AS max_score
+               q.score AS max_score,
+			   CASE WHEN e.exam_no IS NULL AND e.theme IS NOT NULL THEN 1 ELSE 0 END AS practice_exam
         FROM exam_user_answer a
                  JOIN exam_question q ON a.question_no=q.no
 				 JOIN exam_enrollment e ON a.enrollment_no=e.no
@@ -99,7 +100,8 @@
     <update id="gradeSubjectiveAnswer" parameterType="hashmap">
         UPDATE exam_user_answer
         SET score=#{score},
-			is_correct=CASE WHEN #{score} &gt; 0 THEN 'Y' ELSE 'N' END,
+            is_correct=CASE WHEN #{practiceExam}=1 THEN #{isCorrect}
+                            WHEN #{score} &gt; 0 THEN 'Y' ELSE 'N' END,
             graded_at=SYSDATE
         WHERE no=#{answerNo}
           AND grader_id=#{graderId}
@@ -138,5 +140,20 @@
             status='COMPLETE'
         WHERE no=#{enrollmentNo}
     </update>
+
+	<!-- 상시시험은 문항별 score 대신 저장된 답안의 정답 비율로 확정 -->
+	<update id="finalizePracticeEnrollmentScore" parameterType="int">
+		UPDATE exam_enrollment
+		SET totalscore=(
+			SELECT CASE WHEN COUNT(*)=0 THEN 0
+				ELSE ROUND(COUNT(CASE WHEN is_correct='Y' THEN 1 END)*100.0/COUNT(*)) END
+			FROM exam_user_answer
+			WHERE enrollment_no=#{enrollmentNo}
+		),
+			status='COMPLETE'
+		WHERE no=#{enrollmentNo}
+		  AND exam_no IS NULL
+		  AND theme IS NOT NULL
+	</update>
 
 </mapper>

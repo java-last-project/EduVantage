@@ -14,7 +14,7 @@ import java.util.Objects;
 
 @Configuration
 @MapperScan(
-        basePackages="com.sist.web.domain.exam.pgmapper",
+        basePackages={"com.sist.web.domain.exam.pgmapper","com.sist.web.domain.mypage.pgmapper"},
         sqlSessionTemplateRef="postgresSessionTemplate"
 )
 public class PostgresMyBatisConfig {

@@ -1,0 +1,50 @@
+package com.sist.web.domain.mypage.pgmapper;
+
+import java.util.*;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import com.sist.web.domain.exam.vo.RecommendCourseVO;
+
+@Mapper
+public interface CourseRecommandPGMapper {
+/*
+    <!-- pgvector에 있는 course_vector 중 내 학습에 있는 강의 제외한 embedding만 가져오기 -->
+    <select id="findCourseEmbeddings" resultType="string">
+        SELECT embedding::text
+        FROM course_vector
+        WHERE chunk_no = 0
+        AND course_no IN
+        <foreach collection="courseNos" item="no" open="(" separator="," close=")">
+            #{no}
+        </foreach>
+    </select>
+*/
+	public List<String> findCourseEmbeddings(@Param("courseNos") List<Integer> courseNos);
+/*
+    <!-- 내 학습에 포함된 course_no를 NOT IN으로 걸러서 제일 높은 유사도 5개 추출 -->
+    <select id="courseRecomandListData" resultType="com.sist.web.domain.exam.vo.RecommendCourseVO">
+        WITH course_scores AS (
+            SELECT
+                course_no,
+                MAX(1-(embedding &lt;=&gt; CAST(#{queryVector} AS vector))) AS similarity
+            FROM course_vector
+            <if test="excludeCourseNos != null and !excludeCourseNos.isEmpty()">
+            WHERE course_no NOT IN
+            <foreach collection="excludeCourseNos" item="no" open="(" separator="," close=")">
+                #{no}
+            </foreach>
+            </if>
+            GROUP BY course_no
+        )
+        SELECT course_no, similarity, similarity AS recommendation_score
+        FROM course_scores
+        ORDER BY similarity DESC
+        LIMIT 5
+    </select>
+ */
+	public List<RecommendCourseVO> courseRecomandListData(
+			@Param("queryVector") String queryVector,
+			@Param("excludeCourseNos") List<Integer> excludeCourseNos
+			);
+}

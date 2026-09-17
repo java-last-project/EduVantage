@@ -38,9 +38,62 @@ public class ExamRestController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
             int mid=Integer.parseInt(String.valueOf(sessionMid));
+
+            Object rawEnrollmentNo=params.get("enrollmentNo");
+            if (rawEnrollmentNo!=null) {
+                int enrollmentNo;
+                try {
+                    enrollmentNo=Integer.parseInt(String.valueOf(rawEnrollmentNo));
+                } catch (NumberFormatException ex) {
+                    throw new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST, "잘못된 응시기록 번호입니다.");
+                }
+
+                ExamEnrollmentVO enrollment=eService.getResumableEnrollment(mid, enrollmentNo);
+                if (enrollment==null) {
+                    throw new ResponseStatusException(
+                            HttpStatus.NOT_FOUND, "재입장할 수 없는 시험입니다.");
+                }
+
+                if (enrollment.getExam_no()==null
+                        && enrollment.getTheme()==null) {
+                    Map<String, Object> result=eService.getAiExamDetailData(mid, enrollmentNo);
+                    result.put("title", "AI 맞춤시험");
+                    return ResponseEntity.ok(result);
+                }
+
+                List<ExamQuestionVO> questions;
+                String title;
+                int timeLimitMinutes;
+
+                if (enrollment.getExam_no()!=null) {
+                    questions=eService.examDetailData(
+                            enrollment.getExam_no(), null, 0);
+                    title=eService.getExamTitle(
+                            enrollment.getExam_no());
+                    timeLimitMinutes=eService.getExamLimitMinutes(
+                            enrollment.getExam_no());
+                } else {
+                    questions=eService.getPracticeExamQuestions(
+                            mid, enrollmentNo);
+                    title=null; // 기존 detail.html의 theme별 제목 사용
+                    timeLimitMinutes=eService.getExamLimitMinutes(null);
+                }
+
+                Map<String, Object> result=new HashMap<>();
+                result.put("enrollmentNo", enrollment.getNo());
+                result.put("startTime", enrollment.getStarttime());
+                result.put("timeLimitMinutes", timeLimitMinutes);
+                result.put("theme", enrollment.getTheme());
+                result.put("title", title);
+                result.put("count", questions.size());
+                result.put("list", questions);
+                return ResponseEntity.ok(result);
+            }
+
 			boolean ai=Boolean.parseBoolean(String.valueOf(params.getOrDefault("ai",false)));
 			if(ai){
-				Object rawEnrollmentNo=params.get("enrollmentNo");
+				rawEnrollmentNo=params.get("enrollmentNo");
 				if(rawEnrollmentNo==null){
 					throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"AI 시험 응시기록 번호가 없습니다.");
 				}
@@ -57,7 +110,7 @@ public class ExamRestController {
 				return ResponseEntity.ok(map);
 			}
 
-            ExamEnrollmentVO vo=eService.getOrCreateEnrollment(mid,examNo,theme);
+            ExamEnrollmentVO vo=eService.getOrCreateEnrollment(mid,examNo,theme,count);
             map.put("enrollmentNo",vo.getNo());
             map.put("startTime",vo.getStarttime());
 
@@ -65,10 +118,13 @@ public class ExamRestController {
             if(examNo!=null && examNo>0){
                 title=eService.getExamTitle(examNo);
             }
-            List<ExamQuestionVO> list=eService.examDetailData(examNo,theme,count);
+            boolean practiceExam=vo.getExam_no()==null && vo.getTheme()!=null;
+            List<ExamQuestionVO> list=practiceExam
+                    ?eService.getPracticeExamQuestions(mid,vo.getNo())
+                    :eService.examDetailData(examNo,theme,count);
             map.put("enrollmentNo",vo.getNo());
             map.put("title",title);
-            map.put("count",count);
+            map.put("count",practiceExam?list.size():count);
             map.put("list",list);
 			map.put("timeLimitMinutes",eService.getExamLimitMinutes(examNo));
 		}catch(ResponseStatusException ex){
@@ -96,6 +152,26 @@ public class ExamRestController {
             ex.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @GetMapping("/exam/active")
+    public ResponseEntity<?> activeExam(HttpSession session) {
+        Object sessionMid = session.getAttribute("member_id");
+        if (sessionMid == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        int memberId = Integer.parseInt(String.valueOf(sessionMid));
+        ExamEnrollmentVO enrollment =
+                eService.getResumableEnrollment(memberId, null);
+
+        if (enrollment == null) {
+            return ResponseEntity.ok(Map.of("active", false));
+        }
+        return ResponseEntity.ok(Map.of(
+                "active", true,
+                "enrollmentNo", enrollment.getNo()
+        ));
     }
 
     @GetMapping("/exam/result_vue")

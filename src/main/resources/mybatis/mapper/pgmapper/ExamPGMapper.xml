@@ -21,6 +21,7 @@
         LIMIT 3
     </select>
 
+	<!-- 강의별 청크 중 가장 높은 코사인 유사도로 상위 3개 선정 -->
 	<select id="findAiRecommendedCourses" resultType="com.sist.web.domain.exam.vo.RecommendCourseVO">
 		WITH course_scores AS (
 			SELECT

@@ -173,5 +173,15 @@ public class MyPageServiceImpl implements MyPageService {
 		// TODO Auto-generated method stub
 		cMapper.bookCartDelete(member_id, book_no);
 	}
+	@Override
+	public int myBoardCount(int member_id) {
+		// TODO Auto-generated method stub
+		return mMapper.myBoardCount(member_id);
+	}
+	@Override
+	public int myEvaluationCount(int member_id) {
+		// TODO Auto-generated method stub
+		return mMapper.myEvaluationCount(member_id);
+	}
 
 }

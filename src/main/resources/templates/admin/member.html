@@ -1,6 +1,5 @@
 
 <div class="layout">
-  <!-- ================= Main ================= -->
   <main class="main">
 
 	<div class="page-header">
@@ -52,7 +51,7 @@
 					<th>가입일</th>
 					<th>구분</th>
 					<th>상태</th>
-					<th style="text-align:right;">관리</th>
+					<th style="text-align:center;">관리</th>
 				</tr>
 			</thead>
 			<tbody id="member-table-body">
@@ -78,7 +77,7 @@
 						<span th:case="'0'" class="badge badge-pending">휴면</span>
 						<span th:case="'2'" class="badge badge-suspended">정지</span>					
 					</td>
-					<td style="text-align:right;">
+					<td style="text-align:center;">
 						<a class="btn btn-detail" th:href="@{/admin/member_detail(member_id=${vo.MEMBER_ID})}">상세보기</a>
 					</td>
 				</tr>

@@ -30,6 +30,7 @@ const useExamStore=defineStore('exam_store',{
 					examName: params?.examName ?? null
 	            })
 	            this.enrollmentNo=res.data.enrollmentNo
+				this.theme=res.data.theme ?? this.theme
 				this.title=res.data.title
 				this.startTime=res.data.startTime
 				this.timeLimitMinutes=res.data.timeLimitMinutes || 120

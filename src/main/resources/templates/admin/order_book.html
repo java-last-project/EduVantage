@@ -35,7 +35,7 @@
 					<th>총 결제금액</th>
 					<th>주문일시</th>
 					<th>상태</th>
-					<th style="text-align:right;">관리</th>
+					<th style="text-align:center;">관리</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -51,7 +51,7 @@
 						<span th:if="${vo.ORDER_STATUS == '환불완료'}" class="badge badge-suspended">환불완료</span>
 						<span th:if="${vo.ORDER_STATUS == '환불대기'}" class="badge badge-pending">환불대기</span>
 					</td>
-					<td style="text-align:right;">
+					<td style="text-align:center;">
 						
 						<form th:if="${vo.ORDER_STATUS == '환불대기'}" method="post" th:action="@{/admin/order_book_cancel}" style="display:inline;">
 							<input type="hidden" name="no" th:value="${vo.NO}">

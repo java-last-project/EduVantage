@@ -25,6 +25,9 @@ const useExamGradingStore=defineStore('examGradingStore',{
     },
 
     actions:{
+		isPracticeExam(answer){
+			return answer?.exam_no==null && answer?.theme!=null
+		},
         async loadAnswers(){
             const selectedAnswerNo=this.selectedAnswer?.answer_no
 
@@ -117,29 +120,42 @@ const useExamGradingStore=defineStore('examGradingStore',{
             }
         },
 
-        async submitGrade(){
+        async submitGrade(correct){
             if(!this.selectedAnswer?.grader_id){
                 this.errorMessage='답안을 먼저 선점해야 합니다.'
                 return
             }
 
-            const maxScore=Number(this.selectedAnswer.score)
-            const inputScore=Number(this.score)
+            const practiceExam=this.isPracticeExam(this.selectedAnswer)
+            let payload
+            let confirmMessage
+            if(practiceExam){
+				// 상시시험은 문제은행 배점 대신 정오 판정만 전달
+                if(typeof correct!=='boolean'){
+                    this.errorMessage='정답 또는 오답을 선택해 주세요.'
+                    return
+                }
+                payload={correct}
+                confirmMessage=`${correct?'정답':'오답'}으로 채점을 완료하시겠습니까?`
+            }else{
+                const maxScore=Number(this.selectedAnswer.score)
+                const inputScore=Number(this.score)
 
-			// 문항 배점 범위 + 정수 검증
-            if(
-                !Number.isInteger(inputScore) ||
-                inputScore<0 ||
-                inputScore>maxScore
-            ){
-                this.errorMessage=
-                    `점수는 0점부터 ${maxScore}점 사이의 정수여야 합니다.`
-                return
+				// 문항 배점 범위 + 정수 검증
+                if(
+                    !Number.isInteger(inputScore) ||
+                    inputScore<0 ||
+                    inputScore>maxScore
+                ){
+                    this.errorMessage=
+                        `점수는 0점부터 ${maxScore}점 사이의 정수여야 합니다.`
+                    return
+                }
+                payload={score:inputScore}
+                confirmMessage=`${inputScore}점으로 채점을 완료하시겠습니까?`
             }
 
-            const confirmed=confirm(
-                `${inputScore}점으로 채점을 완료하시겠습니까?`
-            )
+            const confirmed=confirm(confirmMessage)
 
             if(!confirmed){
                 return
@@ -151,9 +167,7 @@ const useExamGradingStore=defineStore('examGradingStore',{
             try{
                 await api.post(
                     `/instructor/exam/grading/${this.selectedAnswer.answer_no}/grade`,
-                    {
-                        score:inputScore
-                    }
+                    payload
                 )
                 this.selectedAnswer=null
                 this.score=0

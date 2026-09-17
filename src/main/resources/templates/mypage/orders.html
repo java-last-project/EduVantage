@@ -23,7 +23,7 @@ const SESSION_ID = /*[[${session.member_id}]]*/ 0
     </li>
   </ul>
 
-  <div class="card border" v-if="store.activeTab==='course'">
+  <div class="card border" v-if="store.activeTab==='course' && store.cTotalCount>0">
     <div class="card-body">
 
 		<div class="d-flex justify-content-between align-items-center mb-4">
@@ -40,11 +40,6 @@ const SESSION_ID = /*[[${session.member_id}]]*/ 0
 		    	:class="store.cOrderStatus=='환불완료'?'btn-dark':'btn-outline-secondary'"
 		    >환불완료</button>
 		  </div>
-<!-- 		  <select class="form-select form-select-sm w-auto">
-		    <option>최근 6개월</option>
-		    <option>최근 3개월</option>
-		    <option>최근 1개월</option>
-		  </select> -->
 		</div>
 
       <div class="border rounded-3 mb-3 overflow-hidden" v-for="(cvo,i) in store.cList" :key="cvo.no">
@@ -85,7 +80,7 @@ const SESSION_ID = /*[[${session.member_id}]]*/ 0
     <div class="fw-bold">{{cvo.price.toLocaleString()}} 원&nbsp;</div>
     <button type="button" v-if="cvo.order_status=='결제완료'"
           class="btn btn-dark btn-sm px-3"
-          @click="location.href = '/enrollment/' + cvo.course_no">수강하기</button>
+          @click="store.goToEnrollment(cvo.course_no)">수강하기</button>
   </div>
 </div>
 
@@ -110,8 +105,14 @@ const SESSION_ID = /*[[${session.member_id}]]*/ 0
                 </ul>
     </div>
   </div>
-  
-  <div class="card border" v-if="store.activeTab==='book'">
+<div class="text-center py-5" v-if="store.activeTab==='course' && store.cTotalCount===0">
+  <i class="bi bi-bag-x" style="font-size: 48px; color: #ced4da;"></i>
+  <p class="fw-bold mt-3 mb-1">구매한 강의가 없습니다</p>
+  <p class="text-secondary small mb-4">관심있는 강의를 둘러보세요</p>
+  <a href="/course/list" class="btn btn-dark px-4">강의 둘러보기</a>
+</div>
+
+  <div class="card border" v-if="store.activeTab==='book' && store.bTotalCount>0">
     <div class="card-body">
 
 		<div class="d-flex justify-content-between align-items-center mb-4">
@@ -134,11 +135,6 @@ const SESSION_ID = /*[[${session.member_id}]]*/ 0
 		    	:class="store.bOrderStatus=='환불완료'?'btn-dark':'btn-outline-secondary'"
 		    >환불완료</button>
 		  </div>
-<!-- 		  <select class="form-select form-select-sm w-auto">
-		    <option>최근 6개월</option>
-		    <option>최근 3개월</option>
-		    <option>최근 1개월</option>
-		  </select> -->
 		</div>
 
       <div class="border rounded-3 mb-3 overflow-hidden" v-for="(bvo,i) in store.bList" :key="bvo.no">
@@ -217,6 +213,12 @@ const SESSION_ID = /*[[${session.member_id}]]*/ 0
                 </ul>
     </div>
   </div>
+<div class="text-center py-5" v-if="store.activeTab==='book' && store.bTotalCount===0">
+  <i class="bi bi-bag-x" style="font-size: 48px; color: #ced4da;"></i>
+  <p class="fw-bold mt-3 mb-1">구매한 도서가 없습니다</p>
+  <p class="text-secondary small mb-4">관심있는 도서를 둘러보세요</p>
+  <a href="/book/list" class="btn btn-dark px-4">도서 둘러보기</a>
+</div>
 
 </div>
 <script src="/vue/mypage/orders/ordersStore.js"></script>

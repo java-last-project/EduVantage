@@ -16,4 +16,5 @@ public interface ExamGradingMapper {
     public int gradeSubjectiveAnswer(Map<String, Object> params);
     public int countRemainingPending(int enrollmentNo);
     public int finalizeEnrollmentScore(int enrollmentNo);
+    public int finalizePracticeEnrollmentScore(int enrollmentNo);
 }

@@ -87,7 +87,7 @@
                             응시 {{answer.enrollment_no}}
                         </span>
 
-                        <span>
+                        <span v-if="!store.isPracticeExam(answer)">
                             <i class="fa-solid fa-star"></i>
                             배점 {{answer.score}}점
                         </span>
@@ -133,7 +133,11 @@
 
                 <div class="grading-score-section">
                     <div class="score-area">
-                        <div class="score-field">
+                        <div v-if="store.isPracticeExam(store.selectedAnswer)" class="score-field">
+                            <div class="answer-label">채점 결과</div>
+                            <p class="score-help">{{store.selectedAnswer.grader_id?'정답 또는 오답을 선택하세요.':'채점하려면 먼저 답안을 선점하세요.'}}</p>
+                        </div>
+                        <div v-else class="score-field">
                             <label for="gradingScore">
                                 점수 입력
                             </label>
@@ -163,7 +167,11 @@
                                     채점 취소
                                 </button>
 
-                                <button type="button" class="btn-primary" :disabled="store.submitting" @click="store.submitGrade">
+                                <template v-if="store.isPracticeExam(store.selectedAnswer)">
+                                    <button type="button" class="btn-primary" :disabled="store.submitting" @click="store.submitGrade(true)">정답</button>
+                                    <button type="button" class="btn-outline" :disabled="store.submitting" @click="store.submitGrade(false)">오답</button>
+                                </template>
+                                <button v-else type="button" class="btn-primary" :disabled="store.submitting" @click="store.submitGrade()">
                                     <i class="fa-solid fa-check"></i>
                                     채점 완료
                                 </button>
