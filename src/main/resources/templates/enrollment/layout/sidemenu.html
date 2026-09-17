@@ -30,14 +30,11 @@
        th:style="${menu == 'qna'} ? 'font-weight: 700; background: #415161; color: white' : 'color: #bfc9d1;'">
       <i class="bi bi-chat-dots"></i> QnA
     </a>
-    <a th:href="@{/enrollment/{course_no}/exam(course_no=${course_no})}" class="d-flex align-items-center gap-2 rounded-2 px-2 py-2 text-decoration-none"
-       th:style="${menu == 'exam'} ? 'font-weight: 700; background: #415161; color: white' : 'color: #bfc9d1;'">
-      <i class="bi bi-file-earmark-text"></i> 온라인 시험
-    </a>
-    <a th:href="@{/enrollment/{course_no}/evaluation(course_no=${course_no})}" class="d-flex align-items-center gap-2 rounded-2 px-2 py-2 text-decoration-none"
-       th:style="${menu == 'evaluation'} ? 'font-weight: 700; background: #415161; color: white' : 'color: #bfc9d1;'">
-      <i class="bi bi-star"></i> 강의 평가
-    </a>
+	<a th:href="@{/enrollment/{course_no}/evaluation(course_no=${course_no})}" class="d-flex align-items-center gap-2 rounded-2 px-2 py-2 text-decoration-none"
+	   th:onclick="${progress < 80} ? 'alert(&quot;진행도 80% 미만이면 강의 평가에 접근하실 수 없습니다.&quot;); return false;' : null"
+	   th:style="${menu == 'evaluation'} ? 'font-weight: 700; background: #415161; color: white' : 'color: #bfc9d1;'">
+	  <i class="bi bi-star"></i> 강의 평가
+	</a>
   </div>
 
 </div>

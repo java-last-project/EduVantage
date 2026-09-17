@@ -8,6 +8,18 @@
 		WHERE no=#{course_no}
 	</select>
 	
+	<select id="courseEnrollmentDetailData" resultType="com.sist.web.domain.enrollment.vo.CourseEnrollmentVO" parameterType="int">
+		SELECT is_completed,progress 
+		FROM course_enrollment 
+		WHERE member_id=#{member_id} AND course_no=#{course_no}
+	</select>
+	
+	<update id="lastAccessedUpdate" parameterType="int">
+	    UPDATE course_enrollment
+	    SET last_accessed=SYSDATE
+	    WHERE member_id=#{member_id} AND course_no=#{course_no}
+	</update>
+	
 	<!-- Evaluation -->
 	<select id="evaluationListData" resultType="com.sist.web.domain.enrollment.vo.CourseEvaluationVO" parameterType="int">
 		SELECT no,e.member_id,name,rating,review,like_count,TO_CHAR(e.regdate,'yyyy-mm-dd') as dbday,
@@ -89,7 +101,7 @@
 		WHERE MEMBER_ID=#{member_id}
 		AND COURSE_NO=#{course_no}
 	</select>
-	
+
 	
 
 </mapper>

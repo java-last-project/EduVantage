@@ -7,6 +7,7 @@ import com.sist.web.domain.enrollment.vo.CourseVideoVO;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.sist.web.domain.course.service.CourseService;
 import com.sist.web.domain.course.vo.CourseVO;
 import com.sist.web.domain.enrollment.service.EnrollmentService;
+import com.sist.web.domain.enrollment.vo.CourseEnrollmentVO;
 import com.sist.web.domain.enrollment.vo.CourseEvaluationVO;
 
 import lombok.RequiredArgsConstructor;
@@ -27,14 +29,38 @@ public class EnrollmentController {
 	private final CourseService cService;
 	private final YoutubeService yService;
 
+	static class NotEnrolledException extends RuntimeException {
+		private final int course_no;
+		public NotEnrolledException(int course_no) {
+			// TODO Auto-generated constructor stub
+			this.course_no=course_no;
+		}
+	}
+	
+	@ExceptionHandler(NotEnrolledException.class)
+	public String handlerNotEnrolled(NotEnrolledException ex) {
+		return "redirect:/course/detail?no="+ex.course_no;
+	}
+	
 	@ModelAttribute
-    public void setCourseNo(@PathVariable("course_no") int course_no, Model model) {
-        model.addAttribute("course_no", course_no);
+    public void setCourseNo(@PathVariable("course_no") int course_no, HttpSession session, Model model) {
+		int member_id=(int)session.getAttribute("member_id");
+		CourseEnrollmentVO evo=eService.courseEnrollmentDetailData(member_id, course_no);
+		if(evo==null) {
+			throw new NotEnrolledException(course_no);
+		}
+		model.addAttribute("course_no", course_no);
         model.addAttribute("title", eService.courseTitleData(course_no));
+		model.addAttribute("progress",evo.getProgress());
     }
 
 	@GetMapping
-	public String enrollment_dashboarad(@PathVariable("course_no") int course_no, Model model) {
+	public String enrollment_dashboarad(
+			@PathVariable("course_no") int course_no, 
+			HttpSession session,
+			Model model) {
+		int member_id=(int)session.getAttribute("member_id");
+		eService.lastAccessedUpdate(member_id, course_no);
 		CourseVO vo=eService.courseDetailData(course_no);
 		model.addAttribute("vo",vo);
 		model.addAttribute("menu","dashboard");
@@ -77,15 +103,11 @@ public class EnrollmentController {
 		return "enrollment/layout/main";
 	}
 	
-	@GetMapping("/exam")
-	public String enrollment_exam(Model model) {
-		model.addAttribute("menu","exam");
-		model.addAttribute("enrollment_html","enrollment/exam");
-		return "enrollment/layout/main";
-	}
-	
 	@GetMapping("/evaluation")
 	public String enrollment_evaluation(@PathVariable("course_no") int course_no, Model model) {
+		if((int)model.getAttribute("progress")<80) {
+			return "redirect:/enrollment/"+course_no;
+		}
 		model.addAttribute("menu","evaluation");
 		model.addAttribute("enrollment_html","enrollment/evaluation");
 		return "enrollment/layout/main";

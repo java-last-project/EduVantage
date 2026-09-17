@@ -7,9 +7,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sist.web.domain.course.vo.CourseVO;
 import com.sist.web.domain.enrollment.mapper.EnrollmentMapper;
+import com.sist.web.domain.enrollment.mapper.EnrollmentNoticeMapper;
 import com.sist.web.domain.enrollment.mapper.EnrollmentQnaMapper;
+import com.sist.web.domain.enrollment.vo.CourseEnrollmentVO;
 import com.sist.web.domain.enrollment.vo.CourseEvaluationLikeVO;
 import com.sist.web.domain.enrollment.vo.CourseEvaluationVO;
+import com.sist.web.domain.enrollment.vo.CourseNoticeVO;
 import com.sist.web.domain.enrollment.vo.CourseQnaReplyVO;
 import com.sist.web.domain.enrollment.vo.CourseQnaVO;
 
@@ -20,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 public class EnrollmentServiceImpl implements EnrollmentService {
 	private final EnrollmentMapper eMapper;
 	private final EnrollmentQnaMapper qMapper;
+	private final EnrollmentNoticeMapper nMapper;
+	
 	@Override
 	public CourseVO courseDetailData(int course_no) {
 		// TODO Auto-generated method stub
@@ -158,6 +163,42 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 	public int courseQnaUpdate(CourseQnaVO vo) {
 		// TODO Auto-generated method stub
 		return qMapper.courseQnaUpdate(vo);
+	}
+	@Override
+	public List<CourseNoticeVO> courseNoticeListData(int course_id, int page) {
+		// TODO Auto-generated method stub
+		final int ROWSIZE=5;
+		int start=(page*ROWSIZE)-ROWSIZE;
+		return nMapper
+				.courseNoticeListData(course_id, start);
+	}
+	@Override
+	public int[] noticePages(int page, int course_no) {
+		// TODO Auto-generated method stub
+		int count=nMapper.courseNoticeRowCount(course_no);
+		int totalpage=(int)Math.ceil(count/5.0);
+		final int BLOCK=10;
+		int startpage=((page-1)/BLOCK*BLOCK)+1;
+		int endpage=((page-1)/BLOCK*BLOCK)+BLOCK;
+		if(endpage>totalpage) endpage=totalpage;
+		
+		int[] pages= {page,totalpage,startpage,endpage,count};
+		return pages;
+	}
+	@Override
+	public CourseNoticeVO courseNoticeDetailData(int no) {
+		// TODO Auto-generated method stub
+		return nMapper.courseNoticeDetailData(no);
+	}
+	@Override
+	public CourseEnrollmentVO courseEnrollmentDetailData(int member_id, int course_no) {
+		// TODO Auto-generated method stub
+		return eMapper.courseEnrollmentDetailData(member_id, course_no);
+	}
+	@Override
+	public void lastAccessedUpdate(int member_id, int course_no) {
+		// TODO Auto-generated method stub
+		eMapper.lastAccessedUpdate(member_id, course_no);
 	}
 
 }

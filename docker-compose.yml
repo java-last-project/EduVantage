@@ -60,7 +60,7 @@ services:
       POSTGRES_PASSWORD: happy
       POSTGRES_DB: edu
     ports:
-      - "5432:5432"
+      - "${VECTOR_DB_PORT:-5432}:5432"
     volumes:
       - pgvector-data:/var/lib/postgresql/data
       - ./init:/docker-entrypoint-initdb.d:ro

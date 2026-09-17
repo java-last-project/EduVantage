@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
 import com.sist.web.domain.course.vo.CourseVO;
+import com.sist.web.domain.enrollment.vo.CourseEnrollmentVO;
 import com.sist.web.domain.enrollment.vo.CourseEvaluationLikeVO;
 import com.sist.web.domain.enrollment.vo.CourseEvaluationVO;
 
@@ -17,6 +18,9 @@ import com.sist.web.domain.enrollment.vo.CourseEvaluationVO;
 @Repository
 public interface EnrollmentMapper {
 	public CourseVO courseDetailData(int course_no);
+	public CourseEnrollmentVO courseEnrollmentDetailData(
+			@Param("member_id") int member_id,
+			@Param("course_no") int course_no);
 	public List<CourseEvaluationVO> evaluationListData(
 			@Param("start") int start,
 			@Param("course_no") int course_no,
@@ -25,6 +29,11 @@ public interface EnrollmentMapper {
 	
 	@Select("SELECT title FROM course WHERE no=#{course_no}")
 	public String courseTitleData(int course_no);
+	
+	public void lastAccessedUpdate(
+			@Param("member_id") int member_id,
+			@Param("course_no") int course_no
+			);
 	
 	@Select("SELECT COUNT(*) FROM course_evaluation WHERE course_no=#{course_no}")
 	public int evaluationCount(int course_no);

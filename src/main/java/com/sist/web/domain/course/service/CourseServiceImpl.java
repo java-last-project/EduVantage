@@ -90,6 +90,7 @@ public class CourseServiceImpl implements CourseService {
 	public CourseVO courseDetail(int no) {
 		CourseVO vo=new CourseVO();
 		vo=cMapper.courseDetail(no);
+		if(vo==null) return null;
 		if (vo != null && vo.getTechList()!=null) {
 	        // 상세 화면용 분류명 변환 + 중복 제거
 	        List<String> uniqueCategories = vo.getTechList().stream()
