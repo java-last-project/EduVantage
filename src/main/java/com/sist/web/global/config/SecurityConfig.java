@@ -48,7 +48,7 @@ public class SecurityConfig {
 	          // ADMIN 권한이 있는 사람만 접근이 가능
 	          .requestMatchers("/instructor/**").hasRole("INSTRUCTOR")
 	          // INSTRUCTOR 권한이 있는 사람만 접근이 가능
-	          .requestMatchers("/book/checkout", "/mypage/**", "/qna/insert/**", "/exam/**").authenticated()
+	          .requestMatchers("/book/checkout", "/mypage/**", "/qna/insert/**", "/exam/**", "/enrollment/**").authenticated()
 	          // 로그인 필수 경로 추가
 	          .anyRequest().permitAll()
 	          // 지정이 안된 URL 주소
