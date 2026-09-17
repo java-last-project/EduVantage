@@ -39,5 +39,25 @@
     <script src="/vue/notification/notificationApp.js"></script>
     <script src="/vue/notification/notificationSse.js"></script>
     <script src="/vue/notification/notificationBadgeApp.js"></script>
+    <script>
+        (()=>{
+            const link=document.getElementById('active-exam-link')
+            if (!link) return
+
+            fetch('/exam/active', { credentials: 'same-origin'})
+                .then(response=>response.ok ? response.json() : null)
+                .then(data=>{
+                    if (!data?.active || !Number.isInteger(data.enrollmentNo)) {
+                        return
+                    }
+
+                    link.href='/exam/detail?enrollmentNo='+encodeURIComponent(data.enrollmentNo)
+                    link.style.removeProperty('display')
+                })
+                .catch(()=>{
+                    // 조회에 실패하면 메뉴 숨김
+                })
+        })()
+    </script>
 </body>
 </html>

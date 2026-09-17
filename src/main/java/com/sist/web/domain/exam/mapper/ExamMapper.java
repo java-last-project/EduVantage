@@ -22,6 +22,7 @@ public interface ExamMapper {
 	public ScheduledExamVO getScheduledExam(Integer examNo);
 	public int countScheduledExamQuestions(Integer examNo);
 	public ExamEnrollmentVO findActiveEnrollment(Map<String,Object> map);
+	public ExamEnrollmentVO findResumableEnrollment(Map<String, Object> params);
 	public ExamEnrollmentVO findCompletedEnrollment(Map<String,Object> map);
 	public ExamEnrollmentVO getEnrollmentForMember(Map<String,Object> map);
 	public List<ExamQuestionVO> getQuestionForGrading(Map<String,Object> map);

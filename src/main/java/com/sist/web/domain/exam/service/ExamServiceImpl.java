@@ -292,6 +292,14 @@ public class ExamServiceImpl implements ExamService{
 	}
 
 	@Override
+	public ExamEnrollmentVO getResumableEnrollment(int memberId, Integer enrollmentNo) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("memberId", memberId);
+		params.put("enrollmentNo", enrollmentNo);
+		return eMapper.findResumableEnrollment(params);
+	}
+
+	@Override
 	public Map<String, Object> getExamResultData(int memberId,int enrollmentNo) {
 		Map<String,Object> params=new HashMap<>();
 		params.put("memberId",memberId);
