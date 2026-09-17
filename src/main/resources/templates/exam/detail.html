@@ -219,6 +219,9 @@ const examApp=createApp({
 				count:EXAM_COUNT,
 				examNo:EXAM_NO
 			}
+			if (ENROLLMENT_NO!=null) {
+				requestParams.enrollmentNo=ENROLLMENT_NO
+			}
 			if(AI_EXAM){
 				const aiExam=JSON.parse(sessionStorage.getItem('aiExam') || '{}')
 				requestParams.ai=true

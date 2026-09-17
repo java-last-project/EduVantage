@@ -12,6 +12,7 @@ public interface ExamService {
 	public String getExamTitle(Integer examNo);
 	public int getExamLimitMinutes(Integer examNo);
 	public Map<String, Object> submitExam(int memberId,Map<String, Object> params);
+	public ExamEnrollmentVO getResumableEnrollment(int memberId, Integer enrollmentNo);
 	public Map<String, Object> getExamResultData(int memberId,int enrollmentNo);
 	public Integer getScheduledExamResult(int memberId,int examNo);
 	public List<Map<String, Object>> getMyExamList(int memberId);
