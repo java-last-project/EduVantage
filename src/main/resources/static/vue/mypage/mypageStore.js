@@ -6,6 +6,8 @@ const useMypageStore=defineStore('mypage',{
 		showProfileForm:false,
 		vo:{},
 		eCount:0,
+		bCount:0,
+		vCount:0,
 		formData:{
 			u_email:'',
 			u_password:'',
@@ -30,6 +32,8 @@ const useMypageStore=defineStore('mypage',{
 			})
 			console.log(res.data)
 			this.eCount=res.data.eCount
+			this.bCount=res.data.bCount
+			this.vCount=res.data.vCount
 			this.vo=res.data.vo
 			this.formData.u_name=this.vo.name
 			this.formData.u_sex=this.vo.sex

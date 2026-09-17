@@ -20,7 +20,7 @@ public interface EnrollmentService {
 	//public int evaluationCount(int course_no);
 	public int[] pages(int page,int course_no);
 	public void evaluationInsert(CourseEvaluationVO vo);
-	public void evaluationDelete(int ce_no, int course_no);
+	public void evaluationDelete(int ce_no, int course_no, int member_id);
 	public void evaluationUpdate(CourseEvaluationVO vo);
 	public void evalLikeOn(CourseEvaluationLikeVO vo);
 	public void evalLikeOff(int ce_no,int member_id);

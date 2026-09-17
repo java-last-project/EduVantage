@@ -4,7 +4,9 @@ const useDashboardStore=defineStore('mypage/dashboard',{
 	state:()=>({
 		nearestExam: null,
 		examDday: null,
-		examLoaded: false
+		examLoaded: false,
+		rList:[],
+		recommendLoaded: false
 	}),
 	actions:{
 		async getNearestExam(){
@@ -54,6 +56,18 @@ const useDashboardStore=defineStore('mypage/dashboard',{
 				}
 			} else {
 				location.href = '/exam/list'
+			}
+		},
+		async getRecommendCourses(){
+			try {
+				const res=await api.get('/mypage/recommend_courses')
+				console.log(res.data)
+				this.rList=res.data.rList
+			} catch(error){
+				console.log(error)
+				this.rList=[]
+			} finally {
+				this.recommendLoaded=true
 			}
 		}
 	}

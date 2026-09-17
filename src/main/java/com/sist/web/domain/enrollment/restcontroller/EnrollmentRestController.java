@@ -125,7 +125,7 @@ public class EnrollmentRestController {
 		Map map=new HashMap();
 		try {
 			int member_id=(int)session.getAttribute("member_id");
-			eService.evaluationDelete(ce_no, course_no);
+			eService.evaluationDelete(ce_no, course_no, member_id);
 			map=commonsListData(curpage, course_no,member_id);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -142,6 +142,7 @@ public class EnrollmentRestController {
 		Map map=new HashMap();
 		try {
 			int member_id=(int)session.getAttribute("member_id");
+			vo.setMember_id(member_id);
 			eService.evaluationUpdate(vo);
 			map=commonsListData(vo.getCurpage(), vo.getCourse_no(),member_id);
 		} catch (Exception e) {
@@ -365,7 +366,8 @@ public class EnrollmentRestController {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
-		String encodeFilename=URLEncoder.encode(filename,"UTF-8").replaceAll("\\+", "%20");
+		String originalFilename = filename.substring(filename.indexOf("_") + 1);
+		String encodeFilename=URLEncoder.encode(originalFilename,"UTF-8").replaceAll("\\+", "%20");
 		
 		response.setContentType("application/octet-stream");
 	    response.setHeader("Content-Disposition", "attachment; filename=\"" +

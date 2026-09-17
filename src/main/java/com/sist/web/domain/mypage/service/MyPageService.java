@@ -3,6 +3,7 @@ package com.sist.web.domain.mypage.service;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import com.sist.web.domain.book.vo.BookCartVO;
 import com.sist.web.domain.book.vo.BookOrderVO;
@@ -17,6 +18,9 @@ public interface MyPageService {
 	public List<CourseEnrollmentVO> lastAccessedCourse(int member_id);
 	
 	public int enrolledCount(int member_id);
+	
+	public int myBoardCount(int member_id);
+	public int myEvaluationCount(int member_id);
 	
 	public MyMemberVO memberProfileData(int member_id);
 	public void memberUpdateData(MemberVO vo);

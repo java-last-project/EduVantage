@@ -41,14 +41,14 @@ public interface EnrollmentMapper {
 	public void evaluationInsert(CourseEvaluationVO vo);
 	public void courseStarUpdate(int course_no);
 	
-	@Delete("DELETE FROM course_evaluation WHERE no=#{no}")
-	public void evaluationDelete(int no);
-	
+	@Delete("DELETE FROM course_evaluation WHERE no=#{no} AND member_id=#{member_id}")
+	public void evaluationDelete(@Param("no") int no, @Param("member_id") int member_id);
+
 	@Delete("DELETE FROM course_evaluation_like WHERE ce_no=#{ce_no}")
 	public void evalLikeDeleteAll(int ce_no);
-	
+
 	@Update("UPDATE course_evaluation "
-			+ "SET rating=#{rating},review=#{review} WHERE no=#{no}")
+			+ "SET rating=#{rating},review=#{review} WHERE no=#{no} AND member_id=#{member_id}")
 	public void evaluationUpdate(CourseEvaluationVO vo);
 	
 	@Select("SELECT star FROM course WHERE no=#{course_no}")

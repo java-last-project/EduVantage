@@ -132,6 +132,9 @@ const useOrdersStore=defineStore('mypage/orders',{
 		moveBook(page){
 			this.bCurpage=page
 			this.booksOrderListData(this.member_id)
+		},
+		goToEnrollment(course_no){
+			location.href = '/enrollment/' + course_no
 		}
 	}
 })
