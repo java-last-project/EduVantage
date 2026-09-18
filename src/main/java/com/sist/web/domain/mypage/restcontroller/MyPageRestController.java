@@ -67,7 +67,9 @@ public class MyPageRestController {
 	
 	// 프로필 수정
 	@PostMapping("/mypage/profile_process")
-	public ResponseEntity<Void> mypage_profile_process(MemberVO vo) {
+	public ResponseEntity<Void> mypage_profile_process(
+			MemberVO vo,
+			HttpSession session) {
 	    // 1. 비밀번호 평문 가져오기
 	    String rawPassword = vo.getPassword();
 	    // 2. 비밀번호 암호화
@@ -77,6 +79,9 @@ public class MyPageRestController {
 	    // 4. DB에 저장 
 	    //System.out.println("vo: "+vo);
 	    mService.memberUpdateData(vo);
+	    
+	    // session update
+	    session.setAttribute("name", vo.getName());
 	    return ResponseEntity.status(HttpStatus.FOUND)
 	    		             .location(URI.create("/mypage"))
 	    		             .build();

@@ -31,7 +31,7 @@ public interface MyPageMapper {
 	
 	@Select("SELECT member_id,username,name,sex,"
 			+ "TO_CHAR(regdate,'yyyy-mm-dd') as dbRday,"
-			+ "TO_CHAR(birthdate,'yyyy-mm-dd') as dbBday,"
+			+ "TO_CHAR(birthdate,'YYYYMMDD') as dbBday,"
 			+ "phone,post,addr1,addr2,email,profile_desc,profile_image "
 			+ "FROM member "
 			+ "WHERE member_id=#{member_id}")
