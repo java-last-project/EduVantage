@@ -13,6 +13,7 @@
 				<div class="system-badge">EduVantage 교육 센터</div>
 				<h2 class="join-title">회원가입</h2>
 				<p class="join-subtitle">교육센터 시스템 이용을 위해 계정을 생성해 주세요.</p>
+				<div th:if="${message}" class="error-message" style="color:red;">[[${message}]]</div>
 			</div>
 			<form id="joinForm" action="/member/join_process" method="post" @submit.prevent="store.submitForm">
 			    <div class="section-title">계정 정보</div>

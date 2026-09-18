@@ -141,11 +141,19 @@ public class BookServiceImpl implements BookService {
 	
 	@Override
 	public void bookOrderComplete(BookOrderVO vo, List<BookOrderDetailVO> detailList) {
-		bMapper.bookOrderInsert(vo);
-		for(BookOrderDetailVO detail : detailList) {
-			detail.setBook_order_no(vo.getNo()); 
-			bMapper.bookOrderDetailInsert(detail);
-		}
+	    int realTotal = 0;
+	    for (BookOrderDetailVO detail : detailList) {
+	        BookVO book = bMapper.bookDetailData(detail.getBook_no());
+	        detail.setPrice(book.getPrice());               // 클라이언트가 보낸 price 무시, DB 값으로 덮어씀
+	        realTotal += book.getPrice() * detail.getQuantity();
+	    }
+	    vo.setTotal_price(realTotal);                        // 총액도 서버에서 재계산
+
+	    bMapper.bookOrderInsert(vo);
+	    for (BookOrderDetailVO detail : detailList) {
+	        detail.setBook_order_no(vo.getNo());
+	        bMapper.bookOrderDetailInsert(detail);
+	    }
 	}
 
 	@Override
