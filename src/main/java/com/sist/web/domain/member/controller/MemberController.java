@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.RequiredArgsConstructor;
 import com.sist.web.domain.member.service.*;
@@ -40,17 +42,32 @@ public class MemberController {
 	 public int memberIdCheck(@RequestParam("username") String username) { 
 	     return mService.memberIdCheck(username);
 	 }
-	@PostMapping("/member/join_process")
-	public String member_join_process(MemberVO vo) {
-	    // 1. 비밀번호 평문 가져오기
-	    String rawPassword = vo.getPassword();
-	    // 2. 비밀번호 암호화
-        String encodedPassword = passwordEncoder.encode(rawPassword);
-	    // 3. 암호화된 비밀번호를 VO에 다시 세팅 
-	    vo.setPassword(encodedPassword);
-	    // 4. DB에 저장 
-	    mService.memberInsertData(vo);
-	    
-	    return "redirect:/member/login";
-	}
+	 @PostMapping("/member/join_process")
+	 public String member_join_process(MemberVO vo, @RequestParam("passwordConfirm") String passwordConfirm,
+	         RedirectAttributes ra) {
+	     String rawPassword = vo.getPassword();
+
+	     // 비밀번호 길이 재검증
+	     if (rawPassword == null || rawPassword.length() < 8) {
+	         ra.addFlashAttribute("message", "비밀번호는 8자 이상 입력해야 합니다.");
+	         return "redirect:/member/join";
+	     }
+	     // 비밀번호 일치 재검증
+	     if (!rawPassword.equals(passwordConfirm)) {
+	         ra.addFlashAttribute("message", "비밀번호가 일치하지 않습니다.");
+	         return "redirect:/member/join";
+	     }
+	     // 아이디 중복 재검증
+	     if (mService.memberIdCheck(vo.getUsername()) > 0) {
+	         ra.addFlashAttribute("message", "이미 사용 중인 아이디입니다.");
+	         return "redirect:/member/join";
+	     }
+
+	     // 비밀번호 암호화 
+	     String encodedPassword = passwordEncoder.encode(rawPassword);
+	     vo.setPassword(encodedPassword);
+	     mService.memberInsertData(vo);
+
+	     return "redirect:/member/login";
+	 }
 }
