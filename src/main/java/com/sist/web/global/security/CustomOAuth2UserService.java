@@ -35,16 +35,16 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String email = (String) attributes.get("email"); // 구글 계정 이메일
         String name = (String) attributes.get("name");   // 구글 계정 이름
 
-        // 1. DB에서 해당 이메일(username)로 가입된 회원이 있는지 조회
+        // DB에서 해당 이메일(username)로 가입된 회원이 있는지 조회
         MemberVO vo = memberMapper.memberInfoData(email);
 
-        // 2. 만약 처음 구글 로그인한 회원이라면, DB에 자동으로 회원가입 처리
+        // 만약 처음 구글 로그인한 회원이라면, DB에 자동으로 회원가입 처리
         if (vo == null) {
             MemberVO newMember = new MemberVO();
             newMember.setUsername(email); // 구글 이메일을 아이디로 사용
             newMember.setPassword(passwordEncoder.encode("GOOGLE_SOCIAL_USER")); // 소셜 로그인용 임시 비밀번호 암호화
             newMember.setName(name != null ? name : "구글사용자");
-            newMember.setSex("M"); // DB 성별 컬럼 제약조건에 맞춰 설정 (필요시 수정)
+            newMember.setSex("M"); // DB 성별 컬럼 제약조건에 맞춰 설정 
             newMember.setBirthdate("20000101");
             newMember.setPhone("010-0000-0000");
             newMember.setPost("00000");
@@ -61,7 +61,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             vo = memberMapper.memberInfoData(email);
         }
 
-        // 3. 기존 LoginSuccessHandler와 똑같이 세션에 회원 정보 저장 (NullPointerException 방지)
+        // 기존 LoginSuccessHandler와 똑같이 세션에 회원 정보 저장
         if (vo != null) {
             HttpSession session = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
                     .getRequest().getSession();
