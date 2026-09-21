@@ -28,6 +28,7 @@ public class SecurityConfig {
    private final LoginSuccessHandler loginSuccessHandler;
    private final LoginFailHandler  loginFailHandler;
    private final DataSource dataSource;
+   private final CustomOAuth2UserService customOAuth2UserService;
    
    // 접근 권한 => SecurityFilterChain
 
@@ -70,6 +71,14 @@ public class SecurityConfig {
 	          .failureHandler(loginFailHandler)
 	          .permitAll() 
 	    )
+	    .oauth2Login(oauth2 -> oauth2
+		          .loginPage("/member/login") 
+		          .defaultSuccessUrl("/", false)
+		          .userInfoEndpoint(userInfo -> userInfo
+		                  .userService(customOAuth2UserService)
+		          )
+		)
+	    
 	    // 자동 로그인
 	    .rememberMe(remember-> remember
 	         .key("my-secret-key")
@@ -110,7 +119,7 @@ public class SecurityConfig {
 			   http.getSharedObject(AuthenticationManagerBuilder.class);
 	   builder
 	     .userDetailsService(jdbcUserDetailsService())
-	     .passwordEncoder(passwordEncoder());
+	     .passwordEncoder(passwordEncoder);
 	   return builder.build();
    }
    @Bean
@@ -131,11 +140,6 @@ public class SecurityConfig {
        );
        
        return manager;
-   }
-
-   @Bean
-   public BCryptPasswordEncoder passwordEncoder() {
-	   return new BCryptPasswordEncoder();
    }
    @Bean
    public PersistentTokenRepository persistentTokenRepository() {

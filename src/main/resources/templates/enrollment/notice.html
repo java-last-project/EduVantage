@@ -54,7 +54,7 @@
               <i class="bi bi-paperclip"></i>
             <a :href="'/enrollment/notice_download?filename='+encodeURIComponent(store.curNvo.filename)"
      			class="text-decoration-none text-success">
-              {{store.curNvo.filename}} ({{store.curNvo.filesize.toLocaleString()}}KB)
+              {{store.curNvo.filename.substring(store.curNvo.filename.indexOf('_')+1)}} ({{store.curNvo.filesize.toLocaleString()}}KB)
             </a>
             </div>
           </div>

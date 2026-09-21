@@ -52,7 +52,7 @@ const IMP_CODE = /*[[${impCode}]]*/ 0
         <div class="text-end flex-shrink-0">
           <div class="text-secondary text-decoration-line-through" style="font-size: 13px">{{cvo.regular_price}}원</div>
           <div class="d-flex align-items-center gap-2">
-            <span class="text-danger small">26% 할인</span>
+            <span class="text-danger small" v-if="cvo.regular_price>0">{{Math.round((1 - cvo.pay_price/cvo.regular_price)*100)}}% 할인</span>
             <span class="fw-bold">{{cvo.pay_price}}원</span>
           </div>
         </div>

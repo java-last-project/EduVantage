@@ -267,7 +267,7 @@
 
             const formattedToc = computed(() => {
                 if (!store.vo.toc) return '';
-                return store.vo.toc.replace(/▣/g, '<br><br><b>▣</b>');
+                return store.vo.toc.replace(/▣/g, '<br><br><b>▣</b>'); // 목차 단락 나누기
             });
 
             // 새 댓글 작성 함수
