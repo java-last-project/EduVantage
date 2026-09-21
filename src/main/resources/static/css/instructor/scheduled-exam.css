@@ -253,8 +253,19 @@
 	background: #f8fafc;
 }
 
-.scheduled-action-column {
-	width: 150px;
+.scheduled-action-column,
+.scheduled-list-card tbody td:last-child {
+	width: 160px;
+	min-width: 160px;
+}
+
+.scheduled-list-card .card-actions {
+	flex-wrap: nowrap;
+}
+
+.scheduled-list-card .card-actions button {
+	flex-shrink: 0;
+	white-space: nowrap;
 }
 
 .scheduled-finished {
