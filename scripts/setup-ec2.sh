@@ -140,11 +140,12 @@ sudo docker compose up -d
 echo "[7/8] Kubernetes ConfigMap / Secret 설정"
 
 kubectl create configmap eduvantage-config \
-	--from-literal=KAFKA_BOOTSTRAP_SERVERS="${PRIVATE_IP}:29092" \
-	--from-literal=REDIS_HOST="${PRIVATE_IP}" \
-	--from-literal=REDIS_PORT="7000" \
-	--dry-run=client \
-	-o yaml | kubectl apply -f -
+    --from-literal=KAFKA_BOOTSTRAP_SERVERS="${PRIVATE_IP}:29092" \
+    --from-literal=REDIS_HOST="${PRIVATE_IP}" \
+    --from-literal=REDIS_PORT="7000" \
+    --from-literal=VECTOR_DB_URL="jdbc:postgresql://${PRIVATE_IP}:5432/edu" \
+    --dry-run=client \
+    -o yaml | kubectl apply -f -
 
 if [ ! -f "$SECRET_FILE" ]; then
 	echo
