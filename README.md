@@ -273,14 +273,7 @@
 | **송성민** | 강의 학습페이지 | [이미지/링크 입력] | - |
 | **송성민** | - | [이미지/링크 입력] | - |
 | **송성민** | - | [이미지/링크 입력] | - |
-| **안은혜** | 알림 모듈 | <img width="1919" height="1029" alt="스크린샷 2026-09-21 122736" src="https://github.com/user-attachments/assets/30c7ad88-69b9-4451-b2c6-1710cc7c80ea" />
- | - |
- | **안은혜** | 알림 모듈 | <img width="303" height="114" alt="스크린샷 2026-09-21 124800" src="https://github.com/user-attachments/assets/d9ea73c8-f70e-4922-8962-206376f9b1cc" />
-
- | - |
-| **안은혜** | - | <img width="1920" height="1080" alt="스크린샷 2026-09-21 120853" src="https://github.com/user-attachments/assets/549d334e-cf40-48f9-a477-fce2d8f52200" />
- | - |
-
+| **안은혜** | 알림 모듈 | [이미지/링크 입력] | - |
 </div>
 </details>
 
