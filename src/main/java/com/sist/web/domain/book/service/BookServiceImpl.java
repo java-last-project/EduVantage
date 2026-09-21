@@ -144,7 +144,7 @@ public class BookServiceImpl implements BookService {
 	    int realTotal = 0;
 	    for (BookOrderDetailVO detail : detailList) {
 	        BookVO book = bMapper.bookDetailData(detail.getBook_no());
-	        detail.setPrice(book.getPrice());               // 클라이언트가 보낸 price 무시, DB 값으로 덮어씀
+	        detail.setPrice(book.getPrice());               // 서버측 결제 금액 재검증
 	        realTotal += book.getPrice() * detail.getQuantity();
 	    }
 	    vo.setTotal_price(realTotal);                        // 총액도 서버에서 재계산
